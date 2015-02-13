@@ -1,0 +1,5 @@
+*.o
+apyc-parser*
+apyc-lexer*
+parser-sentinel
+.depend
