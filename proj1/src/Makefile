@@ -34,12 +34,6 @@ APYC = $(shell echo `pwd`/../apyc)
 
 INCLUDES = -I$(LIBHOME)/include
 
-ifeq "$(OS)" "Darwin"
-    OTHER_LIBS = -lpthread
-else
-    OTHER_LIBS = -lpthread -lrt
-endif
-
 LOADLIBS = -L$(LIBHOME)/lib -lgc $(OTHER_LIBS)
 
 CXXFLAGS = -g -Wall $(INCLUDES)
