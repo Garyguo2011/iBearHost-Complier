@@ -11,7 +11,7 @@ Don’t put this off! We’ll count it as the testing part of your team’s grad
 
 	$ git remote add external https://github.com/Garyguo2011/iBearHost-Complier.git
 	$ git push -u external proj1
-	# to set up team upstream to that repo
+	// to set up team upstream to that repo
 
 # Make first test case up running
 
@@ -19,7 +19,7 @@ In team repo:
 	
 	$ make
 	$ make test
-	
+
 then you should see all test pass.
 
 **Quick Test** When you create some trivial test case with couple of print statement, then you run `make check` the autograder will show `2 test cases pass`
