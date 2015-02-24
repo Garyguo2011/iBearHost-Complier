@@ -7,11 +7,10 @@ Submit this assignment from your team repository with the tags proj1a-N (where N
 Don’t put this off! We’ll count it as the testing part of your team’s grade on Project #1.
 
 # Setup External github repo:
-1. In `$team-repo`: run
+In `$team-repo`: run
 
 	$ git remote add external https://github.com/Garyguo2011/iBearHost-Complier.git
 	$ git push -u external proj1
-	// to set up team upstream to that repo
 
 # Make first test case up running
 
