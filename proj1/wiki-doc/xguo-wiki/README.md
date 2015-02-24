@@ -17,7 +17,7 @@ In `$team-repo`: run
 In team repo:
 	
 	$ make
-	$ make test
+	$ make check
 
 then you should see all test pass.
 
