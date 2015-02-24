@@ -1,0 +1,24 @@
+(module 0
+(def 3 (id 3 f) (formals_list 3 (id 3 n))
+  (block 4
+  	(assign 4 (typed_id 4 (id 4 i) (type 4 (id 4 int) (type_list 4)))
+      (int_literal 4 0))
+    (while 5 (compare 5 (id 5 __le__) (id 5 i) (id 5 n))
+    	(if 6 (compare 6 (id 6 __le__)
+      		(left_compare 6 (id 6 __lt__)
+      		(int_literal 6 1)
+      		(binop 6 (id 6 __mod__)
+        	(id 6 i) (int_literal 6 7)))
+      		(int_literal 6 2))
+  			(print 7 (id 7 i)))
+
+  	(stmt_list 8
+    (stmt_list 9
+      (assign 9 (id 9 s) (binop 9 (id 9 __add__) (id 9 i) (int_literal 9 2)))
+      (assign 9 (id 9 t)
+            (binop 9 (id 9 __add__) (id 9 t)
+                  (binop 9 (id 9 __pow__) (id 9 s) (int_literal 9 2))))
+      (println 10 (string_literal 10 "s =")
+        (id 10 s)
+        (string_literal 10 "t =")
+        (id 10 t))))))))
