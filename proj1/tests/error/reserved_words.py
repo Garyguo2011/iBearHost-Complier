@@ -1,0 +1,15 @@
+assert = 5
+yield = 5
+with = 5
+try = 5
+raise = 5
+as = 5
+del = 5
+except = 5
+exec = 5
+from = 5
+finally = 5
+future = 5
+global = 5
+import = 5
+lambda = 5
