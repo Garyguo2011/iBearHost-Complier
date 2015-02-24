@@ -8,6 +8,7 @@ Don’t put this off! We’ll count it as the testing part of your team’s grad
 
 # Setup External github repo:
 1. In `$team-repo`: run
+
 	$ git remote add external https://github.com/Garyguo2011/iBearHost-Complier.git
 	$ git push -u external proj1
 	# to set up team upstream to that repo
@@ -15,8 +16,10 @@ Don’t put this off! We’ll count it as the testing part of your team’s grad
 # Make first test case up running
 
 In team repo:
+	
 	$ make
 	$ make test
+	
 then you should see all test pass.
 
 **Quick Test** When you create some trivial test case with couple of print statement, then you run `make check` the autograder will show `2 test cases pass`
@@ -31,7 +34,7 @@ then you should see all test pass.
 1. then you will found a `.ast` file generate at `$team-repop/tests/correct` directory.
 1. In instructional machine run `pyunparse $team-repop/tests/correct/trivial.ast`, you will get the original python code
 
-**GOAL:** Create set of test files based on python grammar. Try to mentually 
+**GOAL:** Create set of test files based on python grammar. Try to mentually write a AST tree. Make sure you understand.
 
 # Test case folder
 
