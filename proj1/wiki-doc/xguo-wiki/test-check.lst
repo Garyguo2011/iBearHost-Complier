@@ -1,0 +1,97 @@
+Compilation :                                                                              	   Covered: True
+	module                                                                                     Covered: True
+
+N :                                                                                            Covered: True
+	INT                                                                                        Covered: True
+
+Expr :                                                                                         Covered: True
+	next_value                                                                                 Covered: False
+	call N Expr Expr                                                                           Covered: False
+	call N TypeId Expr                                                                         Covered: False
+	binop                                                                                      Covered: True
+	left_compare                                                                               Covered: True
+	unop                                                                                       Covered: True
+	subscript                                                                                  Covered: True
+	slice                                                                                      Covered: True
+	if_expr                                                                                    Covered: True
+	and                                                                                        Covered: False
+	or                                                                                         Covered: False
+	tuple                                                                                      Covered: True
+	list_display                                                                               Covered: False
+	dict_display                                                                               Covered: False
+
+StringLiteral:                                                                                 Covered: True
+	string_literal                                                                             Covered: True
+
+Id : id                                                                                        Covered: True
+
+SpecialId :                                                                                    Covered: False
+	None                                                                                       Covered: False
+	True                                                                                       Covered: False
+	False                                                                                      Covered: False
+
+VarRef:                                                                                        Covered: False
+	Id                                                                                         Covered: False
+	attributeref                                                                               Covered: False
+
+Pair : pair                                                                                    Covered: False
+
+Stmt :                                                                                         Covered: False
+	Expr                                                                                       Covered: False
+	Assign                                                                                     Covered: False
+	StmtList                                                                                   Covered: False
+	print                                                                                      Covered: False
+	break                                                                                      Covered: False
+	continue                                                                                   Covered: False
+	if                                                                                         Covered: False
+	while                                                                                      Covered: False
+	for                                                                                        Covered: False
+	def                                                                                        Covered: False
+	class                                                                                      Covered: False
+	native                                                                                     Covered: False
+
+Assign :                                                                                       Covered: False
+	assign                                                                                     Covered: False
+
+StmtList :                                                                                     Covered: False
+	stmt_list                                                                                  Covered: False
+
+Block :                                                                                        Covered: False
+	block                                                                                      Covered: False
+
+RightSide :                                                                                    Covered: False
+	Expr                                                                                       Covered: False
+	Assign                                                                                     Covered: False
+
+Target:                                                                                        Covered: False
+	VarRef                                                                                     Covered: False
+	subscript_assign                                                                           Covered: False
+	slice_assign                                                                               Covered: False
+	TypedId                                                                                    Covered: False
+
+TargetList:                                                                                    Covered: False
+	Target                                                                                     Covered: False
+	target_list                                                                                Covered: False
+
+Formals :                                                                                      Covered: False
+	formals_list                                                                               Covered: False
+
+TypedId :                                                                                      Covered: False
+	typed_id                                                                                   Covered: False
+
+Type :                                                                                         Covered: False
+	TypeId                                                                                     Covered: False
+	TypeVar                                                                                    Covered: False
+	function_type                                                                              Covered: False
+
+TypeId :                                                                                       Covered: False
+	type                                                                                       Covered: False
+
+TypeVar :                                                                                      Covered: False
+	type_var                                                                                   Covered: False
+
+TypeList0 :                                                                                    Covered: False
+	type_list                                                                                  Covered: False
+
+TypeFormals:                                                                                   Covered: False
+	type_formals_list                                                                          Covered: False
