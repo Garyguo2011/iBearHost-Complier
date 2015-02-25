@@ -1,0 +1,97 @@
+Compilation :
+	module
+
+N : 
+	INT
+
+Expr :
+	next_value
+	call N Expr Expr
+	call N TypeId Expr
+	binop
+	left_compare
+	unop
+	subscript
+	slice
+	if_expr
+	and
+	or
+	tuple
+	list_display
+	dict_display
+
+StringLiteral:
+	string_literal
+
+Id : id
+
+SpecialId : 
+	None
+	True
+	False
+
+VarRef:                                                                                  
+	Id                                                                                   
+	attributeref
+
+Pair : pair
+
+Stmt : 
+	Expr
+	Assign
+	StmtList
+	print
+	break
+	continue
+	if
+	while
+	for
+	def
+	class
+	native                                              
+
+Assign :                                                                                 
+	assign
+
+StmtList : 
+	stmt_list
+
+Block : 
+	block
+
+RightSide : 
+	Expr
+	Assign                                                                
+
+Target:                                                                                  
+	VarRef                                                                               
+	subscript_assign
+	slice_assign
+	TypedId
+
+TargetList:                                                                              
+	Target                                                                               
+	target_list
+
+Formals : 
+	formals_list
+
+TypedId :
+	typed_id
+
+Type : 
+	TypeId                                                                            
+	TypeVar                                                                            
+	function_type
+
+TypeId : 
+	type
+
+TypeVar : 
+	type_var
+
+TypeList0 :
+	type_list
+
+TypeFormals: 
+	type_formals_list
