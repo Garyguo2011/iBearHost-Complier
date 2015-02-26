@@ -32,22 +32,22 @@ SpecialId :                                                                     
 
 VarRef:                                                                                        Covered: False
 	Id                                                                                         Covered: False
-	attributeref                                                                               Covered: False
+	attributeref                                                                               Covered: True
 
 Pair : pair                                                                                    Covered: False
 
 Stmt :                                                                                         Covered: False
 	Expr                                                                                       Covered: False
 	Assign                                                                                     Covered: False
-	StmtList                                                                                   Covered: False
-	print                                                                                      Covered: False
-	break                                                                                      Covered: False
-	continue                                                                                   Covered: False
-	if                                                                                         Covered: False
-	while                                                                                      Covered: False
-	for                                                                                        Covered: False
+	StmtList                                                                                   Covered: True
+	print                                                                                      Covered: True
+	break                                                                                      Covered: True
+	continue                                                                                   Covered: True
+	if                                                                                         Covered: True
+	while                                                                                      Covered: True
+	for                                                                                        Covered: True
 	def                                                                                        Covered: True
-	class                                                                                      Covered: False
+	class                                                                                      Covered: True
 	native                                                                                     Covered: False
 
 Assign :                                                                                       Covered: True
