@@ -17,8 +17,8 @@ Expr :                                                                          
 	and                                                                                        Covered: False
 	or                                                                                         Covered: False
 	tuple                                                                                      Covered: True
-	list_display                                                                               Covered: False
-	dict_display                                                                               Covered: False
+	list_display                                                                               Covered: True
+	dict_display                                                                               Covered: True
 
 StringLiteral:                                                                                 Covered: True
 	string_literal                                                                             Covered: True
@@ -26,8 +26,8 @@ StringLiteral:                                                                  
 Id : id                                                                                        Covered: True
 
 SpecialId :                                                                                    Covered: False
-	None                                                                                       Covered: False
-	True                                                                                       Covered: False
+	None                                                                                       Covered: True
+	True                                                                                       Covered: True
 	False                                                                                      Covered: False
 
 VarRef:                                                                                        Covered: False
@@ -46,12 +46,12 @@ Stmt :                                                                          
 	if                                                                                         Covered: False
 	while                                                                                      Covered: False
 	for                                                                                        Covered: False
-	def                                                                                        Covered: False
+	def                                                                                        Covered: True
 	class                                                                                      Covered: False
 	native                                                                                     Covered: False
 
-Assign :                                                                                       Covered: False
-	assign                                                                                     Covered: False
+Assign :                                                                                       Covered: True
+	assign                                                                                     Covered: True
 
 StmtList :                                                                                     Covered: False
 	stmt_list                                                                                  Covered: False
@@ -61,7 +61,7 @@ Block :                                                                         
 
 RightSide :                                                                                    Covered: False
 	Expr                                                                                       Covered: False
-	Assign                                                                                     Covered: False
+	Assign                                                                                     Covered: True
 
 Target:                                                                                        Covered: False
 	VarRef                                                                                     Covered: False
