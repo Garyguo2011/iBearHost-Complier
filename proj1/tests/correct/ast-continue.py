@@ -4,4 +4,4 @@ while i < 5:
 	if r[i] == 3:
 		continue
 	print r[i]
-	i++
+	i += 1
