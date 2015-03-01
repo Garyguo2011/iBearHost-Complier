@@ -100,6 +100,11 @@
 %token STRING "@string"
 %token RAWSTRING "@rawstring"
 %token UNOP "@unop"
+%token COMPARE "@compare"
+%token LEFT_COMPARE "@left_compare"
+%token BINOP "@binop"
+
+
 
 /* FIXME: MORE... */
 
@@ -133,12 +138,15 @@
  * on the basis of the input so far whether to perform a reduction.  The 
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 32
-%expect 12
+%expect-rr 10
+%expect 7
 
 %left OR
 %left AND
 %left "<" "<=" ">" ">=" "!=" "==" "is" "is not" "in" "not in"
+%left "+" "-"
+%left "*" "/" "%"
+%left "**"
 
 %%
 program : stmt_list   { theTree = $^(MODULE, $*); $$ = NULL; }
@@ -163,22 +171,20 @@ expression :
       INT_LITERAL
     | string_literal
     | conditional_expression
-    | '(' expression ')'
+    | L=expression OP=algebra_operator R=expression   { $$ = $^(BINOP, $OP, $L, $R); }
+    | '('! expression ')'!
     ;
 
 /****************** XGUO-dev *********************/
 /****************** XGUO-dev *********************/
-
-/*
-two_comparison : expression comp_operator expression ;
-left_comparison :
-    two_comparison
-    | left_comparison comp_operator expression 
-    ;
-*/
 
 comparison :
-    L=expression OP=comp_operator R=expression         { $$ = $^(COMPARE, $OP, $L, $R) ;}
+    L=left_comparison OP=comp_operator R=expression         { $$ = $^(COMPARE, $OP, $L, $R) ;}
+    ;
+
+left_comparison : 
+    E=expression                                          { $$ = $E ;}
+    | L=left_comparison OP=comp_operator R=expression     { $$ = $^(LEFT_COMPARE, $OP, $L, $R) ;}
     ;
 
 comp_operator :
@@ -194,7 +200,25 @@ comp_operator :
     | op="not in"                 { $$ = make_id("__notin__", $op.loc()); }
     ;
 
+
+algebra_expr :
+    L=expression OP=algebra_operator R=expression   { $$ = $^(BINOP, $OP, $L, $R); }
+    ;
+
+algebra_operator :
+      op = "+"                    { $$ = make_id("__add__", $op.loc()); }
+    | op = "-"                    { $$ = make_id("__sub__", $op.loc()); }
+    | op = "*"                    { $$ = make_id("__mul__", $op.loc()); }
+    | op = "/"                    { $$ = make_id("__floordiv__", $op.loc()); }
+    | op = "//"                    { $$ = make_id("__floordiv__", $op.loc()); }
+    | op = "%"                    { $$ = make_id("__mod__", $op.loc()); }
+    | op = "**"                   { $$ = make_id("__pow__", $op.loc()); }
+    ;
+
 /****************** XGUO-dev *********************/
+
+
+
 
 conditional_expression :
     not_test
@@ -203,16 +227,14 @@ conditional_expression :
     ;
 
 not_test :
-    comparison         //comp_operator
+    comparison      //comp_operator
     | NOT not_test      { $$ = $^(UNOP, make_id("__not__", $NOT.loc()), $not_test); }
     ;
 
 string_literal :
       STRING            { $$ = $^(STRING_LITERAL, $*); } // FIXME
     ;
-
-
-
+    
 
 /*** LEXICAL DEFINITIONS ***/
 
