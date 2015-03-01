@@ -299,7 +299,7 @@ subscription :
     ;
 
 slicing :
-      identifier '['! lower_bound? ':'! upper_bound? ']'!   { $$ = $^(SLICING, $*); }
+      identifier '['! lower_bound? ':'! upper_bound? ']'!   { $$ = $^(SLICE, $*); }
     ;
 
 lower_bound :
