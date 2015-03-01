@@ -33,7 +33,7 @@
   static int indent_unit = 0;
   static int indent_level = 0;
   static bool first_nonblank_line = true;
- 
+  
 %}
 
 %debug
@@ -46,21 +46,21 @@
  * also often refer to as INDENT. A declaration such as
  *   %token IF "if"
  * defines a constant IF and makes it the syntactic category for the token
- * "if".  The built-in function yyexternal_token_name(...) maps between
- * syntactic categories (like IF) and the token strings defined in these
- * %token declarations (like "if").
+ * "if".  The built-in function yyexternal_token_name(...) maps between 
+ * syntactic categories (like IF) and the token strings defined in these 
+ * %token declarations (like "if").  
  *
  * The Horn system uses tokens as leaf nodes and as AST node operators.  A
  * rule such as
  *     if_stmt: "if"^ expression ":"! ...
  * with no action, by default creates an AST node whose operator is an "if"
  * token (with syntactic category IF, given the %token declaration above).
- * When the node type does not correspond to a token that appears in the
+ * When the node type does not correspond to a token that appears in the 
  * program, we define a dummy token type that serves only as an AST
  * node type.  For example, we can define
  *     %token DICT_DISPLAY ...
  * and then use
- *     dict_display: "{"! key_datum_list? "}"!
+ *     dict_display: "{"! key_datum_list? "}"! 
  *              { $$ = $^(DICT_DISPLAY, $*); }
  * in the grammar (using DICT_DISPLAY only in actions, not as a grammar
  * symbol).
@@ -82,11 +82,11 @@
  * node operators to printable strings.
  */
 
-
 %token PRINTLN "@println"
-%token EMPTY
+%token EMPTY 
 %token MODULE "@module"
 %token ID "@id"
+%token UNOP "@unop"
 %token STRING_LITERAL "@string_literal"
 %token INT_LITERAL "@int_literal"
 %token AND "and"
@@ -121,18 +121,22 @@
 %token LEFT_CURLY_BRACKET
 %token RIGHT_CURLY_BRACKET
 
+%token LEFT_COMPARE "@left_compare"
+%token COMPARE "@compare"
+%token BINOP "@binop"
+
 /* FIXME: MORE... */
 
 /* GLR parsing is useful for cases where the parser must make a reduction before
  * it has sufficient information to know which reduction to make.  For example,
  * consider a statement that begins
  *      a[i], b[j], c
- * (it's not useful, but is valid Python as it stands).  As a tuple, this
+ * (it's not useful, but is valid Python as it stands).  As a tuple, this 
  * consists of a list of expressions.  a[i] is a subscription, and corresponds
  * to a (subscript ...) AST.  But if we have
  *      a[i], b[j], c = L
  * then the a[i] should create a subscript_assign.  If you try to handle this
- * by having two rules for subscription, one for the first case and one
+ * by having two rules for subscription, one for the first case and one 
  * for the second, the parser has to decide which to choose just after seeing
  * seeing a[i], but long before seeing "=", which is how one tells which
  * translation is appropriate.  A GLR parser will hold off on this decision
@@ -145,51 +149,106 @@
  * or it could indicate conflicts that the GLR algorithm will correctly resolve.
  * There's really no way to know without testing.  When you get conflicts
  * THAT YOU EXPECT you can record here these expectations by reporting how
- * many reduce/reduce (%expect-rr) and shift-reduce (%expect) you expect.
+ * many reduce/reduce (%expect-rr) and shift-reduce (%expect) you expect. 
  * Before increasing these counts, make sure you understand what causes your
  * conflicts and that GLR will resolve them.  Don't expect too many (our solution
  * has 20 overall) and try to remove conflicts rather than tolerating them.
  * A conflict will occur when there is a situation where Bison cannot decide
- * on the basis of the input so far whether to perform a reduction.  The
+ * on the basis of the input so far whether to perform a reduction.  The 
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 0
-%expect 0
+%expect-rr 73
+%expect 16
+
+%left OR
+%left AND
+%left "<" "<=" ">" ">=" "!=" "==" "is" "is not" "in" "not in"
+%left "+" "-"
+%left "*" "/" "%"
+%left "**"
 
 %%
-program : expression | expression program ;
+program : stmt_list   { theTree = $^(MODULE, $*); $$ = NULL; }
+        ;
 
-expression :
-      INT_LITERAL
-    | STRING
-    | RAWSTRING
-    | PRINTLN
-    | MODULE
-    | AND
-    | ID
-    | BREAK
-    | CLASS
-    | CONTINUE
-    | DEF
-    | ELIF
-    | ELSE
-    | FOR
-    | IF
-    | IN
-    | IS
-    | NOT
-    | OR
-    | PASS
-    | PRINT
-    | RETURN
-    | WHILE
-    | COMMENT
-    | BLANKLINE
-    | NEWLINE
-    | INDENT
-    | DEDENT
+// REPLACE THE FOLLOWING WITH SOMETHING REAL.  (These are incomplete examples.)
+
+stmt_list : print_stmt NEWLINE!
     ;
 
+print_stmt : "print"! expression_list 
+                      { $$ = $^(PRINTLN, $*); }
+    ;
+
+expression_list :
+      expression /*(","! expression)* */
+    | /*empty*/
+    ;
+
+expression :
+      INT_LITERAL     
+    | string_literal
+    | conditional_expression
+    | L=expression OP=algebra_operator R=expression   { $$ = $^(BINOP, $OP, $L, $R); }
+    | '('! expression ')'!
+    ;
+
+/****************** XGUO-dev *********************/
+/****************** XGUO-dev *********************/
+
+comparison :
+    L=left_comparison OP=comp_operator R=expression         { $$ = $^(COMPARE, $OP, $L, $R) ;}
+    ;
+
+left_comparison : 
+    E=expression                                          { $$ = $E ;}
+    | L=left_comparison OP=comp_operator R=expression     { $$ = $^(LEFT_COMPARE, $OP, $L, $R) ;}
+    ;
+
+comp_operator :
+      op="<"                      { $$ = make_id("__lt__", $op.loc()); }
+    | op=">"                      { $$ = make_id("__gt__", $op.loc()); }
+    | op="=="                     { $$ = make_id("__eq__", $op.loc()); } 
+    | op=">="                     { $$ = make_id("__ge__", $op.loc()); }
+    | op="<="                     { $$ = make_id("__le__", $op.loc()); }
+    | op="!="                     { $$ = make_id("__ne__", $op.loc()); }
+    | op="is"                     { $$ = make_id("__is__", $op.loc()); }
+    | op="is not"                 { $$ = make_id("__isnot__", $op.loc()); }
+    | op="in"                     { $$ = make_id("__in__", $op.loc()); }
+    | op="not in"                 { $$ = make_id("__notin__", $op.loc()); }
+    ;
+
+algebra_expr :
+    L=expression OP=algebra_operator R=expression   { $$ = $^(BINOP, $OP, $L, $R); }
+    ;
+
+algebra_operator :
+      op = "+"                    { $$ = make_id("__add__", $op.loc()); }
+    | op = "-"                    { $$ = make_id("__sub__", $op.loc()); }
+    | op = "*"                    { $$ = make_id("__mul__", $op.loc()); }
+    | op = "/"                    { $$ = make_id("__floordiv__", $op.loc()); }
+    | op = "//"                    { $$ = make_id("__floordiv__", $op.loc()); }
+    | op = "%"                    { $$ = make_id("__mod__", $op.loc()); }
+    | op = "**"                   { $$ = make_id("__pow__", $op.loc()); }
+    ;
+
+/****************** XGUO-dev *********************/
+
+conditional_expression :
+    not_test
+    | L=conditional_expression AND R=conditional_expression { $$ = $^(AND, $L, $R); }
+    | L=conditional_expression OR R=conditional_expression  { $$ = $^(OR, $L, $R); }
+    ;
+
+not_test :
+    comparison      //comp_operator
+    | NOT not_test      { $$ = $^(UNOP, make_id("__not__", $NOT.loc()), $not_test); }
+    ;
+
+string_literal :
+      STRING            { $$ = $^(STRING_LITERAL, $*); } // FIXME
+    ;
+    
 
 /*** LEXICAL DEFINITIONS ***/
 
@@ -220,7 +279,7 @@ _NONDOUBLEQUOTE : _ANY - '\"' ;
 _RAWNONSINGLEQUOTE : _ANY - ('\'' | '\\') | _RAWESCAPESEQ ;
 _RAWNONDOUBLEQUOTE : _ANY - ('\"' | '\\') | _RAWESCAPESEQ ;
 
-_RAWLONGSTRING : "\'\'\'" (_RAWNONSINGLEQUOTE* ('\''_RAWNONSINGLEQUOTE | "\'\'"_RAWNONSINGLEQUOTE)* _RAWNONSINGLEQUOTE*)* "\'\'\'"
+_RAWLONGSTRING : "\'\'\'" (_RAWNONSINGLEQUOTE* ('\''_RAWNONSINGLEQUOTE | "\'\'"_RAWNONSINGLEQUOTE)* _RAWNONSINGLEQUOTE*)* "\'\'\'" 
               | "\"\"\"" (_RAWNONDOUBLEQUOTE* ('\"'_RAWNONDOUBLEQUOTE | "\"\""_RAWNONDOUBLEQUOTE)* _RAWNONDOUBLEQUOTE*)* "\"\"\"" ;
 
 
@@ -232,7 +291,7 @@ _SHORTSTRING : '\'' _SHORTSTRINGITEM1* '\'' |
               '\"' _SHORTSTRINGITEM2* '\"' ;
 _LONGNONSINGLEQUOTE : _ANY - ('\'' | '\\') | _ESCAPESEQ ;
 _LONGNONDOUBLEQUOTE : _ANY - ('\"' | '\\') | _ESCAPESEQ ;
-_LONGSTRING : "\'\'\'" (_LONGNONSINGLEQUOTE* ('\''_LONGNONSINGLEQUOTE | "\'\'"_LONGNONSINGLEQUOTE)* _LONGNONSINGLEQUOTE*)* "\'\'\'"
+_LONGSTRING : "\'\'\'" (_LONGNONSINGLEQUOTE* ('\''_LONGNONSINGLEQUOTE | "\'\'"_LONGNONSINGLEQUOTE)* _LONGNONSINGLEQUOTE*)* "\'\'\'" 
               | "\"\"\"" (_LONGNONDOUBLEQUOTE* ('\"'_LONGNONDOUBLEQUOTE | "\"\""_LONGNONDOUBLEQUOTE)* _LONGNONDOUBLEQUOTE*)* "\"\"\"" ;
 
 STRING : _SHORTSTRING | _LONGSTRING ;
@@ -246,19 +305,19 @@ LEFT_CURLY_BRACKET : '{' { curly_bracket_count += 1 ; } ;
 RIGHT_CURLY_BRACKET : '}' { if (curly_bracket_count) curly_bracket_count -= 1 ; } ;
 
 NEWLINE_WITH_BACKSLASH : "\\\n" { YYIGNORE ; } ;
-NEWLINE : '\n' { if ( paren_count || square_bracket_count || curly_bracket_count ) YYIGNORE; } ;
+NEWLINE : '\n' { if ( paren_count || square_bracket_count || curly_bracket_count ) YYIGNORE; } ; 
 
 _WS_NONNEWLINE : '\r' | '\t' | ' ' | '\f' ;
 _NONNEWLINE : _ANY - '\n' ;
-_NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
+_NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ; 
 
 COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE ; } ;
 
 BLANKLINE : _WS_NONNEWLINE* '\n' { YYIGNORE ; } ;
 
-INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; };
+INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; }; 
 INDENT : _BOL (' ' | '\t')*  %prefer
-{
+{ 
   fprintf(stderr, "start indenting program, indent level is %d \n", indent_level);
   if (first_nonblank_line && $TEXT_SIZE != 0) {
     indentation_error();
@@ -309,7 +368,7 @@ INDENT : _BOL (' ' | '\t')*  %prefer
     YYIGNORE;
   }
   fprintf(stderr, "ending indentation, indent level is %d \n \n \n \n", indent_level);
-} ;
+} ; 
 
 WS : ('\t' | ' ')* { YYIGNORE ; } ;
 
@@ -332,7 +391,7 @@ AST::lineNumber ()
     return yylocation_line (loc ());
 }
 
-void indentation_error(int expected_indent, int actual_indent)
+void indentation_error(int expected_indent, int actual_indent) 
 {
   fprintf(stderr, "expected %d actual %d \n", expected_indent, actual_indent);
 }
@@ -369,4 +428,3 @@ parse (FILE* f, const gcstring& name)
         theTree->print (cout, 0);
     }
 }
-
