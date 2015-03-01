@@ -98,7 +98,7 @@
 %token WHILE "while"
 %token STRING "@string"
 %token RAWSTRING "@rawstring"
-%token UNOP "@unop"
+
 
 /* FIXME: MORE... */
 
@@ -132,11 +132,8 @@
  * on the basis of the input so far whether to perform a reduction.  The 
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 2
+%expect-rr 0
 %expect 0
-
-%left OR
-%left AND
 
 %%
 program : stmt_list   { theTree = $^(MODULE, $*); $$ = NULL; }
@@ -152,6 +149,12 @@ print_stmt : "print"! expression_list
     ;
 
 
+if_stmt : IF expression ":" suite ( ELIF expression ":" suite )* (ELSE ":" suite)?
+    ;
+
+suite : stmt_list 
+    ;
+
 expression_list :
       expression (","! expression)*
     | /*empty*/
@@ -160,18 +163,6 @@ expression_list :
 expression :
       INT_LITERAL
     | string_literal
-    | conditional_expression
-    ;
-
-conditional_expression :
-    not_test
-    | L=conditional_expression AND R=conditional_expression { $$ = $^(AND, $L, $R); }
-    | L=conditional_expression OR R=conditional_expression  { $$ = $^(OR, $L, $R); }
-    ;
-
-not_test :
-    INT_LITERAL         
-    | NOT not_test      { $$ = $^(UNOP, make_id("__not__", $NOT.loc()), $not_test); }
     ;
 
 string_literal :
