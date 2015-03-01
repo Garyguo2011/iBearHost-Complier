@@ -133,11 +133,12 @@
  * on the basis of the input so far whether to perform a reduction.  The 
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 2
-%expect 0
+%expect-rr 32
+%expect 12
 
 %left OR
 %left AND
+%left "<" "<=" ">" ">=" "!=" "==" "is" "is not" "in" "not in"
 
 %%
 program : stmt_list   { theTree = $^(MODULE, $*); $$ = NULL; }
@@ -162,7 +163,38 @@ expression :
       INT_LITERAL
     | string_literal
     | conditional_expression
+    | '(' expression ')'
     ;
+
+/****************** XGUO-dev *********************/
+/****************** XGUO-dev *********************/
+
+/*
+two_comparison : expression comp_operator expression ;
+left_comparison :
+    two_comparison
+    | left_comparison comp_operator expression 
+    ;
+*/
+
+comparison :
+    L=expression OP=comp_operator R=expression         { $$ = $^(COMPARE, $OP, $L, $R) ;}
+    ;
+
+comp_operator :
+      op="<"                      { $$ = make_id("__lt__", $op.loc()); }
+    | op=">"                      { $$ = make_id("__gt__", $op.loc()); }
+    | op="=="                     { $$ = make_id("__eq__", $op.loc()); } 
+    | op=">="                     { $$ = make_id("__ge__", $op.loc()); }
+    | op="<="                     { $$ = make_id("__le__", $op.loc()); }
+    | op="!="                     { $$ = make_id("__ne__", $op.loc()); }
+    | op="is"                     { $$ = make_id("__is__", $op.loc()); }
+    | op="is not"                 { $$ = make_id("__isnot__", $op.loc()); }
+    | op="in"                     { $$ = make_id("__in__", $op.loc()); }
+    | op="not in"                 { $$ = make_id("__notin__", $op.loc()); }
+    ;
+
+/****************** XGUO-dev *********************/
 
 conditional_expression :
     not_test
@@ -171,13 +203,15 @@ conditional_expression :
     ;
 
 not_test :
-    INT_LITERAL         
+    comparison         //comp_operator
     | NOT not_test      { $$ = $^(UNOP, make_id("__not__", $NOT.loc()), $not_test); }
     ;
 
 string_literal :
       STRING            { $$ = $^(STRING_LITERAL, $*); } // FIXME
     ;
+
+
 
 
 /*** LEXICAL DEFINITIONS ***/

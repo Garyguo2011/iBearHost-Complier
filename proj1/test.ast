@@ -1,0 +1,9 @@
+(module 0
+    (println 1
+        (or 1
+            (and 1
+                (int_literal 1 5)
+                (int_literal 1 6))
+            (unop 1
+                (id 1 __not__)
+                (int_literal 1 9)))))
