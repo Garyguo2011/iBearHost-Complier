@@ -24,6 +24,16 @@
    *  TOKEN. */
   static AST_Ptr make_id (const char* token, Location_Type loc);
 
+
+  /* Variables for lexer */
+  static int paren_count = 0 ;
+  static int square_bracket_count = 0;
+  static int curly_bracket_count = 0;
+
+  static int indent_unit = 0;
+  static int indent_level = 0;
+  static bool first_nonblank_line = true;
+  
 %}
 
 %debug
@@ -72,14 +82,12 @@
  * node operators to printable strings.
  */
 
-
 %token PRINTLN "@println"
 %token EMPTY 
 %token MODULE "@module"
 %token ID "@id"
 %token STRING_LITERAL "@string_literal"
 %token INT_LITERAL "@int_literal"
-%token IDENTIFIER 
 %token AND "and"
 %token BREAK "break"
 %token CLASS "class"
@@ -99,7 +107,18 @@
 %token WHILE "while"
 %token STRING "@string"
 %token RAWSTRING "@rawstring"
-%token UNOP "@unop"
+%token INDENT "@indent"
+%token DEDENT "@dedent"
+%token NEWLINE
+%token COMMENT
+%token BLANKLINE
+%token INDENT_BLANKLINE
+%token LEFT_PAREN
+%token RIGHT_PAREN
+%token LEFT_SQUARE_BRACKET
+%token RIGHT_SQUARE_BRACKET
+%token LEFT_CURLY_BRACKET
+%token RIGHT_CURLY_BRACKET
 
 /* FIXME: MORE... */
 
@@ -183,11 +202,10 @@ string_literal :
 /*** LEXICAL DEFINITIONS ***/
 
 /* Normally, throw away whitespace other than newline. */
-* : (' ' | '\t' | '\r')+ ;
 
 _NONZERODIGIT : '1' .. '9' ;
 
-IDENTIFIER : (_LETTER | '_') (_LETTER | _DIGIT | '_')* ;
+ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')* ;
 
 _DECIMAL : _NONZERODIGIT _DIGIT* | '0' ;
 _OCTDIGIT : '0' .. '7' ;
@@ -200,7 +218,6 @@ _RAWESCAPESEQ : '\\' _ANY ;
 _RAWSHORTSTRINGITEM1 : _ANY - ('\'' | '\n') | _RAWESCAPESEQ ;
 _RAWSHORTSTRINGITEM2 : _ANY - ('\"' | '\n') | _RAWESCAPESEQ ;
 _RAWLONGSTRINGITEM : _ANY - '\\' | _RAWESCAPESEQ ;
-
 
 _RAWSTRINGPREFIX : 'r' | 'R' ;
 _RAWSHORTSTRING : '\'' _RAWSHORTSTRINGITEM1* '\'' |
@@ -229,6 +246,78 @@ _LONGSTRING : "\'\'\'" (_LONGNONSINGLEQUOTE* ('\''_LONGNONSINGLEQUOTE | "\'\'"_L
 STRING : _SHORTSTRING | _LONGSTRING ;
 RAWSTRING : _RAWSTRINGPREFIX (_RAWSHORTSTRING | _RAWLONGSTRING) ;
 
+LEFT_PAREN : '(' { paren_count += 1 ; } ;
+RIGHT_PAREN : ')' { if (paren_count) paren_count -= 1 ; } ;
+LEFT_SQUARE_BRACKET : '[' { square_bracket_count += 1 ; } ;
+RIGHT_SQUARE_BRACKET : ']' { if (square_bracket_count) square_bracket_count -= 1 ; } ;
+LEFT_CURLY_BRACKET : '{' { curly_bracket_count += 1 ; } ;
+RIGHT_CURLY_BRACKET : '}' { if (curly_bracket_count) curly_bracket_count -= 1 ; } ;
+
+NEWLINE_WITH_BACKSLASH : "\\\n" { YYIGNORE ; } ;
+NEWLINE : '\n' { if ( paren_count || square_bracket_count || curly_bracket_count ) YYIGNORE; } ; 
+
+_WS_NONNEWLINE : '\r' | '\t' | ' ' | '\f' ;
+_NONNEWLINE : _ANY - '\n' ;
+_NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ; 
+
+COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE ; } ;
+
+BLANKLINE : _WS_NONNEWLINE* '\n' { YYIGNORE ; } ;
+
+INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; }; 
+INDENT : _BOL (' ' | '\t')*  %prefer
+{ 
+  fprintf(stderr, "start indenting program, indent level is %d \n", indent_level);
+  if (first_nonblank_line && $TEXT_SIZE != 0) {
+    indentation_error();
+    YYIGNORE;
+  }
+  if (!first_nonblank_line) {
+    int equivalent_blank_count = calculate_equivalent_blanks($TEXT);
+    if (indent_unit == 0) {
+      indent_unit = equivalent_blank_count;
+      if (equivalent_blank_count != 0) {
+        YYSET_TOKEN(INDENT);
+        fprintf(stderr, "INDENT \n");
+        indent_level++;
+      }
+      else {
+        YYIGNORE;
+      }
+    }
+    else {
+      int default_blank_count = indent_level * indent_unit;
+      if (equivalent_blank_count % indent_unit != 0) {
+        indentation_error(default_blank_count, equivalent_blank_count);
+        YYIGNORE;
+      }
+      else {
+        if (equivalent_blank_count == default_blank_count) {
+          YYIGNORE;
+        }
+        else if (equivalent_blank_count == default_blank_count + indent_unit) {
+          YYSET_TOKEN(INDENT);
+          fprintf(stderr, "INDENT \n");
+          indent_level++;
+        }
+        else {
+          int new_indent_level = equivalent_blank_count / indent_unit;
+          int difference = indent_level - new_indent_level;
+          while (difference > 0) {
+            yyqueue_token(DEDENT, 0);
+            indent_level--;
+            difference--;
+          }
+        }
+      }
+    }
+  }
+  if (first_nonblank_line && $TEXT_SIZE == 0) {
+    first_nonblank_line = false;
+    YYIGNORE;
+  }
+  fprintf(stderr, "ending indentation, indent level is %d \n \n \n \n", indent_level);
+} ; 
 
 %%
 
@@ -247,6 +336,31 @@ int
 AST::lineNumber ()
 {
     return yylocation_line (loc ());
+}
+
+void indentation_error(int expected_indent, int actual_indent) 
+{
+  fprintf(stderr, "expected %d actual %d \n", expected_indent, actual_indent);
+}
+
+void indentation_error() {
+  fprintf(stderr, "indentation error");
+}
+
+int calculate_equivalent_blanks(const char* text) {
+  int blank_count = 0;
+  int quotient = 0;
+  const char* it;
+  for (it = text; *it; ++it) {
+    if (*it == ' ') {
+      blank_count++;
+    }
+    else if (*it == '\t') {
+      quotient = blank_count / 8;
+      blank_count = 8 * (quotient + 1);
+    }
+  }
+  return blank_count;
 }
 
 void
