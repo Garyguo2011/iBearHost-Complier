@@ -79,6 +79,7 @@
 %token ID "@id"
 %token STRING_LITERAL "@string_literal"
 %token INT_LITERAL "@int_literal"
+%token IDENTIFIER 
 %token AND "and"
 %token BREAK "break"
 %token CLASS "class"
@@ -186,7 +187,7 @@ string_literal :
 
 _NONZERODIGIT : '1' .. '9' ;
 
-ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')* ;
+IDENTIFIER : (_LETTER | '_') (_LETTER | _DIGIT | '_')* ;
 
 _DECIMAL : _NONZERODIGIT _DIGIT* | '0' ;
 _OCTDIGIT : '0' .. '7' ;
