@@ -86,6 +86,7 @@
 %token EMPTY 
 %token MODULE "@module"
 %token ID "@id"
+%token UNOP "@unop"
 %token STRING_LITERAL "@string_literal"
 %token INT_LITERAL "@int_literal"
 %token AND "and"
