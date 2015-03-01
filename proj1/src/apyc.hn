@@ -120,6 +120,10 @@
 %token RIGHT_SQUARE_BRACKET
 %token LEFT_CURLY_BRACKET
 %token RIGHT_CURLY_BRACKET
+%token PAIR "@pair"
+%token ATTRIBUTEREF "@attributeref"
+%token SUBSCRIPT "@subscript"
+%token SLICE "slice"
 
 /* FIXME: MORE... */
 
@@ -156,6 +160,13 @@
 %expect-rr 0
 %expect 0
 
+%left OR
+%left AND
+%left "<" "<=" ">" ">=" "!=" "==" "is" "is not" "in" "not in"
+%left "+" "-"
+%left "*" "/" "%"
+%left "**"
+
 %%
 program : expression | expression program ;
 
@@ -189,6 +200,115 @@ expression :
     | INDENT
     | DEDENT
     ;
+
+identifier :
+    ID      { $$ = make_id($ID.c_text(), $ID.loc()); }
+    ;
+
+atom : 
+      identifier 
+    | literal
+    | enclosure
+    ;
+
+enclosure : 
+      parenth_form
+    | list_display
+    | dict_display
+    ;
+
+/********** LITERALS **********************/
+literal :
+      stringliteral
+    | INT_LITERAL     { $$ = $^(INT_LITERAL, $*); }
+    ;
+
+stringliteral :
+      stringliteralpiece
+    | stringliteral stringliteralpiece
+    ;
+
+//TODO fill out semantic actions
+stringliteralpiece :
+      STRING
+    | RAWSTRING
+    ;
+/******************************************/
+
+/********** COLLECTIONS *******************/
+parenth_form :
+      '('! expression_list? ')'!
+    ;
+
+list_display :
+      '['! expression_list? ']'!
+    ;
+
+expression_list :
+      atom
+    ;
+
+list_for :
+      FOR target_list IN old_expression_list (list_for)?
+    ;
+
+target_list :
+      atom    //TODO actual target_list
+    ;
+
+old_expression_list :
+      old_expression ((','! old_expression)+ ','!?)?
+    ;
+
+old_expression :
+      atom //TODO actual old_expression
+    ;
+
+dict_display :
+      '{'! key_datum_list? '}'!
+      ;
+
+pair :
+      expression ':'! expression   { $$ = $^(PAIR, $*); }
+      ;
+
+key_datum_list :
+      pair (','! pair)* ','!?
+      ;
+
+/*******************************************/
+
+primary :
+      atom
+    | attributeref
+    | subscription
+    | slicing
+    | call 
+      ;
+
+call :
+      atom  //TODO actual call
+      ;
+
+attributeref :
+      primary '.'! identifier       { $$ = $^(ATTRIBUTEREF, $*); }
+    ;
+
+subscription :
+      identifier '['! expression ']'!   { $$ = $^(SUBSCRIPT, $*); }
+    ;
+
+slicing :
+      identifier '['! lower_bound? ':'! upper_bound? ']'!   { $$ = $^(SLICING, $*); }
+    ;
+
+lower_bound :
+      expression
+    ;
+
+upper_bound :
+      expression 
+    ; 
 
 
 /*** LEXICAL DEFINITIONS ***/
