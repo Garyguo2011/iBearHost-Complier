@@ -331,7 +331,7 @@ not_test :
 /*******************************************/
 /***************STATEMENTS******************/
 expression_list :
-             expression ( ',' expression )* (',')?
+      expression ( ',' expression )* (',')?
     ;
 
 simple_stmt : 
@@ -538,18 +538,14 @@ RIGHT_CURLY_BRACKET : '}' { if (curly_bracket_count) curly_bracket_count -= 1 ; 
 NEWLINE_WITH_BACKSLASH : "\\\n" { YYIGNORE ; } ;
 NEWLINE : '\n' { if ( paren_count || square_bracket_count || curly_bracket_count ) YYIGNORE; } ;
 
-_WS_NONNEWLINE : '\r' | '\t' | ' ' | '\f' ;
 _NONNEWLINE : _ANY - '\n' ;
 _NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
 
 COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE ; } ;
 
-BLANKLINE : _WS_NONNEWLINE* '\n' { YYIGNORE ; } ;
-
 INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; };
 INDENT : _BOL (' ' | '\t')*  %prefer
 {
-  fprintf(stderr, "start indenting program, indent level is %d \n", indent_level);
   if (first_nonblank_line && $TEXT_SIZE != 0) {
     indentation_error();
     YYIGNORE;
@@ -560,7 +556,6 @@ INDENT : _BOL (' ' | '\t')*  %prefer
       indent_unit = equivalent_blank_count;
       if (equivalent_blank_count != 0) {
         YYSET_TOKEN(INDENT);
-        fprintf(stderr, "INDENT \n");
         indent_level++;
       }
       else {
@@ -579,7 +574,6 @@ INDENT : _BOL (' ' | '\t')*  %prefer
         }
         else if (equivalent_blank_count == default_blank_count + indent_unit) {
           YYSET_TOKEN(INDENT);
-          fprintf(stderr, "INDENT \n");
           indent_level++;
         }
         else {
@@ -598,10 +592,10 @@ INDENT : _BOL (' ' | '\t')*  %prefer
     first_nonblank_line = false;
     YYIGNORE;
   }
-  fprintf(stderr, "ending indentation, indent level is %d \n \n \n \n", indent_level);
 } ;
 
-WS : ('\t' | ' ')* { YYIGNORE ; } ;
+
+WS : (' ' | '\t')* _EOL | (' ' | '\t')* { YYIGNORE ; } ;
 
 %%
 
