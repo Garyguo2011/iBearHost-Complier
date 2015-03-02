@@ -83,7 +83,7 @@
  */
 
 
-%token PRINTLN "@println"
+%token PRINTLN "println"
 %token EMPTY
 %token MODULE "@module"
 %token ID "@id"
@@ -102,7 +102,6 @@
 %token IS "is"
 %token NOT "not"
 %token OR "or"
-%token PRINT "print"
 %token RETURN "return"
 %token WHILE "while"
 %token STRING "@string"
@@ -119,11 +118,17 @@
 %token RIGHT_SQUARE_BRACKET
 %token LEFT_CURLY_BRACKET
 %token RIGHT_CURLY_BRACKET
-%token PAIR "@pair"
 %token ATTRIBUTEREF "@attributeref"
 %token SUBSCRIPT "@subscript"
 %token SLICE "@slice"
 %token PASS "@pass"
+
+%token UNOP "@unop"
+%token BINOP "@binop"
+%token DICT_DISPLAY "@dict_display"
+%token PAIR "@pair"
+%token LIST_DISPLAY "@list_display"
+%token TUPLE "@tuple"
 
 /* FIXME: MORE... */
 
@@ -190,7 +195,7 @@ enclosure :
 /********** LITERALS **********************/
 literal :
       stringliteral
-    | INT_LITERAL     { $$ = $^(INT_LITERAL, $*); }
+    | INT_LITERAL
     ;
 
 stringliteral :
@@ -206,24 +211,22 @@ stringliteralpiece :
 /******************************************/
 
 /********** COLLECTIONS *******************/
-parenth_form :
-      '('! expression_list? ')'!
+parenth_form : "("! ")"!
+    | "("! expression (","! expression)* ","!? ")"! {$$ = $^(TUPLE, $*); }
     ;
 
-list_display :
-      '['! expression_list? ']'!
+list_display : "["! "]"!
+    | "["! expression (","! expression)* ","!? "]"!  {$$ = $^(LIST_DISPLAY, $*); }
+    ;   
+
+dict_display : "{"! "}"!
+    | "{"! pair_list "}"!
     ;
 
-dict_display :
-      '{'! key_datum_list? '}'!
-    ;
+pair_list : pair (","! pair)* ","!? { $$ = $^(DICT_DISPLAY, $*); }
+    ; 
 
-pair :
-      expression ':'! expression   { $$ = $^(PAIR, $*); }
-    ;
-
-key_datum_list :
-      pair (','! pair)* ','!?
+pair : l=expression ":"! expression { $$ = $^(PAIR, $*); }
     ;
 /*******************************************/
 
@@ -268,29 +271,26 @@ argument_list :
 /*******************************************/
 
 /**************** ARITHMETIC ***************/
-power : 
-      primary ("**" u_expr)?
+power : primary
+    | primary (op="**" u_expr) { $$ = $^(BINOP, make_id("__pow__", $op.loc()), $primary, $u_expr); } 
+    ; 
+
+u_expr : power 
+    | op="-" u_expr { $$ = $^(UNOP, make_id("__neg__", $op.loc()), $u_expr); }
+    | op="+" u_expr { $$ = $^(UNOP, make_id("__pos__", $op.loc()), $u_expr); } 
     ;
 
-u_expr :
-      power
-    | '-' u_expr
-    | '+' u_expr
+m_expr : u_expr
+    | m_expr op="*" u_expr { $$ = $^(BINOP, make_id("__mul__", $op.loc()), $m_expr, $u_expr); }
+    | m_expr op="//" u_expr { $$ = $^(BINOP, make_id("__floordiv__", $op.loc()), $m_expr, $u_expr); }
+    | m_expr op="/" u_expr { $$ = $^(BINOP, make_id("__floordiv__", $op.loc()), $m_expr, $u_expr); }
+    | m_expr op="%" u_expr { $$ = $^(BINOP, make_id("__mod__", $op.loc()), $m_expr, $u_expr); } 
     ;
 
-m_expr :
-      u_expr
-    | m_expr '*' u_expr
-    | m_expr "//" u_expr
-    | m_expr '/' u_expr
-    | m_expr '%' u_expr
-    ;
-
-a_expr :
-      m_expr
-    | a_expr '+' m_expr
-    | a_expr '-' m_expr
-    ;
+a_expr : m_expr
+    | a_expr op="+" m_expr { $$ = $^(BINOP, make_id("__add__", $op.loc()), $a_expr, $m_expr); }
+    | a_expr op="-" m_expr { $$ = $^(BINOP, make_id("__sub__", $op.loc()), $a_expr, $m_expr); } 
+    ; 
 
 comparison :
       a_expr ( comp_operator a_expr)*
@@ -313,19 +313,16 @@ expression :
       or_test (IF or_test ELSE expression)?
     ;
 
-or_test :
-      and_test 
-    | or_test OR and_test
+or_test : and_test
+    | or_test "or" and_test { $$ = $^(OR, $or_test, $and_test); }
     ;
 
-and_test :
-      not_test
-    | and_test AND not_test
+and_test : not_test 
+    | and_test "and" not_test { $$ = $^(AND, $and_test, $not_test); }
     ;
 
-not_test :
-      comparison
-    | NOT not_test
+not_test : comparison 
+    | op="not" not_test { $$ = $^(UNOP, make_id("__not__", $op.loc()), $not_test); }
     ;
 
 /*******************************************/
@@ -368,9 +365,16 @@ pass_stmt :
     EMPTY
     ;
 
+/* Original Grammar rule */
 print_stmt :
-    PRINT (expression (','! expression)* ','!?)?
+    "print"! (expression (','! expression)* ','!?)?          { $$ = $^(PRINTLN, $*); }      
     ;
+
+
+/*
+print_stmt : "print"! (expression (','! expression)*)?    { $$ = $^(PRINTLN, $*); } 
+      ;
+*/
 
 return_stmt :
     RETURN expression_list?
