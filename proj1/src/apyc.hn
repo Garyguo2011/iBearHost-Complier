@@ -102,7 +102,6 @@
 %token IS "is"
 %token NOT "not"
 %token OR "or"
-%token PASS "pass"
 %token PRINT "print"
 %token RETURN "return"
 %token WHILE "while"
@@ -124,6 +123,7 @@
 %token ATTRIBUTEREF "@attributeref"
 %token SUBSCRIPT "@subscript"
 %token SLICE "@slice"
+%token PASS "@pass"
 
 /* FIXME: MORE... */
 
@@ -157,8 +157,8 @@
  * on the basis of the input so far whether to perform a reduction.  The
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 0
-%expect 0
+%expect-rr 8
+%expect 10
 
 %left OR
 %left AND
@@ -168,41 +168,11 @@
 %left "**"
 
 %%
-program : expression | expression program ;
-
-expression :
-      INT_LITERAL
-    | STRING
-    | RAWSTRING
-    | PRINTLN
-    | MODULE
-    | AND
-    | ID
-    | BREAK
-    | CLASS
-    | CONTINUE
-    | DEF
-    | ELIF
-    | ELSE
-    | FOR
-    | IF
-    | IN
-    | IS
-    | NOT
-    | OR
-    | PASS
-    | PRINT
-    | RETURN
-    | WHILE
-    | COMMENT
-    | BLANKLINE
-    | NEWLINE
-    | INDENT
-    | DEDENT
+program : (NEWLINE! | statement)*             { theTree = $^(MODULE, $*); $$ = NULL; }
     ;
 
 identifier :
-    ID      { $$ = make_id($ID.c_text(), $ID.loc()); }
+    ID                                        { $$ = make_id($ID.c_text(), $ID.loc()); }
     ;
 
 atom : 
@@ -244,39 +214,20 @@ list_display :
       '['! expression_list? ']'!
     ;
 
-expression_list :
-      atom
-    ;
-
-list_for :
-      FOR target_list IN old_expression_list (list_for)?
-    ;
-
-target_list :
-      atom    //TODO actual target_list
-    ;
-
-old_expression_list :
-      old_expression ((','! old_expression)+ ','!?)?
-    ;
-
-old_expression :
-      atom //TODO actual old_expression
-    ;
-
 dict_display :
       '{'! key_datum_list? '}'!
-      ;
+    ;
 
 pair :
       expression ':'! expression   { $$ = $^(PAIR, $*); }
-      ;
+    ;
 
 key_datum_list :
       pair (','! pair)* ','!?
-      ;
-
+    ;
 /*******************************************/
+
+/**************** PRIMARIES ****************/
 
 primary :
       atom
@@ -284,11 +235,7 @@ primary :
     | subscription
     | slicing
     | call 
-      ;
-
-call :
-      atom  //TODO actual call
-      ;
+    ;
 
 attributeref :
       primary '.'! identifier       { $$ = $^(ATTRIBUTEREF, $*); }
@@ -310,6 +257,229 @@ upper_bound :
       expression 
     ; 
 
+call :
+      primary '('! (argument_list ','!?)? ')'!
+    ;
+
+argument_list :
+      expression (','! expression)* 
+    ;
+
+/*******************************************/
+
+/**************** ARITHMETIC ***************/
+power : 
+      primary ("**" u_expr)?
+    ;
+
+u_expr :
+      power
+    | '-' u_expr
+    | '+' u_expr
+    ;
+
+m_expr :
+      u_expr
+    | m_expr '*' u_expr
+    | m_expr "//" u_expr
+    | m_expr '/' u_expr
+    | m_expr '%' u_expr
+    ;
+
+a_expr :
+      m_expr
+    | a_expr '+' m_expr
+    | a_expr '-' m_expr
+    ;
+
+comparison :
+      a_expr ( comp_operator a_expr)*
+    ;
+
+comp_operator :
+      '<'
+    | '>'
+    | "=="
+    | ">="
+    | "<="
+    | "!="
+    | IS
+    | IS NOT
+    | IN
+    | NOT IN
+    ;
+
+expression :
+      or_test (IF or_test ELSE expression)?
+    ;
+
+or_test :
+      and_test 
+    | or_test OR and_test
+    ;
+
+and_test :
+      not_test
+    | and_test AND not_test
+    ;
+
+not_test :
+      comparison
+    | NOT not_test
+    ;
+
+/*******************************************/
+/***************STATEMENTS******************/
+expression_list :
+             expression ( ',' expression )* (',')?
+    ;
+
+simple_stmt : 
+      expression_stmt
+    | assignment_stmt
+    | pass_stmt
+    | print_stmt
+    | return_stmt
+    | break_stmt    
+    | continue_stmt
+    ;
+/***************** Dev-xg ******************/
+
+expression_stmt :
+    expression_list
+    ;
+
+assignment_stmt :
+    (target_list '='!)+ expression_list
+    ;
+
+target_list :
+    target (','! target)* ','!?
+    ;
+
+target :
+      identifier
+    | attributeref
+    | subscription
+    | slicing
+    ;
+
+pass_stmt :
+    EMPTY
+    ;
+
+print_stmt :
+    PRINT (expression (','! expression)* ','!?)?
+    ;
+
+return_stmt :
+    RETURN expression_list?
+    ;
+
+break_stmt :
+    BREAK
+    ;
+
+continue_stmt :
+    CONTINUE
+    ;
+
+compound_stmt :
+      if_stmt
+    | while_stmt
+    | for_stmt
+    | funcdef
+    | classdef
+    ;
+
+suite :
+      stmt_list NEWLINE
+    | NEWLINE INDENT statement+ DEDENT
+    ;
+
+statement :
+      stmt_list NEWLINE! 
+    | compound_stmt
+    ;
+
+stmt_list :
+    simple_stmt (';'! simple_stmt)* ';'!?
+    ;
+
+if_stmt : 
+    IF expression ':'! suite (ELIF expression ':'? suite)* (ELSE ':' suite)?
+    ;
+
+while_stmt :
+    WHILE expression ':' suite (ELSE ':' suite)?
+    ;
+
+for_stmt :
+    FOR target_list IN expression_list ':'! suite (ELSE ':'! suite)
+    ;
+
+/**************** Function Call *****************/
+
+funcdef :
+    DEF funcname '('! parameter_list ')'!
+    ;
+
+parameter_list :
+     (defparameter ','!)* defparameter
+    ;
+
+defparameter :
+    parameter ('='! expression)?
+    ;
+
+sublist : 
+    parameter (','! parameter)* ','!?
+    ;
+
+parameter :
+      identifier
+    | '('! sublist ')'!
+    ;
+
+funcname :
+    identifier
+    ;
+
+/************************************************/
+
+/**************** Class Definition *****************/
+classdef :
+    CLASS classname ':'! suite
+    ;
+
+classname :
+    identifier
+    ;
+
+/************************************************/
+
+/*****************  FILE I/O ********************/
+
+/*
+file_input :
+    (NEWLINE! | statement)*
+    ;
+
+interactive_input :
+      NEWLINE!
+    | compound_stmt NEWLINE
+    ;
+
+eval_input :
+    expression_list NEWLINE*
+    ;
+
+input_input :
+    expression_list NEWLINE
+    ;
+*/
+
+/************************************************/
 
 /*** LEXICAL DEFINITIONS ***/
 
