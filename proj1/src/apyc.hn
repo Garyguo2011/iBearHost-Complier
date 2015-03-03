@@ -137,6 +137,8 @@
 %token STMTLIST "@stmt_list"
 %token BLOCK "@block"
 %token FORMALSLIST "@formals_list"
+%token ASSIGN "@assign"
+%token TARGETLIST "@target_list"
 
 /* FIXME: MORE... */
 
@@ -221,7 +223,8 @@ stringliteralpiece :
 
 /********** COLLECTIONS *******************/
 parenth_form : "("! ")"!
-    | "("! expression (","! expression)* ","!? ")"! {$$ = $^(TUPLE, $*); }
+    | "("! expression ")"!
+    | "("! expression (","! expression)+ ","!? ")"! {$$ = $^(TUPLE, $*); }
     ;
 
 list_display : "["! "]"!
@@ -337,7 +340,8 @@ not_test : comparison
 /*******************************************/
 /***************STATEMENTS******************/
 expression_list :
-      expression ( ','! expression )* (','!)?     { $$ = $^(TUPLE, $*); }
+      expression
+    | expression ( ','! expression )+ (','!)?  { $$ = $^(TUPLE, $*); }
     ;
 
 simple_stmt : 
@@ -356,11 +360,12 @@ expression_stmt :
     ;
 
 assignment_stmt :
-    (target_list '='!)+ expression_list
+    target_list '='! right_side                 {$$ = $^(ASSIGN, $target_list, $right_side);}
     ;
 
 target_list :
-    target (','! target)* ','!?
+      target 
+    | target (','! target)+ ','!?               {$$ = $^(TARGETLIST, $*);}
     ;
 
 target :
@@ -368,6 +373,11 @@ target :
     | attributeref
     | subscription
     | slicing
+    ;
+
+right_side :
+      expression_list
+    | assignment_stmt
     ;
 
 pass_stmt :
