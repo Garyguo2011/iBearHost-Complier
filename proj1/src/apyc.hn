@@ -83,16 +83,17 @@
  */
 
 
-%token PRINTLN "println"
+%token PRINTLN "@println"
+%token PRINT "@print"
 %token EMPTY
 %token MODULE "@module"
 %token ID "@id"
 %token STRING_LITERAL "@string_literal"
 %token INT_LITERAL "@int_literal"
 %token AND "and"
-%token BREAK "break"
+%token BREAK "@break"
 %token CLASS "class"
-%token CONTINUE "continue"
+%token CONTINUE "@continue"
 %token DEF "def"
 %token ELIF "elif"
 %token ELSE "else"
@@ -367,7 +368,8 @@ pass_stmt :
 
 /* Original Grammar rule */
 print_stmt :
-    "print"! (expression (','! expression)* ','!?)?          { $$ = $^(PRINTLN, $*); }      
+      "print"! (expression (','! expression)*)?          { $$ = $^(PRINTLN, $*); }      
+    | "print"! expression (','! expression)* ','!        { $$ = $^(PRINT, $*); }
     ;
 
 
@@ -381,11 +383,11 @@ return_stmt :
     ;
 
 break_stmt :
-    BREAK
+    "break"!             { $$ = $^(BREAK); }
     ;
 
 continue_stmt :
-    CONTINUE
+    "continue"!          { $$ = $^(CONTINUE); }
     ;
 
 compound_stmt :
