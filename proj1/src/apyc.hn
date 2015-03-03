@@ -95,9 +95,9 @@
 %token INT_LITERAL "@int_literal"
 %token AND "and"
 %token BREAK "@break"
-%token CLASS "class"
+%token CLASS "@class"
 %token CONTINUE "@continue"
-%token DEF "def"
+%token DEF "@def"
 %token ELIF "elif"
 %token ELSE "else"
 %token FOR "for"
@@ -110,8 +110,8 @@
 %token WHILE "while"
 %token STRING "@string"
 %token RAWSTRING "@rawstring"
-%token INDENT "@indent"
-%token DEDENT "@dedent"
+%token INDENT
+%token DEDENT
 %token NEWLINE
 %token COMMENT
 %token BLANKLINE
@@ -135,6 +135,8 @@
 %token TUPLE "@tuple"
 %token SPECIALID
 %token STMTLIST "@stmt_list"
+%token BLOCK "@block"
+%token FORMALSLIST "@formals_list"
 
 /* FIXME: MORE... */
 
@@ -179,7 +181,7 @@
 %left "**"
 
 %%
-program : (NEWLINE! | statement)*             { theTree = $^(MODULE, $*); $$ = NULL; }
+program : (NEWLINE! | statement)*           { theTree = $^(MODULE, $*); $$ = NULL; }
     ;
 
 identifier :
@@ -378,7 +380,6 @@ print_stmt :
     | "print"! expression (','! expression)* ','!        { $$ = $^(PRINT, $*); }
     ;
 
-
 /*
 print_stmt : "print"! (expression (','! expression)*)?    { $$ = $^(PRINTLN, $*); } 
       ;
@@ -402,17 +403,17 @@ compound_stmt :
     | while_stmt
     | for_stmt
     | funcdef
-    | classdef
+    | classdef          
     ;
 
 suite :
-      stmt_list NEWLINE
-    | NEWLINE INDENT statement+ DEDENT
+      stmt_list NEWLINE!        { $$ = $^(BLOCK, $*); }
+    | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
     ;
 
 statement :
-      stmt_list NEWLINE! 
-    | compound_stmt
+      stmt_list NEWLINE!    
+    | compound_stmt  
     ;
 
 stmt_list :
@@ -434,24 +435,16 @@ for_stmt :
 /**************** Function Call *****************/
 
 funcdef :
-    DEF funcname '('! parameter_list ')'!
+    "def"! funcname '('! parameter_list ')'! ':'! suite   { $$ = $^(DEF, $*); }
     ;
 
 parameter_list :
-     (defparameter ','!)* defparameter
-    ;
-
-defparameter :
-    parameter ('='! expression)?
-    ;
-
-sublist : 
-    parameter (','! parameter)* ','!?
+     (parameter ','!)* parameter ','!?     { $$ = $^(FORMALSLIST, $*); }
+    | /*EMPTY*/                       { $$ = $^(FORMALSLIST); }
     ;
 
 parameter :
-      identifier
-    | '('! sublist ')'!
+    identifier
     ;
 
 funcname :
@@ -462,11 +455,11 @@ funcname :
 
 /**************** Class Definition *****************/
 classdef :
-    CLASS classname ':'! suite
+    "class"! classname ':'! suite      { $$ = $^(CLASS, $*); }
     ;
 
 classname :
-    identifier
+    identifier          
     ;
 
 /************************************************/
@@ -500,8 +493,8 @@ input_input :
 
 _NONZERODIGIT : '1' .. '9' ;
 
-ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')* ;
 SPECIALID : "True" | "False" | "None" ; 
+ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')*  ;
 
 _DECIMAL : _NONZERODIGIT _DIGIT* | '0' ;
 _OCTDIGIT : '0' .. '7' ;
@@ -555,10 +548,10 @@ NEWLINE : '\n' { if ( paren_count || square_bracket_count || curly_bracket_count
 _NONNEWLINE : _ANY - '\n' ;
 _NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
 
-COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE ; } ;
+COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE;} ;
 
 INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; };
-INDENT : _BOL (' ' | '\t')*  %prefer
+INDENT : /*_BOL (' ' | '\t')* _EOF | */ _BOL (' ' | '\t')*  %prefer
 {
   if (first_nonblank_line && $TEXT_SIZE != 0) {
     indentation_error();
@@ -594,10 +587,11 @@ INDENT : _BOL (' ' | '\t')*  %prefer
           int new_indent_level = equivalent_blank_count / indent_unit;
           int difference = indent_level - new_indent_level;
           while (difference > 0) {
-            yyqueue_token(DEDENT, 0);
+            yyqueue_token(DEDENT, 0, NULL, $TEXT, $TEXT_SIZE);
             indent_level--;
             difference--;
           }
+          YYIGNORE;
         }
       }
     }
