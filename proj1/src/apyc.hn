@@ -335,7 +335,7 @@ not_test : comparison
 /*******************************************/
 /***************STATEMENTS******************/
 expression_list :
-      expression ( ',' expression )* (',')?     { $$ = $^(TUPLE, $*); }
+      expression ( ','! expression )* (','!)?     { $$ = $^(TUPLE, $*); }
     ;
 
 simple_stmt : 
