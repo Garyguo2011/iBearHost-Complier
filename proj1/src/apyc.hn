@@ -24,6 +24,9 @@
    *  TOKEN. */
   static AST_Ptr make_id (const char* token, Location_Type loc);
 
+  /** Return a new SPECIALID node, where the text of the identifier is given by
+   *  TOKEN. */
+  static AST_Ptr make_specialId (const char* token, Location_Type loc);
 
   /* Variables for lexer */
   static int paren_count = 0 ;
@@ -103,7 +106,7 @@
 %token IS "is"
 %token NOT "not"
 %token OR "or"
-%token RETURN "return"
+%token RETURN "@return"
 %token WHILE "while"
 %token STRING "@string"
 %token RAWSTRING "@rawstring"
@@ -122,7 +125,7 @@
 %token ATTRIBUTEREF "@attributeref"
 %token SUBSCRIPT "@subscript"
 %token SLICE "@slice"
-%token PASS "@pass"
+%token PASS "pass"
 
 %token UNOP "@unop"
 %token BINOP "@binop"
@@ -130,6 +133,8 @@
 %token PAIR "@pair"
 %token LIST_DISPLAY "@list_display"
 %token TUPLE "@tuple"
+%token SPECIALID
+%token STMTLIST "@stmt_list"
 
 /* FIXME: MORE... */
 
@@ -178,13 +183,14 @@ program : (NEWLINE! | statement)*             { theTree = $^(MODULE, $*); $$ = N
     ;
 
 identifier :
-    ID                                        { $$ = make_id($ID.c_text(), $ID.loc()); }
+    ID                                        
     ;
 
 atom : 
       identifier 
     | literal
     | enclosure
+    | SPECIALID
     ;
 
 enclosure : 
@@ -329,7 +335,7 @@ not_test : comparison
 /*******************************************/
 /***************STATEMENTS******************/
 expression_list :
-      expression ( ',' expression )* (',')?
+      expression ( ',' expression )* (',')?     { $$ = $^(TUPLE, $*); }
     ;
 
 simple_stmt : 
@@ -363,7 +369,7 @@ target :
     ;
 
 pass_stmt :
-    EMPTY
+    PASS      { $$ = NULL; }
     ;
 
 /* Original Grammar rule */
@@ -379,7 +385,8 @@ print_stmt : "print"! (expression (','! expression)*)?    { $$ = $^(PRINTLN, $*)
 */
 
 return_stmt :
-    RETURN expression_list?
+    "return"! expression_list { $$ = $^(RETURN, $expression_list); }
+    | r="return"! { $$ = $^(RETURN, make_specialId("None", $r.loc())); }
     ;
 
 break_stmt :
@@ -409,7 +416,7 @@ statement :
     ;
 
 stmt_list :
-    simple_stmt (';'! simple_stmt)* ';'!?
+    simple_stmt (';'! simple_stmt)* ';'!?     { $$ = $^(STMTLIST, $*); }
     ;
 
 if_stmt : 
@@ -494,6 +501,7 @@ input_input :
 _NONZERODIGIT : '1' .. '9' ;
 
 ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')* ;
+SPECIALID : "True" | "False" | "None" ; 
 
 _DECIMAL : _NONZERODIGIT _DIGIT* | '0' ;
 _OCTDIGIT : '0' .. '7' ;
@@ -612,6 +620,14 @@ static AST_Ptr
 make_id (const char* text, Location_Type loc)
 {
     AST_Ptr result = AST::make_token (ID, text);
+    result->set_loc (loc);
+    return result;
+}
+
+static AST_Ptr
+make_specialId (const char* text, Location_Type loc)
+{
+    AST_Ptr result = AST::make_token (SPECIALID, text);
     result->set_loc (loc);
     return result;
 }
