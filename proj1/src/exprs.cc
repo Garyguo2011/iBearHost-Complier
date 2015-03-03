@@ -79,7 +79,7 @@ class Id_Token : public AST_Token {
 private:
 
     void print (ostream& out, int indent) {
-        out << "(id " << lineNumber () << " " << as_chars () << ")";
+        out << "(id " << lineNumber () << " " << as_string ().c_str () << ")";
     }
 
     TOKEN_CONSTRUCTORS(Id_Token, AST_Token);
@@ -88,6 +88,19 @@ private:
 
 TOKEN_FACTORY(Id_Token, ID);
 
+/** Represents a special id. */
+class SpecialId_Token : public AST_Token {
+private:
+
+    void print (ostream& out, int indent) {
+        out << "(" << as_string ().c_str () << " " << lineNumber () << ")";
+    }
+
+    TOKEN_CONSTRUCTORS(SpecialId_Token, AST_Token);
+
+};
+
+TOKEN_FACTORY(SpecialId_Token, SPECIALID);
     
 /** Represents a string. */
 class String_Token : public AST_Token {

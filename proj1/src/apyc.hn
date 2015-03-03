@@ -24,6 +24,9 @@
    *  TOKEN. */
   static AST_Ptr make_id (const char* token, Location_Type loc);
 
+  /** Return a new SPECIALID node, where the text of the identifier is given by
+   *  TOKEN. */
+  static AST_Ptr make_specialId (const char* token, Location_Type loc);
 
   /* Variables for lexer */
   static int paren_count = 0 ;
@@ -83,17 +86,18 @@
  */
 
 
-%token PRINTLN "println"
+%token PRINTLN "@println"
+%token PRINT "@print"
 %token EMPTY
 %token MODULE "@module"
 %token ID "@id"
 %token STRING_LITERAL "@string_literal"
 %token INT_LITERAL "@int_literal"
 %token AND "and"
-%token BREAK "break"
-%token CLASS "class"
-%token CONTINUE "continue"
-%token DEF "def"
+%token BREAK "@break"
+%token CLASS "@class"
+%token CONTINUE "@continue"
+%token DEF "@def"
 %token ELIF "elif"
 %token ELSE "else"
 %token FOR "for"
@@ -102,12 +106,12 @@
 %token IS "is"
 %token NOT "not"
 %token OR "or"
-%token RETURN "return"
+%token RETURN "@return"
 %token WHILE "while"
 %token STRING "@string"
 %token RAWSTRING "@rawstring"
-%token INDENT "@indent"
-%token DEDENT "@dedent"
+%token INDENT
+%token DEDENT
 %token NEWLINE
 %token COMMENT
 %token BLANKLINE
@@ -121,7 +125,7 @@
 %token ATTRIBUTEREF "@attributeref"
 %token SUBSCRIPT "@subscript"
 %token SLICE "@slice"
-%token PASS "@pass"
+%token PASS "pass"
 
 %token UNOP "@unop"
 %token BINOP "@binop"
@@ -129,6 +133,12 @@
 %token PAIR "@pair"
 %token LIST_DISPLAY "@list_display"
 %token TUPLE "@tuple"
+%token SPECIALID
+%token STMTLIST "@stmt_list"
+%token BLOCK "@block"
+%token FORMALSLIST "@formals_list"
+%token ASSIGN "@assign"
+%token TARGETLIST "@target_list"
 
 %token COMPARE "@compare"
 %token LEFT_COMPARE "@left_compare"
@@ -176,17 +186,18 @@
 %left "**"
 
 %%
-program : (NEWLINE! | statement)*             { theTree = $^(MODULE, $*); $$ = NULL; }
+program : (NEWLINE! | statement)*           { theTree = $^(MODULE, $*); $$ = NULL; }
     ;
 
 identifier :
-    ID                                        { $$ = make_id($ID.c_text(), $ID.loc()); }
+    ID                                        
     ;
 
 atom : 
       identifier 
     | literal
     | enclosure
+    | SPECIALID
     ;
 
 enclosure : 
@@ -340,7 +351,8 @@ not_test : comparison
 /*******************************************/
 /***************STATEMENTS******************/
 expression_list :
-      expression ( ',' expression )* (',')?
+      expression
+    | expression ( ','! expression )+ (','!)?  { $$ = $^(TUPLE, $*); }
     ;
 
 simple_stmt : 
@@ -360,11 +372,12 @@ expression_stmt :
     ;
 
 assignment_stmt :
-    (target_list '='!)+ expression_list
+    target_list '='! right_side                 {$$ = $^(ASSIGN, $target_list, $right_side);}
     ;
 
 target_list :
-    target (','! target)* ','!?
+      target 
+    | target (','! target)+ ','!?               {$$ = $^(TARGETLIST, $*);}
     ;
 
 target :
@@ -374,15 +387,20 @@ target :
     | slicing
     ;
 
+right_side :
+      expression_list
+    | assignment_stmt
+    ;
+
 pass_stmt :
-    EMPTY
+    PASS      { $$ = NULL; }
     ;
 
 /* Original Grammar rule */
 print_stmt :
-    "print"! (expression (','! expression)* ','!?)?          { $$ = $^(PRINTLN, $*); }      
+      "print"! (expression (','! expression)*)?          { $$ = $^(PRINTLN, $*); }      
+    | "print"! expression (','! expression)* ','!        { $$ = $^(PRINT, $*); }
     ;
-
 
 /*
 print_stmt : "print"! (expression (','! expression)*)?    { $$ = $^(PRINTLN, $*); } 
@@ -390,15 +408,16 @@ print_stmt : "print"! (expression (','! expression)*)?    { $$ = $^(PRINTLN, $*)
 */
 
 return_stmt :
-    RETURN expression_list?
+    "return"! expression_list { $$ = $^(RETURN, $expression_list); }
+    | r="return"! { $$ = $^(RETURN, make_specialId("None", $r.loc())); }
     ;
 
 break_stmt :
-    BREAK
+    "break"!             { $$ = $^(BREAK); }
     ;
 
 continue_stmt :
-    CONTINUE
+    "continue"!          { $$ = $^(CONTINUE); }
     ;
 
 compound_stmt :
@@ -406,21 +425,21 @@ compound_stmt :
     | while_stmt
     | for_stmt
     | funcdef
-    | classdef
+    | classdef          
     ;
 
 suite :
-      stmt_list NEWLINE
-    | NEWLINE INDENT statement+ DEDENT
+      stmt_list NEWLINE!        { $$ = $^(BLOCK, $*); }
+    | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
     ;
 
 statement :
-      stmt_list NEWLINE! 
-    | compound_stmt
+      stmt_list NEWLINE!    
+    | compound_stmt  
     ;
 
 stmt_list :
-    simple_stmt (';'! simple_stmt)* ';'!?
+    simple_stmt (';'! simple_stmt)* ';'!?     { $$ = $^(STMTLIST, $*); }
     ;
 
 if_stmt : 
@@ -438,24 +457,16 @@ for_stmt :
 /**************** Function Call *****************/
 
 funcdef :
-    DEF funcname '('! parameter_list ')'!
+    "def"! funcname '('! parameter_list ')'! ':'! suite   { $$ = $^(DEF, $*); }
     ;
 
 parameter_list :
-     (defparameter ','!)* defparameter
-    ;
-
-defparameter :
-    parameter ('='! expression)?
-    ;
-
-sublist : 
-    parameter (','! parameter)* ','!?
+     (parameter ','!)* parameter ','!?     { $$ = $^(FORMALSLIST, $*); }
+    | /*EMPTY*/                       { $$ = $^(FORMALSLIST); }
     ;
 
 parameter :
-      identifier
-    | '('! sublist ')'!
+    identifier
     ;
 
 funcname :
@@ -466,11 +477,11 @@ funcname :
 
 /**************** Class Definition *****************/
 classdef :
-    CLASS classname ':'! suite
+    "class"! classname ':'! suite      { $$ = $^(CLASS, $*); }
     ;
 
 classname :
-    identifier
+    identifier          
     ;
 
 /************************************************/
@@ -516,7 +527,8 @@ error :
 
 _NONZERODIGIT : '1' .. '9' ;
 
-ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')* ;
+SPECIALID : "True" | "False" | "None" ; 
+ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')*  ;
 
 _DECIMAL : _NONZERODIGIT _DIGIT* | '0' ;
 _OCTDIGIT : '0' .. '7' ;
@@ -636,10 +648,10 @@ NEWLINE : '\n' { if ( paren_count || square_bracket_count || curly_bracket_count
 _NONNEWLINE : _ANY - '\n' ;
 _NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
 
-COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE ; } ;
+COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE;} ;
 
 INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; };
-INDENT : _BOL (' ' | '\t')*  %prefer
+INDENT : /*_BOL (' ' | '\t')* _EOF | */ _BOL (' ' | '\t')*  %prefer
 {
   if (first_nonblank_line && $TEXT_SIZE != 0) {
     indentation_error();
@@ -675,10 +687,11 @@ INDENT : _BOL (' ' | '\t')*  %prefer
           int new_indent_level = equivalent_blank_count / indent_unit;
           int difference = indent_level - new_indent_level;
           while (difference > 0) {
-            yyqueue_token(DEDENT, 0);
+            yyqueue_token(DEDENT, 0, NULL, $TEXT, $TEXT_SIZE);
             indent_level--;
             difference--;
           }
+          YYIGNORE;
         }
       }
     }
@@ -701,6 +714,14 @@ static AST_Ptr
 make_id (const char* text, Location_Type loc)
 {
     AST_Ptr result = AST::make_token (ID, text);
+    result->set_loc (loc);
+    return result;
+}
+
+static AST_Ptr
+make_specialId (const char* text, Location_Type loc)
+{
+    AST_Ptr result = AST::make_token (SPECIALID, text);
     result->set_loc (loc);
     return result;
 }

@@ -37,3 +37,15 @@ then you should see all test pass.
 
 # Test case folder
 
+
+# assgin
+assign there is a technical problem with parsing 
+	
+	assginements such as x,y,z = E
+
+because `x, y, z` is an expression in its own right. As a result, obvious renderings of the grammar into Bison will cause conflicts (am I creating a target list or an expression list? I don’t know until I see the ‘=’). 
+
+1. You can get around this easily by parsing the left side of an assignment as a plain expression
+2. then checking the resulting AST with a specially written C++ function to make sure it is a proper target list.
+3. Alternatively, you can create a GLR parser, which puts off the decision of whether to interpret the left-hand side as a target list or an expression list until it sees (or does not see) the ‘=’.
+
