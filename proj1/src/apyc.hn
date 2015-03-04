@@ -139,6 +139,7 @@
 %token FORMALSLIST "@formals_list"
 %token ASSIGN "@assign"
 %token TARGETLIST "@target_list"
+%token CALL "@call"
 
 %token COMPARE "@compare"
 %token LEFT_COMPARE "@left_compare"
@@ -177,7 +178,7 @@
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
 %expect-rr 8
-%expect 11
+%expect 10
 
 %left OR
 %left AND
@@ -276,11 +277,7 @@ upper_bound :
     ; 
 
 call :
-      primary '('! (argument_list ','!?)? ')'!
-    ;
-
-argument_list :
-      expression (','! expression)* 
+      primary '('! (expression (','! expression)*  ','!?)? ')'!       { $$ = $^(CALL, $*); }
     ;
 
 /*******************************************/
@@ -455,7 +452,7 @@ for_stmt :
     FOR target_list IN expression_list ':'! suite (ELSE ':'! suite)
     ;
 
-/**************** Function Call *****************/
+/************* Function Definition **************/
 
 funcdef :
     "def"! funcname '('! parameter_list ')'! ':'! suite   { $$ = $^(DEF, $*); }
