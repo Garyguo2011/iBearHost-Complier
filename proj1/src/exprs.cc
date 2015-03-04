@@ -110,14 +110,32 @@ private:
      *  escape sequences as necessary. */
     String_Token* post_make () {
         if (syntax () == RAWSTRING) {
-            literal_text = gcstring (as_chars (), text_size ());
+            const char* s = as_chars ();
+            int stringSize;
+            literal_text.clear ();
+            if ( (s[1] == '\'' && s[2] == '\'' && s[3] == '\'') || (s[1] == '\"' && s[2] == '\"' && s[3] == '\"') ) {
+                stringSize = text_size() - 7;
+                literal_text = gcstring (s+4, stringSize);
+            } 
+            else {
+                stringSize = text_size() - 3;
+                literal_text = gcstring (s+2, stringSize);
+            }
         } else {
             int v;
             const char* s = as_chars ();
-            size_t i;
-            i = 0;
+            int endOfString;
+            int i;
             literal_text.clear ();
-            while (i < text_size ()) {
+            if ( (s[0] == '\'' && s[1] == '\'' && s[2] == '\'') || (s[0] == '\"' && s[1] == '\"' && s[2] == '\"') ) {
+                i = 3;
+                endOfString = text_size() - 3;
+            } 
+            else {
+                endOfString = text_size() - 1;
+                i = 1;
+            }
+            while (i < endOfString) {
                 i += 1;
                 if (s[i-1] == '\\') {
                     i += 1;
@@ -146,7 +164,7 @@ private:
                         break;
                     }
                     case 'x': {
-                        if (i+2 > text_size () || 
+                        if (i+2 > endOfString || 
                             !isxdigit (s[i]) || !isxdigit (s[i+1])) {
                             error (s, "bad hexadecimal escape sequence");
                             break;
@@ -165,7 +183,6 @@ private:
     }
 
     void print (ostream& out, int indent) {
-        out << "(string_literal " << lineNumber () << " \"";
         for (size_t i = 0; i < literal_text.size (); i += 1) {
             char c = literal_text[i];
             if (c < 32 || c == '\\' || c == '"') {
@@ -174,7 +191,6 @@ private:
             } else
                 out << c;
         }
-        out << "\")";
     }
 
     gcstring string_text () const {
