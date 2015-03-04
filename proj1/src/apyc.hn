@@ -140,6 +140,10 @@
 %token ASSIGN "@assign"
 %token TARGETLIST "@target_list"
 
+%token COMPARE "@compare"
+%token LEFT_COMPARE "@left_compare"
+%token IF_EXPR "@if_expr"
+
 /* FIXME: MORE... */
 
 /* GLR parsing is useful for cases where the parser must make a reduction before
@@ -173,7 +177,7 @@
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
 %expect-rr 8
-%expect 10
+%expect 11
 
 %left OR
 %left AND
@@ -303,26 +307,35 @@ a_expr : m_expr
     | a_expr op="-" m_expr { $$ = $^(BINOP, make_id("__sub__", $op.loc()), $a_expr, $m_expr); } 
     ; 
 
+/*Jinge get some comparisons working, but still need implementing*/
 comparison :
-      a_expr ( comp_operator a_expr)*
+      a_expr
+    | L=a_expr op=comp_operator R=a_expr                      { $$ = $^(COMPARE, $op, $L, $R); }
+    | L=left_comparison op=comp_operator R=a_expr             { $$ = $^(COMPARE, $op, $L, $R); }
+    ;
+left_comparison :
+      L=a_expr op=comp_operator R=a_expr                      { $$ = $^(LEFT_COMPARE, $op, $L, $R); }
+    | L=left_comparison op=comp_operator R=a_expr             { $$ = $^(LEFT_COMPARE, $op, $L, $R); }
     ;
 
 comp_operator :
-      '<'
-    | '>'
-    | "=="
-    | ">="
-    | "<="
-    | "!="
-    | IS
-    | IS NOT
-    | IN
-    | NOT IN
+      op='<'            { $$ = make_id("__lt__", $op.loc()); }
+    | op='>'            { $$ = make_id("__gt__", $op.loc()); }
+    | op="=="           { $$ = make_id("__eq__", $op.loc()); }
+    | op=">="           { $$ = make_id("__ge__", $op.loc()); }
+    | op="<="           { $$ = make_id("__le__", $op.loc()); }
+    | op="!="           { $$ = make_id("__ne__", $op.loc()); }
+    | op="is"           { $$ = make_id("__is__", $op.loc()); }
+    | op="is not"       { $$ = make_id("__isnot__", $op.loc()); }
+    | op="not in"       { $$ = make_id("__notin__", $op.loc()); }
+    | op="in"           { $$ = make_id("__in__", $op.loc()); }
     ;
 
 expression :
-      or_test (IF or_test ELSE expression)?
+      or_test
+    | L=or_test IF M=or_test ELSE R=expression             { $$ = $^(IF_EXPR, $M, $L, $R); }
     ;
+/**************************************************************/
 
 or_test : and_test
     | or_test "or" and_test { $$ = $^(OR, $or_test, $and_test); }
@@ -351,6 +364,7 @@ simple_stmt :
     | return_stmt
     | break_stmt    
     | continue_stmt
+    | error
     ;
 /***************** Dev-xg ******************/
 
@@ -496,6 +510,18 @@ input_input :
 
 /************************************************/
 
+error : 
+      ERROR_LONGSTRING_SINGLEQUOTE              { error(yysource_location(), "Error on long string single quote!"); }
+    | ERROR_LONGSTRING_DOUBLEQUOTE              { error(yysource_location(), "Error on long string double quote!"); }
+    | ERROR_RAW_LONGSTRING_SINGLEQUOTE          { error(yysource_location(), "Error on raw long string single quote!"); }
+    | ERROR_RAW_LONGSTRING_DOUBLEQUOTE          { error(yysource_location(), "Error on raw long string double quote!"); }
+    | ERROR_SHORTSTRING                         { error(yysource_location(), "Error on short string!"); }
+    | ERROR_RAW_SHORTSTRING                     { error(yysource_location(), "Error on raw short string!"); }
+    | ERROR_CHARACTER                           { error(yysource_location(), "Error characters!"); }
+    | ERROR_STMTS                               { error(yysource_location(), "Error statements!"); }
+    ;
+/*********************************************/
+
 /*** LEXICAL DEFINITIONS ***/
 
 /* Normally, throw away whitespace other than newline. */
@@ -510,7 +536,11 @@ _OCTDIGIT : '0' .. '7' ;
 _OCTINTEGER : '0' _OCTDIGIT+ ;
 _HEXINTEGER : '0' ('x' | 'X') _HEX+ ;
 
-INT_LITERAL : _DECIMAL | _OCTINTEGER | _HEXINTEGER ;
+INT_LITERAL :
+      _DECIMAL                { if(atol($TEXT) > 1073741824) error(yysource_location(), "int can't be that large!"); }
+    | _OCTINTEGER             { if(strtol($TEXT, NULL, 8) > 1073741824)  error(yysource_location(), "oct can't be that large!"); }
+    | _HEXINTEGER             { if(strtol($TEXT, NULL, 16) > 1073741824)  error(yysource_location(), "hex can't be that large!"); }
+    ;
 
 _RAWESCAPESEQ : '\\' _ANY ;
 _RAWSHORTSTRINGITEM1 : _ANY - ('\'' | '\n') | _RAWESCAPESEQ ;
@@ -526,8 +556,12 @@ _NONDOUBLEQUOTE : _ANY - '\"' ;
 _RAWNONSINGLEQUOTE : _ANY - ('\'' | '\\') | _RAWESCAPESEQ ;
 _RAWNONDOUBLEQUOTE : _ANY - ('\"' | '\\') | _RAWESCAPESEQ ;
 
-_RAWLONGSTRING : "\'\'\'" (_RAWNONSINGLEQUOTE* ('\''_RAWNONSINGLEQUOTE | "\'\'"_RAWNONSINGLEQUOTE)* _RAWNONSINGLEQUOTE*)* "\'\'\'"
-              | "\"\"\"" (_RAWNONDOUBLEQUOTE* ('\"'_RAWNONDOUBLEQUOTE | "\"\""_RAWNONDOUBLEQUOTE)* _RAWNONDOUBLEQUOTE*)* "\"\"\"" ;
+_RAWLONGSTRINGITEM1 : (_RAWNONSINGLEQUOTE* ('\''_RAWNONSINGLEQUOTE | "\'\'"_RAWNONSINGLEQUOTE)* _RAWNONSINGLEQUOTE*) ;
+_RAWLONGSTRINGITEM2 : (_RAWNONDOUBLEQUOTE* ('\"'_RAWNONDOUBLEQUOTE | "\"\""_RAWNONDOUBLEQUOTE)* _RAWNONDOUBLEQUOTE*) ;
+
+_RAWLONGSTRING : "\'\'\'" _RAWLONGSTRINGITEM1* "\'\'\'" 
+              | "\"\"\"" _RAWLONGSTRINGITEM2* "\"\"\"" ;
+
 
 
 _ESCAPESEQ : _RAWESCAPESEQ | '\\' _OCTDIGIT | '\\' _OCTDIGIT _OCTDIGIT | '\\' _OCTDIGIT _OCTDIGIT _OCTDIGIT ;
@@ -538,11 +572,53 @@ _SHORTSTRING : '\'' _SHORTSTRINGITEM1* '\'' |
               '\"' _SHORTSTRINGITEM2* '\"' ;
 _LONGNONSINGLEQUOTE : _ANY - ('\'' | '\\') | _ESCAPESEQ ;
 _LONGNONDOUBLEQUOTE : _ANY - ('\"' | '\\') | _ESCAPESEQ ;
-_LONGSTRING : "\'\'\'" (_LONGNONSINGLEQUOTE* ('\''_LONGNONSINGLEQUOTE | "\'\'"_LONGNONSINGLEQUOTE)* _LONGNONSINGLEQUOTE*)* "\'\'\'"
-              | "\"\"\"" (_LONGNONDOUBLEQUOTE* ('\"'_LONGNONDOUBLEQUOTE | "\"\""_LONGNONDOUBLEQUOTE)* _LONGNONDOUBLEQUOTE*)* "\"\"\"" ;
+_LONGSTRINGITEM1 : _LONGNONSINGLEQUOTE* ('\''_LONGNONSINGLEQUOTE | "\'\'"_LONGNONSINGLEQUOTE)* _LONGNONSINGLEQUOTE* ;
+_LONGSTRINGITEM2 : _LONGNONDOUBLEQUOTE* ('\"'_LONGNONDOUBLEQUOTE | "\"\""_LONGNONDOUBLEQUOTE)* _LONGNONDOUBLEQUOTE* ;
+_LONGSTRING : "\'\'\'" _LONGSTRINGITEM1* "\'\'\'"
+              | "\"\"\"" _LONGSTRINGITEM2* "\"\"\"" ;
 
 STRING : _SHORTSTRING | _LONGSTRING ;
 RAWSTRING : _RAWSTRINGPREFIX (_RAWSHORTSTRING | _RAWLONGSTRING) ;
+
+/**************************** Error Handling *************************/
+
+ERROR_LONGSTRING_SINGLEQUOTE : "\'\'\'" _LONGSTRINGITEM1* _EOF ;
+ERROR_LONGSTRING_DOUBLEQUOTE : "\"\"\""  _LONGSTRINGITEM2* _EOF ;
+
+ERROR_RAW_LONGSTRING_SINGLEQUOTE : _RAWSTRINGPREFIX "\'\'\'" _RAWLONGSTRINGITEM1* _EOF ;
+ERROR_RAW_LONGSTRING_DOUBLEQUOTE : _RAWSTRINGPREFIX "\"\"\""  _RAWLONGSTRINGITEM2* _EOF ;
+
+ERROR_SHORTSTRING :
+      '\'' _SHORTSTRINGITEM1*
+    | '\"' _SHORTSTRINGITEM2*
+    ;
+ERROR_RAW_SHORTSTRING :
+      _RAWSTRINGPREFIX '\'' _RAWSHORTSTRINGITEM1*
+    | _RAWSTRINGPREFIX '\"' _RAWSHORTSTRINGITEM2*
+    ;
+ERROR_CHARACTER : ('|' | '&' | '^' | "<<" | ">>" | '~') ; /* More error characters to be implemented. */
+ERROR_STMTS :
+      "as"
+    | "assert"
+    | "del"
+    | "except"
+    | "exec"
+    | "from"
+    | "finally"
+    | "future"
+    | "global"
+    | "import"
+    | "lambda"
+    | "raise"
+    | "try"
+    | "with"
+    | "yield"
+    ;
+
+/********************************************************************************/
+
+
+
 
 LEFT_PAREN : '(' { paren_count += 1 ; } ;
 RIGHT_PAREN : ')' { if (paren_count) paren_count -= 1 ; } ;
