@@ -210,14 +210,13 @@ literal :
     ;
 
 stringliteral :
-      stringliteralpiece
-    | stringliteral stringliteralpiece
+      stringliteralpiece+           { $$ = $^(STRING_LITERAL, $*); }
     ;
 
 //TODO fill out semantic actions
 stringliteralpiece :
       STRING
-    | RAWSTRING
+    | RAWSTRING             
     ;
 /******************************************/
 
