@@ -12,3 +12,8 @@ def foobar(x,y):
 	return z
 print foobar(1,2)
 print 1 + foobar(1,2)
+def foobarbar():
+	def foofoobarbar():
+		print "foofoobarbar"
+	foofoobarbar()
+foobarbar()
