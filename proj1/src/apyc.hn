@@ -142,6 +142,7 @@
 
 %token COMPARE "@compare"
 %token LEFT_COMPARE "@left_compare"
+%token IF_EXPR "@if_expr"
 
 /* FIXME: MORE... */
 
@@ -330,11 +331,12 @@ comp_operator :
     | op="not in"       { $$ = make_id("__notin__", $op.loc()); }
     | op="in"           { $$ = make_id("__in__", $op.loc()); }
     ;
-/**************************************************************/
 
 expression :
-      or_test (IF or_test ELSE expression)?
+      or_test
+    | L=or_test IF M=or_test ELSE R=expression             { $$ = $^(IF_EXPR, $M, $L, $R); }
     ;
+/**************************************************************/
 
 or_test : and_test
     | or_test "or" and_test { $$ = $^(OR, $or_test, $and_test); }
@@ -514,8 +516,8 @@ error :
     | ERROR_LONGSTRING_DOUBLEQUOTE              { error(yysource_location(), "Error on long string double quote!"); }
     | ERROR_RAW_LONGSTRING_SINGLEQUOTE          { error(yysource_location(), "Error on raw long string single quote!"); }
     | ERROR_RAW_LONGSTRING_DOUBLEQUOTE          { error(yysource_location(), "Error on raw long string double quote!"); }
-    | ERROR_SHORTSTRING                         { error(yysource_location(), "Error on short string single quote!"); }
-    | ERROR_RAW_SHORTSTRING                     { error(yysource_location(), "Error on raw short string single quote!"); }
+    | ERROR_SHORTSTRING                         { error(yysource_location(), "Error on short string!"); }
+    | ERROR_RAW_SHORTSTRING                     { error(yysource_location(), "Error on raw short string!"); }
     | ERROR_CHARACTER                           { error(yysource_location(), "Error characters!"); }
     | ERROR_STMTS                               { error(yysource_location(), "Error statements!"); }
     ;
@@ -604,12 +606,12 @@ ERROR_RAW_LONGSTRING_DOUBLEQUOTE :
     | _RAWSTRINGPREFIX "\"\"\""  _RAWLONGSTRINGITEM2* _EOF
     ;
 ERROR_SHORTSTRING :
-      '\'' _SHORTSTRINGITEM1* _EOL
-    | '\"' _SHORTSTRINGITEM2* _EOL
+      '\'' _SHORTSTRINGITEM1*
+    | '\"' _SHORTSTRINGITEM2*
     ;
 ERROR_RAW_SHORTSTRING :
-      _RAWSTRINGPREFIX '\'' _RAWSHORTSTRINGITEM1* _EOL
-    | _RAWSTRINGPREFIX '\"' _RAWSHORTSTRINGITEM2* _EOL
+      _RAWSTRINGPREFIX '\'' _RAWSHORTSTRINGITEM1*
+    | _RAWSTRINGPREFIX '\"' _RAWSHORTSTRINGITEM2*
     ;
 ERROR_CHARACTER : ('|' | '&' | '^' | "<<" | ">>" | '~') ; /* More error characters to be implemented. */
 ERROR_STMTS :
