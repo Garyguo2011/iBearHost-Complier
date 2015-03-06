@@ -185,7 +185,7 @@
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
 %expect-rr 8
-%expect 10
+%expect 0
 
 %left OR
 %left AND
@@ -439,11 +439,6 @@ native_block :
     | NEWLINE! INDENT! "native"! stringliteral NEWLINE! DEDENT! { $$ = $^(BLOCK, $^(NATIVE, $stringliteral)); }
     ;
 
-suite :
-      stmt_list NEWLINE!        { $$ = $^(BLOCK, $*); }
-    | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
-    ;
-
 statement :
       stmt_list NEWLINE!    
     | compound_stmt  
@@ -453,16 +448,28 @@ stmt_list :
     simple_stmt (';'! simple_stmt)* ';'!?     { $$ = $^(STMTLIST, $*); }
     ;
 
+/******************* compound statement ****************/
+
 if_stmt : 
-    IF expression ':'! suite (ELIF expression ':'? suite)* (ELSE ':' suite)?
+    IF! expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); }
+    ;
+
+elif_stmt:
+    ELSE! ':'! for_while_if
+    | ELIF! expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); }
     ;
 
 while_stmt :
-    WHILE expression ':' suite (ELSE ':' suite)?
+    WHILE! expression ':'! for_while_if (ELSE! ':'! for_while_if)? { $$ = $^(WHILE, $*); } 
     ;
 
 for_stmt :
-    FOR target_list IN expression_list ':'! suite (ELSE ':'! suite)
+    FOR! target_list IN! expression_list ':'! for_while_if (ELSE! ':'! for_while_if)? { $$ = $^(FOR, $*); }
+    ;
+
+for_while_if : 
+    NEWLINE! INDENT! statement+ DEDENT!  { $$ = $^(STMTLIST, $*); }
+    | stmt_list NEWLINE!
     ;
 
 /************* Function Definition **************/
@@ -505,7 +512,6 @@ type_formals_list :
 
 /************************************************/
 /*************** STATIC TYPING ******************/
-
 typed_id :
       identifier "::"! type         { $$ = $^(TYPED_ID, $*); }
     ;
