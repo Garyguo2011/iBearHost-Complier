@@ -763,11 +763,11 @@ AST::lineNumber ()
 
 void indentation_error(int expected_indent, int actual_indent)
 {
-  fprintf(stderr, "expected %d actual %d \n", expected_indent, actual_indent);
+  error(yysource_location(), "bad indentation\n");
 }
 
 void indentation_error() {
-  fprintf(stderr, "indentation error");
+  error(yysource_location(), "bad indentation\n");
 }
 
 int calculate_equivalent_blanks(const char* text) {
