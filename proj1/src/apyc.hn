@@ -154,6 +154,7 @@
 %token TYPE_LIST "@type_list"
 %token TYPE_FORMALS "@type_formals_list"
 %token FUNCTION_TYPE "@function_type"
+%token NATIVE "@native"
 
 /* FIXME: MORE... */
 
@@ -230,7 +231,7 @@ stringliteral :
     ;
 
 stringliteralpiece :
-      STRING
+      STRING                       
     | RAWSTRING             
     ;
 /******************************************/
@@ -449,6 +450,11 @@ block :
     | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
     ;
 
+native_block :
+      "native"! stringliteral NEWLINE!                         { $$ = $^(BLOCK, $^(NATIVE, $stringliteral)); }
+    | NEWLINE! INDENT! "native"! stringliteral NEWLINE! DEDENT! { $$ = $^(BLOCK, $^(NATIVE, $stringliteral)); }
+    ;
+
 statement :
       stmt_list NEWLINE!    
     | compound_stmt  
@@ -485,7 +491,8 @@ for_while_if :
 /************* Function Definition **************/
 
 funcdef :
-    "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); }
+    "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! native_block { $$ = $^(DEF, $*); }
+    | "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); } 
     ;
 
 parameter_list :
@@ -521,7 +528,6 @@ type_formals_list :
 
 /************************************************/
 /*************** STATIC TYPING ******************/
-
 typed_id :
       identifier "::"! type         { $$ = $^(TYPED_ID, $*); }
     ;
@@ -787,11 +793,11 @@ AST::lineNumber ()
 
 void indentation_error(int expected_indent, int actual_indent)
 {
-  fprintf(stderr, "expected %d actual %d \n", expected_indent, actual_indent);
+  error(yysource_location(), "bad indentation\n");
 }
 
 void indentation_error() {
-  fprintf(stderr, "indentation error");
+  error(yysource_location(), "bad indentation\n");
 }
 
 int calculate_equivalent_blanks(const char* text) {
