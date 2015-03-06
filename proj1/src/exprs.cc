@@ -82,6 +82,10 @@ private:
         out << "(id " << lineNumber () << " " << as_string ().c_str () << ")";
     }
 
+    void print_value (ostream& out, int indent) {
+        out << as_string ().c_str ();
+    }
+
     TOKEN_CONSTRUCTORS(Id_Token, AST_Token);
 
 };
@@ -101,7 +105,7 @@ private:
 };
 
 TOKEN_FACTORY(SpecialId_Token, SPECIALID);
-    
+  
 /** Represents a string. */
 class String_Token : public AST_Token {
 private:
