@@ -36,6 +36,7 @@
   static int loop_count = 0;
   static int func_count = 0;
   static int if_count = 0;
+  static bool has_class = false;
 
   static int indent_unit = 0;
   static int indent_level = 0;
@@ -191,8 +192,8 @@
  * on the basis of the input so far whether to perform a reduction.  The
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 12
-%expect 0
+%expect-rr 14
+%expect 1
 
 %left OR
 %left AND
@@ -428,18 +429,17 @@ print_stmt :
     ;
 
 return_stmt :
-    "return"! expression_list { $$ = $^(RETURN, $expression_list); }
-    | r="return"! { $$ = $^(RETURN, make_specialId("None", $r.loc())); }
+    "return"! {if (func_count == 0) error(yysource_location(), "return not properly in a funcdef"); } expression_list { $$ = $^(RETURN, $expression_list); }
+    | r="return"! {if (func_count == 0) error(yysource_location(), "return not properly in a funcdef"); } { $$ = $^(RETURN, make_specialId("None", $r.loc())); }
     ;
 
 break_stmt :
-    "break"!             { if (loop_count == 0) error(yysource_location(), "@break outside loop");
+    "break"!             { if (loop_count == 0) error(yysource_location(), "@break not properly in a loop");
                             $$ = $^(BREAK); }
     ;
 
 continue_stmt :
-    "continue"!          { if (loop_count == 0) error(yysource_location(), "@continue outside loop");
-                            $$ = $^(CONTINUE); }
+    "continue"!          { if (loop_count == 0) error(yysource_location(), "@continue not properly in a loop")                        ; $$ = $^(CONTINUE); }
     ;
 
 compound_stmt :
@@ -497,7 +497,7 @@ for_while_if :
 
 funcdef :
     "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! native_block { $$ = $^(DEF, $*); }
-    | "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); func_count -= 1; } 
+    | "def"! funcname '('! parameter_list ')'! { if (loop_count > 0 or if_count > 0) error(yysource_location(), "cannot def in loop or condition") ; func_count += 1; } ("::"! type)? ':'! block   { $$ = $^(DEF, $*); func_count -= 1; } 
     ;
 
 parameter_list :
@@ -518,8 +518,8 @@ funcname :
 
 /************* Class Definition *****************/
 classdef :
-    "class"! classname "of"! type_formals_list ':'! block      { $$ = $^(CLASS, $*); }
-    | "class"! classname ':'! block  { $$ = $^(CLASS, $classname, $^(TYPE_FORMALS), $block); }
+    "class"! { if (has_class == true) error(yysource_location(), "cannot define a class in a class"); has_class = true; } classname "of"! type_formals_list ':'! block      { $$ = $^(CLASS, $*); has_class = false; }
+    | "class"! { if (has_class == true) error(yysource_location(), "cannot define a class in a class"); has_class = true; } classname ':'! block  { $$ = $^(CLASS, $classname, $^(TYPE_FORMALS), $block); has_class = false; }
     ;
 
 classname :
