@@ -450,7 +450,7 @@ if_stmt :
 
 elif_stmt:
     ELSE! ':'! for_while_if
-    | ELIF! expression ':'! for_while_if (elif_stmt)* { $$ = $^(IF, $*); }
+    | ELIF! expression ':'! for_while_if elif_stmt { $$ = $^(IF, $*); }
     ;
 
 while_stmt :
