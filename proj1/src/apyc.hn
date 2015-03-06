@@ -600,6 +600,25 @@ error :
 _NONZERODIGIT : '1' .. '9' ;
 
 SPECIALID : "True" | "False" | "None" ; 
+
+ERROR_STMTS :
+      "as"
+    | "assert"
+    | "del"
+    | "except"
+    | "exec"
+    | "from"
+    | "finally"
+    | "future"
+    | "global"
+    | "import"
+    | "lambda"
+    | "raise"
+    | "try"
+    | "with"
+    | "yield"
+    ;
+    
 ID : (_LETTER | '_') (_LETTER | _DIGIT | '_')*  ;
 
 _DECIMAL : _NONZERODIGIT _DIGIT* | '0' ;
@@ -668,23 +687,7 @@ ERROR_RAW_SHORTSTRING :
     | _RAWSTRINGPREFIX '\"' _RAWSHORTSTRINGITEM2*
     ;
 ERROR_CHARACTER : ('|' | '&' | '^' | "<<" | ">>" | '~') ; /* More error characters to be implemented. */
-ERROR_STMTS :
-      "as"
-    | "assert"
-    | "del"
-    | "except"
-    | "exec"
-    | "from"
-    | "finally"
-    | "future"
-    | "global"
-    | "import"
-    | "lambda"
-    | "raise"
-    | "try"
-    | "with"
-    | "yield"
-    ;
+
 
 /********************************************************************************/
 
