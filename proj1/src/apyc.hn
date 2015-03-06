@@ -33,6 +33,9 @@
   static int paren_count = 0 ;
   static int square_bracket_count = 0;
   static int curly_bracket_count = 0;
+  static int loop_count = 0;
+  static int func_count = 0;
+  static int if_count = 0;
 
   static int indent_unit = 0;
   static int indent_level = 0;
@@ -430,11 +433,13 @@ return_stmt :
     ;
 
 break_stmt :
-    "break"!             { $$ = $^(BREAK); }
+    "break"!             { if (loop_count == 0) error(yysource_location(), "@break outside loop");
+                            $$ = $^(BREAK); }
     ;
 
 continue_stmt :
-    "continue"!          { $$ = $^(CONTINUE); }
+    "continue"!          { if (loop_count == 0) error(yysource_location(), "@continue outside loop");
+                            $$ = $^(CONTINUE); }
     ;
 
 compound_stmt :
@@ -467,7 +472,7 @@ stmt_list :
 /******************* compound statement ****************/
 
 if_stmt : 
-    IF! expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); }
+    IF! { if_count += 1; } expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); if_count -= 1}
     ;
 
 elif_stmt:
@@ -476,11 +481,11 @@ elif_stmt:
     ;
 
 while_stmt :
-    WHILE! expression ':'! for_while_if (ELSE! ':'! for_while_if)? { $$ = $^(WHILE, $*); } 
+    WHILE! { loop_count += 1; } expression ':'! for_while_if { loop_count -= 1; } (ELSE! ':'! for_while_if)? { $$ = $^(WHILE, $*); } 
     ;
 
 for_stmt :
-    FOR! target_list IN! expression_list ':'! for_while_if (ELSE! ':'! for_while_if)? { $$ = $^(FOR, $*); }
+    FOR! { loop_count += 1; } target_list IN! expression_list ':'! for_while_if { loop_count -= 1; } (ELSE! ':'! for_while_if)? { $$ = $^(FOR, $*); }
     ;
 
 for_while_if : 
@@ -492,7 +497,7 @@ for_while_if :
 
 funcdef :
     "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! native_block { $$ = $^(DEF, $*); }
-    | "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); } 
+    | "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); func_count -= 1; } 
     ;
 
 parameter_list :
