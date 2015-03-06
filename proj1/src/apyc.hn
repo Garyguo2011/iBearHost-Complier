@@ -27,6 +27,7 @@
   /** Return a new SPECIALID node, where the text of the identifier is given by
    *  TOKEN. */
   static AST_Ptr make_specialId (const char* token, Location_Type loc);
+  static AST_Ptr make_intLiteral (const char* text, Location_Type loc);
 
   /* Variables for lexer */
   static int paren_count = 0 ;
@@ -124,7 +125,10 @@
 %token RIGHT_CURLY_BRACKET
 %token ATTRIBUTEREF "@attributeref"
 %token SUBSCRIPT "@subscript"
+%token SUBSCRIPT_ASSIGN "@subscript_assign"
 %token SLICE "@slice"
+%token SLICE_ASSIGN "@slice_assign"
+%token NEXT_VALUE "@next_value"
 %token PASS "pass"
 
 %token UNOP "@unop"
@@ -183,8 +187,8 @@
  * on the basis of the input so far whether to perform a reduction.  The
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 8
-%expect 0
+%expect-rr 12
+%expect 0 
 
 %left OR
 %left AND
@@ -267,11 +271,13 @@ attributeref :
     ;
 
 subscription :
-      identifier '['! expression ']'!   { $$ = $^(SUBSCRIPT, $*); }
+      e=identifier '['! expression ']'!                         { $$ = $^(SUBSCRIPT, make_id("__getitem__",$e.loc()),$*); }
     ;
 
 slicing :
-      identifier '['! lower_bound? ':'! upper_bound? ']'!   { $$ = $^(SLICE, $*); }
+      e=identifier '['! l=lower_bound ':'! u=upper_bound ']'!       { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, $u);}
+    | e=identifier '['! l=lower_bound ':'! ']'!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()));}
+    | e=identifier '['! ':'! u=upper_bound ']'!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u);}
     ;
 
 lower_bound :
@@ -388,9 +394,19 @@ target_list :
 target :
       identifier
     | attributeref
-    | subscription
-    | slicing
+    | subscription_assgin
+    | slicing_assgin
     | typed_id
+    ;
+
+subscription_assgin :
+    e=identifier '['! expression ']'!                             {$$ = $^(SUBSCRIPT_ASSIGN,make_id("__setitem__",$e.loc()), $*, $^(NEXT_VALUE));}
+    ;
+
+slicing_assgin :
+      e=identifier '['! l=lower_bound ':'! u=upper_bound ']'!     {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, $u, $^(NEXT_VALUE));}
+    | e=identifier '['! l=lower_bound ':'! ']'!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()), $^(NEXT_VALUE));}
+    | e=identifier '['! ':'! u=upper_bound ']'!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u, $^(NEXT_VALUE));}
     ;
 
 right_side :
@@ -743,6 +759,14 @@ static AST_Ptr
 make_id (const char* text, Location_Type loc)
 {
     AST_Ptr result = AST::make_token (ID, text);
+    result->set_loc (loc);
+    return result;
+}
+
+static AST_Ptr
+make_intLiteral (const char* text, Location_Type loc)
+{
+    AST_Ptr result = AST::make_token (INT_LITERAL, text);
     result->set_loc (loc);
     return result;
 }
