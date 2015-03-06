@@ -150,6 +150,7 @@
 %token TYPE_LIST "@type_list"
 %token TYPE_FORMALS "@type_formals_list"
 %token FUNCTION_TYPE "@function_type"
+%token NATIVE "@native"
 
 /* FIXME: MORE... */
 
@@ -226,7 +227,7 @@ stringliteral :
     ;
 
 stringliteralpiece :
-      STRING
+      STRING                       
     | RAWSTRING             
     ;
 /******************************************/
@@ -433,6 +434,11 @@ block :
     | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
     ;
 
+native_block :
+      "native"! stringliteral NEWLINE!                         { $$ = $^(BLOCK, $^(NATIVE, $stringliteral)); }
+    | NEWLINE! INDENT! "native"! stringliteral NEWLINE! DEDENT! { $$ = $^(BLOCK, $^(NATIVE, $stringliteral)); }
+    ;
+
 suite :
       stmt_list NEWLINE!        { $$ = $^(BLOCK, $*); }
     | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
@@ -462,7 +468,8 @@ for_stmt :
 /************* Function Definition **************/
 
 funcdef :
-    "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); }
+    "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! native_block { $$ = $^(DEF, $*); }
+    | "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); } 
     ;
 
 parameter_list :
