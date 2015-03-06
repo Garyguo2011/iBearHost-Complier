@@ -144,6 +144,12 @@
 %token COMPARE "@compare"
 %token LEFT_COMPARE "@left_compare"
 %token IF_EXPR "@if_expr"
+%token TYPE "@type"
+%token TYPED_ID "@typed_id"
+%token TYPE_VAR "@type_var"
+%token TYPE_LIST "@type_list"
+%token TYPE_FORMALS "@type_formals_list"
+%token FUNCTION_TYPE "@function_type"
 
 /* FIXME: MORE... */
 
@@ -191,6 +197,7 @@
 program : (NEWLINE! | statement)*           { theTree = $^(MODULE, $*); $$ = NULL; }
     ;
 
+/************** ATOMS ********************/
 identifier :
     ID                                        
     ;
@@ -207,7 +214,7 @@ enclosure :
     | list_display
     | dict_display
     ;
-
+/******************************************/
 /********** LITERALS **********************/
 literal :
       stringliteral
@@ -218,7 +225,6 @@ stringliteral :
       stringliteralpiece+           { $$ = $^(STRING_LITERAL, $*); }
     ;
 
-//TODO fill out semantic actions
 stringliteralpiece :
       STRING
     | RAWSTRING             
@@ -278,6 +284,7 @@ upper_bound :
 
 call :
       primary '('! (expression (','! expression)*  ','!?)? ')'!       { $$ = $^(CALL, $*); }
+    | typed_id '('! (expression (','! expression)*  ','!?)? ')'!      { $$ = $^(CALL, $*); }
     ;
 
 /*******************************************/
@@ -383,6 +390,7 @@ target :
     | attributeref
     | subscription
     | slicing
+    | typed_id
     ;
 
 right_side :
@@ -394,16 +402,10 @@ pass_stmt :
     PASS      { $$ = NULL; }
     ;
 
-/* Original Grammar rule */
 print_stmt :
       "print"! (expression (','! expression)*)?          { $$ = $^(PRINTLN, $*); }      
     | "print"! expression (','! expression)* ','!        { $$ = $^(PRINT, $*); }
     ;
-
-/*
-print_stmt : "print"! (expression (','! expression)*)?    { $$ = $^(PRINTLN, $*); } 
-      ;
-*/
 
 return_stmt :
     "return"! expression_list { $$ = $^(RETURN, $expression_list); }
@@ -424,6 +426,11 @@ compound_stmt :
     | for_stmt
     | funcdef
     | classdef          
+    ;
+
+block :
+      stmt_list NEWLINE!        { $$ = $^(BLOCK, $*); }
+    | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
     ;
 
 suite :
@@ -455,7 +462,7 @@ for_stmt :
 /************* Function Definition **************/
 
 funcdef :
-    "def"! funcname '('! parameter_list ')'! ':'! suite   { $$ = $^(DEF, $*); }
+    "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); }
     ;
 
 parameter_list :
@@ -465,6 +472,7 @@ parameter_list :
 
 parameter :
     identifier
+    | typed_id    
     ;
 
 funcname :
@@ -473,17 +481,49 @@ funcname :
 
 /************************************************/
 
-/**************** Class Definition *****************/
+/************* Class Definition *****************/
 classdef :
-    "class"! classname ':'! suite      { $$ = $^(CLASS, $*); }
+    "class"! classname "of"! type_formals_list ':'! block      { $$ = $^(CLASS, $*); }
+    | "class"! classname ':'! block  { $$ = $^(CLASS, $classname, $^(TYPE_FORMALS), $block); }
     ;
 
 classname :
     identifier          
     ;
 
-/************************************************/
+type_formals_list :
+    '['! (type_var ','!)* type_var ']'!     { $$ = $^(TYPE_FORMALS, $*); }
+    | type_var                              { $$ = $^(TYPE_FORMALS, $*); }
+    ;
 
+/************************************************/
+/*************** STATIC TYPING ******************/
+
+typed_id :
+      identifier "::"! type         { $$ = $^(TYPED_ID, $*); }
+    ;
+
+type :
+      type_id
+    | type_var
+    | '('! type_list ')'! "->"! type    { $$ = $^(FUNCTION_TYPE, $type, $type_list); }
+    ;
+
+type_var :
+      '$'! identifier      { $$ = $^(TYPE_VAR, $identifier); }
+    ;
+
+type_list :
+     (type ','!)* type              { $$ = $^(TYPE_LIST, $*); }
+    ;
+
+type_id :
+      identifier "of"! '['! type_list ']'!    { $$ = $^(TYPE, $*); }
+    | identifier "of"! type               { $$ = $^(TYPE, $identifier, $^(TYPE_LIST, $type)); }
+    | identifier                          { $$ = $^(TYPE, $identifier, $^(TYPE_LIST)); }
+    ;
+
+/************************************************/
 /*****************  FILE I/O ********************/
 
 /*
