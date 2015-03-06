@@ -27,6 +27,7 @@
   /** Return a new SPECIALID node, where the text of the identifier is given by
    *  TOKEN. */
   static AST_Ptr make_specialId (const char* token, Location_Type loc);
+  static AST_Ptr make_intLiteral (const char* text, Location_Type loc);
 
   /* Variables for lexer */
   static int paren_count = 0 ;
@@ -124,7 +125,10 @@
 %token RIGHT_CURLY_BRACKET
 %token ATTRIBUTEREF "@attributeref"
 %token SUBSCRIPT "@subscript"
+%token SUBSCRIPT_ASSIGN "@subscript_assign"
 %token SLICE "@slice"
+%token SLICE_ASSIGN "@slice_assign"
+%token NEXT_VALUE "@next_value"
 %token PASS "pass"
 
 %token UNOP "@unop"
@@ -144,6 +148,13 @@
 %token COMPARE "@compare"
 %token LEFT_COMPARE "@left_compare"
 %token IF_EXPR "@if_expr"
+%token TYPE "@type"
+%token TYPED_ID "@typed_id"
+%token TYPE_VAR "@type_var"
+%token TYPE_LIST "@type_list"
+%token TYPE_FORMALS "@type_formals_list"
+%token FUNCTION_TYPE "@function_type"
+%token NATIVE "@native"
 
 /* FIXME: MORE... */
 
@@ -177,8 +188,8 @@
  * on the basis of the input so far whether to perform a reduction.  The
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 8
-%expect 10
+%expect-rr 12
+%expect 0
 
 %left OR
 %left AND
@@ -191,6 +202,7 @@
 program : (NEWLINE! | statement)*           { theTree = $^(MODULE, $*); $$ = NULL; }
     ;
 
+/************** ATOMS ********************/
 identifier :
     ID                                        
     ;
@@ -207,7 +219,7 @@ enclosure :
     | list_display
     | dict_display
     ;
-
+/******************************************/
 /********** LITERALS **********************/
 literal :
       stringliteral
@@ -218,9 +230,8 @@ stringliteral :
       stringliteralpiece+           { $$ = $^(STRING_LITERAL, $*); }
     ;
 
-//TODO fill out semantic actions
 stringliteralpiece :
-      STRING
+      STRING                       
     | RAWSTRING             
     ;
 /******************************************/
@@ -261,11 +272,13 @@ attributeref :
     ;
 
 subscription :
-      identifier '['! expression ']'!   { $$ = $^(SUBSCRIPT, $*); }
+      e=identifier '['! expression ']'!                         { $$ = $^(SUBSCRIPT, make_id("__getitem__",$e.loc()),$*); }
     ;
 
 slicing :
-      identifier '['! lower_bound? ':'! upper_bound? ']'!   { $$ = $^(SLICE, $*); }
+      e=identifier '['! l=lower_bound ':'! u=upper_bound ']'!       { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, $u);}
+    | e=identifier '['! l=lower_bound ':'! ']'!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()));}
+    | e=identifier '['! ':'! u=upper_bound ']'!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u);}
     ;
 
 lower_bound :
@@ -278,6 +291,7 @@ upper_bound :
 
 call :
       primary '('! (expression (','! expression)*  ','!?)? ')'!       { $$ = $^(CALL, $*); }
+    | typed_id '('! (expression (','! expression)*  ','!?)? ')'!      { $$ = $^(CALL, $*); }
     ;
 
 /*******************************************/
@@ -381,8 +395,19 @@ target_list :
 target :
       identifier
     | attributeref
-    | subscription
-    | slicing
+    | subscription_assgin
+    | slicing_assgin
+    | typed_id
+    ;
+
+subscription_assgin :
+    e=identifier '['! expression ']'!                             {$$ = $^(SUBSCRIPT_ASSIGN,make_id("__setitem__",$e.loc()), $*, $^(NEXT_VALUE));}
+    ;
+
+slicing_assgin :
+      e=identifier '['! l=lower_bound ':'! u=upper_bound ']'!     {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, $u, $^(NEXT_VALUE));}
+    | e=identifier '['! l=lower_bound ':'! ']'!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()), $^(NEXT_VALUE));}
+    | e=identifier '['! ':'! u=upper_bound ']'!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u, $^(NEXT_VALUE));}
     ;
 
 right_side :
@@ -394,16 +419,10 @@ pass_stmt :
     PASS      { $$ = NULL; }
     ;
 
-/* Original Grammar rule */
 print_stmt :
       "print"! (expression (','! expression)*)?          { $$ = $^(PRINTLN, $*); }      
     | "print"! expression (','! expression)* ','!        { $$ = $^(PRINT, $*); }
     ;
-
-/*
-print_stmt : "print"! (expression (','! expression)*)?    { $$ = $^(PRINTLN, $*); } 
-      ;
-*/
 
 return_stmt :
     "return"! expression_list { $$ = $^(RETURN, $expression_list); }
@@ -426,9 +445,14 @@ compound_stmt :
     | classdef          
     ;
 
-suite :
+block :
       stmt_list NEWLINE!        { $$ = $^(BLOCK, $*); }
     | NEWLINE! INDENT! statement+ DEDENT! { $$ = $^(BLOCK, $*); }
+    ;
+
+native_block :
+      "native"! stringliteral NEWLINE!                         { $$ = $^(BLOCK, $^(NATIVE, $stringliteral)); }
+    | NEWLINE! INDENT! "native"! stringliteral NEWLINE! DEDENT! { $$ = $^(BLOCK, $^(NATIVE, $stringliteral)); }
     ;
 
 statement :
@@ -440,22 +464,35 @@ stmt_list :
     simple_stmt (';'! simple_stmt)* ';'!?     { $$ = $^(STMTLIST, $*); }
     ;
 
+/******************* compound statement ****************/
+
 if_stmt : 
-    IF expression ':'! suite (ELIF expression ':'? suite)* (ELSE ':' suite)?
+    IF! expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); }
+    ;
+
+elif_stmt:
+    ELSE! ':'! for_while_if
+    | ELIF! expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); }
     ;
 
 while_stmt :
-    WHILE expression ':' suite (ELSE ':' suite)?
+    WHILE! expression ':'! for_while_if (ELSE! ':'! for_while_if)? { $$ = $^(WHILE, $*); } 
     ;
 
 for_stmt :
-    FOR target_list IN expression_list ':'! suite (ELSE ':'! suite)
+    FOR! target_list IN! expression_list ':'! for_while_if (ELSE! ':'! for_while_if)? { $$ = $^(FOR, $*); }
+    ;
+
+for_while_if : 
+    NEWLINE! INDENT! statement+ DEDENT!  { $$ = $^(STMTLIST, $*); }
+    | stmt_list NEWLINE!
     ;
 
 /************* Function Definition **************/
 
 funcdef :
-    "def"! funcname '('! parameter_list ')'! ':'! suite   { $$ = $^(DEF, $*); }
+    "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! native_block { $$ = $^(DEF, $*); }
+    | "def"! funcname '('! parameter_list ')'! ("::"! type)? ':'! block   { $$ = $^(DEF, $*); } 
     ;
 
 parameter_list :
@@ -465,6 +502,7 @@ parameter_list :
 
 parameter :
     identifier
+    | typed_id    
     ;
 
 funcname :
@@ -473,17 +511,48 @@ funcname :
 
 /************************************************/
 
-/**************** Class Definition *****************/
+/************* Class Definition *****************/
 classdef :
-    "class"! classname ':'! suite      { $$ = $^(CLASS, $*); }
+    "class"! classname "of"! type_formals_list ':'! block      { $$ = $^(CLASS, $*); }
+    | "class"! classname ':'! block  { $$ = $^(CLASS, $classname, $^(TYPE_FORMALS), $block); }
     ;
 
 classname :
     identifier          
     ;
 
-/************************************************/
+type_formals_list :
+    '['! (type_var ','!)* type_var ']'!     { $$ = $^(TYPE_FORMALS, $*); }
+    | type_var                              { $$ = $^(TYPE_FORMALS, $*); }
+    ;
 
+/************************************************/
+/*************** STATIC TYPING ******************/
+typed_id :
+      identifier "::"! type         { $$ = $^(TYPED_ID, $*); }
+    ;
+
+type :
+      type_id
+    | type_var
+    | '('! type_list ')'! "->"! type    { $$ = $^(FUNCTION_TYPE, $type, $type_list); }
+    ;
+
+type_var :
+      '$'! identifier      { $$ = $^(TYPE_VAR, $identifier); }
+    ;
+
+type_list :
+     (type ','!)* type              { $$ = $^(TYPE_LIST, $*); }
+    ;
+
+type_id :
+      identifier "of"! '['! type_list ']'!    { $$ = $^(TYPE, $*); }
+    | identifier "of"! type               { $$ = $^(TYPE, $identifier, $^(TYPE_LIST, $type)); }
+    | identifier                          { $$ = $^(TYPE, $identifier, $^(TYPE_LIST)); }
+    ;
+
+/************************************************/
 /*****************  FILE I/O ********************/
 
 /*
@@ -701,6 +770,14 @@ make_id (const char* text, Location_Type loc)
 }
 
 static AST_Ptr
+make_intLiteral (const char* text, Location_Type loc)
+{
+    AST_Ptr result = AST::make_token (INT_LITERAL, text);
+    result->set_loc (loc);
+    return result;
+}
+
+static AST_Ptr
 make_specialId (const char* text, Location_Type loc)
 {
     AST_Ptr result = AST::make_token (SPECIALID, text);
@@ -716,11 +793,11 @@ AST::lineNumber ()
 
 void indentation_error(int expected_indent, int actual_indent)
 {
-  fprintf(stderr, "expected %d actual %d \n", expected_indent, actual_indent);
+  error(yysource_location(), "bad indentation\n");
 }
 
 void indentation_error() {
-  fprintf(stderr, "indentation error");
+  error(yysource_location(), "bad indentation\n");
 }
 
 int calculate_equivalent_blanks(const char* text) {
