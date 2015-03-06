@@ -28,6 +28,8 @@ public:
      *  multiple lines. */
     virtual void print (std::ostream& out, int indent) = 0;
 
+    virtual void print_value (std::ostream& out, int indent) = 0;
+
     /** For nodes that represent types, return the node with a static
      *  type that reveals its Type operations.  An error on node types
      *  that do not represent types. */
@@ -46,6 +48,8 @@ public:
         : CommonToken<AST, AST_Token, AST_Tree> (syntax, text) { }
 
     void print (std::ostream& out, int indent);
+
+    void print_value (std::ostream& out, int indent);
 
     /** The text denoted by THIS, if a string literal.  Undefined
      *  otherwise.  This is distinct from the actual text of a
@@ -74,6 +78,8 @@ public:
      *  trees: prints (<OP> <LINE> <CHILD0> ...), where <OP> is the 
      *  external operator name and line is the source line number. */
     void print (std::ostream& out, int indent);
+
+    void print_value (std::ostream& out, int indent);
 
     NODE_BASE_CONSTRUCTORS (AST_Tree, Parent);
 

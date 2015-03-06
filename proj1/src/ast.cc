@@ -32,6 +32,13 @@ AST_Tree::print (ostream& out, int indent)
     out << ")";
 }
 
+void 
+AST_Tree::print_value (ostream& out, int indent) {
+}
+
+void 
+AST_Token::print_value (ostream& out, int indent) {
+}
 /** My node operator name, as it appears in my external (text) AST
  *  representation.  The value is valid only until the next call to
  *  external_name. */
@@ -87,3 +94,21 @@ class Empty_AST : public AST_Tree {
 };
 
 NODE_FACTORY (Empty_AST, EMPTY);
+
+class TypeVar_AST : public AST_Tree {
+    void print (ostream& out, int indent) {
+
+        out << "(type_var " << lineNumber () << " "; 
+
+        for_each_child(c, this) {
+                c->print_value (out, indent);
+        } end_for;
+
+        out << " )"; 
+
+    }
+
+    NODE_CONSTRUCTORS (TypeVar_AST, AST_Tree);
+};
+
+NODE_FACTORY (TypeVar_AST, TYPE_VAR);
