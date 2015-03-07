@@ -1,0 +1,6 @@
+3<5 is true
+3 > 0 is true
+3<=3 is true
+5 >= 3 is true
+3 == 3 is true
+3 != 4 is true

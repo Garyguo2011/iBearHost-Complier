@@ -1,0 +1,4 @@
+1 < a < 6 is true
+6 > a > 1 is true
+1 <= a <= 6 is true
+1 >= a >= 6 is false
