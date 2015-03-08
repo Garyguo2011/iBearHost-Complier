@@ -244,6 +244,7 @@ stringliteralpiece :
 parenth_form : "("! ")"! {$$ = $^(TUPLE)}
     | "("! expression ")"!
     | "("! expression (","! expression)+ ","!? ")"! {$$ = $^(TUPLE, $*); }
+    | "("! expression ","! ")"! {$$ = $^(TUPLE, $*); } 
     ;
 
 list_display : "["! "]"!  {$$ = $^(LIST_DISPLAY); }
@@ -369,6 +370,7 @@ not_test : comparison
 expression_list :
       expression
     | expression ( ','! expression )+ (','!)?  { $$ = $^(TUPLE, $*); }
+    | expression ','!                { $$ = $^(TUPLE, $*); }
     ;
 
 simple_stmt : 
