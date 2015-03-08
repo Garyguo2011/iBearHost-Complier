@@ -194,7 +194,7 @@
  * on the basis of the input so far whether to perform a reduction.  The
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 14
+%expect-rr 16
 %expect 12
 
 %left OR
@@ -279,13 +279,15 @@ attributeref :
     ;
 
 subscription :
-      e=identifier LEFT_SQUARE_BRACKET! expression RIGHT_SQUARE_BRACKET!                         { $$ = $^(SUBSCRIPT, make_id("__getitem__",$e.loc()),$*); }
+      e=primary LEFT_SQUARE_BRACKET! expression RIGHT_SQUARE_BRACKET!                         { $$ = $^(SUBSCRIPT, make_id("__getitem__",$e.loc()),$*); }
     ;
 
 slicing :
-      e=identifier LEFT_SQUARE_BRACKET! l=lower_bound ':'! u=upper_bound RIGHT_SQUARE_BRACKET!       { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, $u);}
-    | e=identifier LEFT_SQUARE_BRACKET! l=lower_bound ':'! RIGHT_SQUARE_BRACKET!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()));}
-    | e=identifier LEFT_SQUARE_BRACKET! ':'! u=upper_bound RIGHT_SQUARE_BRACKET!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u);}
+      e=primary LEFT_SQUARE_BRACKET! l=lower_bound ':'! u=upper_bound RIGHT_SQUARE_BRACKET!       { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, $u);}
+    | e=primary LEFT_SQUARE_BRACKET! l=lower_bound ':'! RIGHT_SQUARE_BRACKET!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()));}
+    | e=primary LEFT_SQUARE_BRACKET! ':'! u=upper_bound RIGHT_SQUARE_BRACKET!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u);}
+    | e=primary LEFT_SQUARE_BRACKET! ':'! RIGHT_SQUARE_BRACKET!                     { $$ = $^(SLICE, make_id("__getslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), make_intLiteral ("1073741823", $e.loc()));}
+    
     ;
 
 lower_bound :
@@ -404,18 +406,20 @@ target :
       identifier
     | attributeref
     | subscription_assgin
-    | slicing_assgin
+    | slicing_assign
     | typed_id
     ;
 
 subscription_assgin :
-    e=identifier LEFT_SQUARE_BRACKET! expression RIGHT_SQUARE_BRACKET!                             {$$ = $^(SUBSCRIPT_ASSIGN,make_id("__setitem__",$e.loc()), $*, $^(NEXT_VALUE));}
+    e=primary LEFT_SQUARE_BRACKET! expression RIGHT_SQUARE_BRACKET!                             {$$ = $^(SUBSCRIPT_ASSIGN,make_id("__setitem__",$e.loc()), $*, $^(NEXT_VALUE));}
     ;
 
-slicing_assgin :
-      e=identifier LEFT_SQUARE_BRACKET! l=lower_bound ':'! u=upper_bound RIGHT_SQUARE_BRACKET!     {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, $u, $^(NEXT_VALUE));}
-    | e=identifier LEFT_SQUARE_BRACKET! l=lower_bound ':'! RIGHT_SQUARE_BRACKET!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()), $^(NEXT_VALUE));}
-    | e=identifier LEFT_SQUARE_BRACKET! ':'! u=upper_bound RIGHT_SQUARE_BRACKET!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u, $^(NEXT_VALUE));}
+slicing_assign :
+      e=primary LEFT_SQUARE_BRACKET! l=lower_bound ':'! u=upper_bound RIGHT_SQUARE_BRACKET!     {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, $u, $^(NEXT_VALUE));}
+    | e=primary LEFT_SQUARE_BRACKET! l=lower_bound ':'! RIGHT_SQUARE_BRACKET!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, $l, make_intLiteral ("1073741823", $e.loc()), $^(NEXT_VALUE));}
+    | e=primary LEFT_SQUARE_BRACKET! ':'! u=upper_bound RIGHT_SQUARE_BRACKET!                   {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), $u, $^(NEXT_VALUE));}
+    | e=primary LEFT_SQUARE_BRACKET! ':'! RIGHT_SQUARE_BRACKET!                                 {$$ = $^(SLICE_ASSIGN, make_id("__setslice__",$e.loc()), $e, make_intLiteral ("0", $e.loc()), make_intLiteral ("1073741823", $e.loc()), $^(NEXT_VALUE));}
+    
     ;
 
 right_side :
