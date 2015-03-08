@@ -68,8 +68,11 @@ compile: ../apyc
 # generated files in turn depend on parser-sentinel, and it depends on
 # apyc.hn. So, whenever apyc.hn is changed, any compilation that
 # depends on a generated file will cause horn to rebuild the generated
-# files (ALL_GENERATED).
+# files (ALL_GENERATED).  The (non-printing) command is a dummy; its effect
+# is to signal that all of the files in $(ALL_GENERATED) should be
+# considered changed if parser-sentinel gets rebuilt.
 $(ALL_GENERATED): parser-sentinel
+	@true
 
 parser-sentinel: apyc.hn
 	horn $<

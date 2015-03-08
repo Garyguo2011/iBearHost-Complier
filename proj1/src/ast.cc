@@ -112,3 +112,16 @@ class TypeVar_AST : public AST_Tree {
 };
 
 NODE_FACTORY (TypeVar_AST, TYPE_VAR);
+
+/* Debugging utilities */
+
+/** Output AST on the standard error output, using its print method. */
+void
+DB(AST* ast)
+{
+    if (ast == NULL) {
+        cerr << "<null>" << endl;
+    } else {
+        ast->print(cerr, 0);
+    }
+}
