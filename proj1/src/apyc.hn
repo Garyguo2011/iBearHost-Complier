@@ -650,7 +650,7 @@ _HEXINTEGER : '0' ('x' | 'X') _HEX+ ;
 INT_LITERAL :
       _DECIMAL                { if(strtol($TEXT, NULL, 10) > 1073741824) error(yysource_location(), "int can't be that large!"); }
     | _OCTINTEGER             { if(strtol($TEXT, NULL, 8) > 1073741824)  error(yysource_location(), "oct can't be that large!"); }
-    | _HEXINTEGER             { if(strtol($TEXT, NULL, 16) > 1073741824)  error(yysource_location(), "hex can't be that large!"); }
+    | _HEXINTEGER             { if(strtol($TEXT, NULL, 16) > 1073741824) error(yysource_location(), "hex can't be that large!"); }
     ;
 
 _RAWESCAPESEQ : '\\' _ANY ;
