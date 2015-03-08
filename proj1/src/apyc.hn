@@ -241,16 +241,16 @@ stringliteralpiece :
 /******************************************/
 
 /********** COLLECTIONS *******************/
-parenth_form : "("! ")"!
+parenth_form : "("! ")"! {$$ = $^(TUPLE)}
     | "("! expression ")"!
     | "("! expression (","! expression)+ ","!? ")"! {$$ = $^(TUPLE, $*); }
     ;
 
-list_display : "["! "]"!
+list_display : "["! "]"!  {$$ = $^(LIST_DISPLAY); }
     | "["! expression (","! expression)* ","!? "]"!  {$$ = $^(LIST_DISPLAY, $*); }
     ;   
 
-dict_display : "{"! "}"!
+dict_display : "{"! "}"! {$$ = $^(DICT_DISPLAY);}
     | "{"! pair_list "}"!
     ;
 
