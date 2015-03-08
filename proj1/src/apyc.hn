@@ -710,7 +710,7 @@ _NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
 COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE;} ;
 
 INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; };
-INDENT : /*_BOL (' ' | '\t')* _EOF | */ _BOL (' ' | '\t')*  %prefer
+INDENT : _BOL (' ' | '\t')*  %prefer
 {
   if (first_nonblank_line && $TEXT_SIZE != 0) {
     indentation_error();
@@ -762,7 +762,8 @@ INDENT : /*_BOL (' ' | '\t')* _EOF | */ _BOL (' ' | '\t')*  %prefer
 } ;
 
 
-WS : (' ' | '\t')* _EOL | (' ' | '\t')* { YYIGNORE ; } ;
+WS : (' ' | '\t')* _EOL { YYIGNORE ; }
+  | (' ' | '\t')* { YYIGNORE ; } ;
 
 %%
 
