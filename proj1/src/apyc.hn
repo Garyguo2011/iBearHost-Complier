@@ -480,7 +480,7 @@ stmt_list :
 /******************* compound statement ****************/
 
 if_stmt : 
-    IF! { if_count += 1; } expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); if_count -= 1}
+    IF! { if_count += 1; has_class = true; } expression ':'! for_while_if (elif_stmt)? { $$ = $^(IF, $*); if_count -= 1}
     ;
 
 elif_stmt:
@@ -489,11 +489,11 @@ elif_stmt:
     ;
 
 while_stmt :
-    WHILE! { loop_count += 1; } expression ':'! for_while_if { loop_count -= 1; } (ELSE! ':'! for_while_if)? { $$ = $^(WHILE, $*); } 
+    WHILE! { loop_count += 1; has_class = true; } expression ':'! for_while_if { loop_count -= 1; } (ELSE! ':'! for_while_if)? { $$ = $^(WHILE, $*); } 
     ;
 
 for_stmt :
-    FOR! { loop_count += 1; } target_list IN! expression_list ':'! for_while_if { loop_count -= 1; } (ELSE! ':'! for_while_if)? { $$ = $^(FOR, $*); }
+    FOR! { loop_count += 1; has_class = true; } target_list IN! expression_list ':'! for_while_if { loop_count -= 1; } (ELSE! ':'! for_while_if)? { $$ = $^(FOR, $*); }
     ;
 
 for_while_if : 
@@ -505,7 +505,7 @@ for_while_if :
 
 funcdef :
     "def"! funcname LEFT_PAREN! parameter_list RIGHT_PAREN! ("::"! type)? ':'! native_block { $$ = $^(DEF, $*); }
-    | "def"! funcname LEFT_PAREN! parameter_list RIGHT_PAREN! { if (loop_count > 0 or if_count > 0) error(yysource_location(), "cannot def in loop or condition") ; func_count += 1; } ("::"! type)? ':'! block   { $$ = $^(DEF, $*); func_count -= 1; } 
+    | "def"! funcname LEFT_PAREN! parameter_list RIGHT_PAREN! { if (loop_count > 0 or if_count > 0) error(yysource_location(), "cannot def in loop or condition") ; func_count += 1; has_class = true; } ("::"! type)? ':'! block   { $$ = $^(DEF, $*); func_count -= 1; } 
     ;
 
 parameter_list :
@@ -526,8 +526,8 @@ funcname :
 
 /************* Class Definition *****************/
 classdef :
-    "class"! { if (has_class == true) error(yysource_location(), "cannot define a class in a class"); has_class = true; } classname "of"! type_formals_list ':'! block      { $$ = $^(CLASS, $*); has_class = false; }
-    | "class"! { if (has_class == true) error(yysource_location(), "cannot define a class in a class"); has_class = true; } classname ':'! block  { $$ = $^(CLASS, $classname, $^(TYPE_FORMALS), $block); has_class = false; }
+    "class"! { if (has_class == true) error(yysource_location(), "cannot define a class inside others!"); has_class = true; } classname "of"! type_formals_list ':'! block      { $$ = $^(CLASS, $*); has_class = false; }
+    | "class"! { if (has_class == true) error(yysource_location(), "cannot define a class inside others!"); has_class = true; } classname ':'! block  { $$ = $^(CLASS, $classname, $^(TYPE_FORMALS), $block); has_class = false; }
     ;
 
 classname :
@@ -650,7 +650,7 @@ _HEXINTEGER : '0' ('x' | 'X') _HEX+ ;
 INT_LITERAL :
       _DECIMAL                { if(strtol($TEXT, NULL, 10) > 1073741824) error(yysource_location(), "int can't be that large!"); }
     | _OCTINTEGER             { if(strtol($TEXT, NULL, 8) > 1073741824)  error(yysource_location(), "oct can't be that large!"); }
-    | _HEXINTEGER             { if(strtol($TEXT, NULL, 16) > 1073741824)  error(yysource_location(), "hex can't be that large!"); }
+    | _HEXINTEGER             { if(strtol($TEXT, NULL, 16) > 1073741824) error(yysource_location(), "hex can't be that large!"); }
     ;
 
 _RAWESCAPESEQ : '\\' _ANY ;
