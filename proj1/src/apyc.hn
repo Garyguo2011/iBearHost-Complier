@@ -194,8 +194,8 @@
  * on the basis of the input so far whether to perform a reduction.  The
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
-%expect-rr 16
-%expect 12
+%expect-rr 23
+%expect 23
 
 %left OR
 %left AND
@@ -374,7 +374,7 @@ not_test : comparison
 expression_list :
       expression
     | expression ( ','! expression )+ (','!)?  { $$ = $^(TUPLE, $*); }
-    | expression ','!                { $$ = $^(TUPLE, $*); }
+    | expression ','!                          { $$ = $^(TUPLE, $*); }
     ;
 
 simple_stmt : 
@@ -394,12 +394,18 @@ expression_stmt :
     ;
 
 assignment_stmt :
-    target_list '='! right_side                 {$$ = $^(ASSIGN, $target_list, $right_side);}
+      target_list '='! right_side                           {$$ = $^(ASSIGN, $target_list, $right_side);}
     ;
 
 target_list :
       target 
-    | target (','! target)+ ','!?               {$$ = $^(TARGETLIST, $*);}
+    | target (','! target)+ ','!?                                                            {$$ = $^(TARGETLIST, $*);}
+    | target ','!                                                                            {$$ = $^(TARGETLIST, $*);}
+    | LEFT_PAREN! target (','! target)+ ','!? RIGHT_PAREN!                                   {$$ = $^(TARGETLIST, $*);}
+    | LEFT_SQUARE_BRACKET! target (','! target)+ ','!? RIGHT_SQUARE_BRACKET!                 {$$ = $^(TARGETLIST, $*);}
+    | LEFT_PAREN! target ','! RIGHT_PAREN!                                                   {$$ = $^(TARGETLIST, $*);}
+    | LEFT_PAREN! target RIGHT_PAREN!
+    | LEFT_SQUARE_BRACKET! target ','!? RIGHT_SQUARE_BRACKET!                                {$$ = $^(TARGETLIST, $*);}
     ;
 
 target :
