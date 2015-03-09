@@ -8,6 +8,7 @@
 
 %{
   #include <string>
+  #include <stack>
   #include "apyc.h"
   #include "ast.h"
 
@@ -38,8 +39,8 @@
   static int if_count = 0;
   static bool has_class = false;
 
-  static int indent_unit = 0;
-  static int indent_level = 0;
+  static stack<int> indent_unit;
+  static int total_blank_count = 0;
   static bool first_nonblank_line = true;
  
 %}
@@ -195,7 +196,7 @@
  * conflict is OK if it will become clear later on in the input what should
  * have been done. */
 %expect-rr 16
-%expect 12
+%expect 1
 
 %left OR
 %left AND
@@ -244,7 +245,7 @@ stringliteralpiece :
 
 /********** COLLECTIONS *******************/
 parenth_form : LEFT_PAREN! RIGHT_PAREN! {$$ = $^(TUPLE)}
-    | LEFT_PAREN! {paren_count += 1;} expression RIGHT_PAREN! {paren_count -= 1;} 
+    | LEFT_PAREN! expression RIGHT_PAREN!
     | LEFT_PAREN! expression (","! expression)+ ","!? RIGHT_PAREN! { $$ = $^(TUPLE, $*); }
     | LEFT_PAREN! expression ","! RIGHT_PAREN! {$$ = $^(TUPLE, $*); } 
     ;
@@ -469,7 +470,7 @@ native_block :
     ;
 
 statement :
-      stmt_list NEWLINE!    
+      stmt_list NEWLINE!  
     | compound_stmt  
     ;
 
@@ -612,11 +613,26 @@ RIGHT_SQUARE_BRACKET : ']' { if (square_bracket_count) square_bracket_count -= 1
 LEFT_CURLY_BRACKET : '{' { curly_bracket_count += 1 ; } ;
 RIGHT_CURLY_BRACKET : '}' { if (curly_bracket_count) curly_bracket_count -= 1 ; } ;
 
-NEWLINE : '\n' { //fprintf(stderr, "paren count is %d \n", paren_count);
+_NONNEWLINE : _ANY - '\n' ;
+_NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
+
+COMMENT : _BOL (' ' | '\t')*  '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n' %prefer
+          {
+            YYIGNORE;}
+        
+        | (' ' | '\t')*  '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH _EOL %prefer
+          {
+
+            YYIGNORE;}
+        
+        ;
+
+NEWLINE : '\n' { 
                   if ( paren_count > 0 || square_bracket_count > 0 || curly_bracket_count > 0 ) 
                   {
                     YYIGNORE;
-                  }} ;
+                  }
+                } ;
 
 _NONZERODIGIT : '1' .. '9' ;
 
@@ -713,12 +729,7 @@ ERROR_CHARACTER : ('|' | '&' | '^' | "<<" | ">>" | '~') ; /* More error characte
 /********************************************************************************/
 
 
-NEWLINE_WITH_BACKSLASH : "\\\n" { YYIGNORE ; } ;
-
-_NONNEWLINE : _ANY - '\n' ;
-_NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
-
-COMMENT : '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n'  %prefer { YYIGNORE;} ;
+NEWLINE_WITH_BACKSLASH : "\\\n" (' ' | '\t')* { YYIGNORE ; } ;
 
 INDENT_BLANKLINE : _BOL (' ' | '\t')* '\n' %prefer { YYIGNORE ; };
 INDENT : _BOL (' ' | '\t')*  %prefer
@@ -731,40 +742,41 @@ INDENT : _BOL (' ' | '\t')*  %prefer
     }
     if (!first_nonblank_line) {
       int equivalent_blank_count = calculate_equivalent_blanks($TEXT);
-      if (indent_unit == 0) {
-        indent_unit = equivalent_blank_count;
+      if (indent_unit.empty()) {
         if (equivalent_blank_count != 0) {
+          indent_unit.push(equivalent_blank_count);
+          total_blank_count += equivalent_blank_count;
           YYSET_TOKEN(INDENT);
-          indent_level++;
         }
         else {
           YYIGNORE;
         }
       }
       else {
-        int default_blank_count = indent_level * indent_unit;
-        if (equivalent_blank_count % indent_unit != 0) {
-          indentation_error(default_blank_count, equivalent_blank_count);
+        if (equivalent_blank_count == total_blank_count) {
           YYIGNORE;
         }
+        else if (equivalent_blank_count > total_blank_count) {
+          int indent_diff = equivalent_blank_count - total_blank_count;
+          total_blank_count = equivalent_blank_count;
+          indent_unit.push(indent_diff);
+          YYSET_TOKEN(INDENT);
+        }
         else {
-          if (equivalent_blank_count == default_blank_count) {
-            YYIGNORE;
-          }
-          else if (equivalent_blank_count == default_blank_count + indent_unit) {
-            YYSET_TOKEN(INDENT);
-            indent_level++;
-          }
-          else {
-            int new_indent_level = equivalent_blank_count / indent_unit;
-            int difference = indent_level - new_indent_level;
-            while (difference > 0) {
-              yyqueue_token(DEDENT, 0, NULL, $TEXT, $TEXT_SIZE);
-              indent_level--;
-              difference--;
+          int difference = total_blank_count - equivalent_blank_count;
+          while (difference > 0) {
+            int last_indent = indent_unit.top();
+            difference -= last_indent;
+            if (difference < 0) {
+              indentation_error(last_indent, difference+last_indent);
             }
-            YYIGNORE;
+            else {
+              indent_unit.pop();
+              yyqueue_token(DEDENT, 0, NULL, $TEXT, $TEXT_SIZE);
+            }
           }
+          total_blank_count = equivalent_blank_count;
+          YYIGNORE;
         }
       }
     }
