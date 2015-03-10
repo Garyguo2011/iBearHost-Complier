@@ -626,11 +626,11 @@ RIGHT_CURLY_BRACKET : '}' { if (curly_bracket_count) curly_bracket_count -= 1 ; 
 _NONNEWLINE : _ANY - '\n' ;
 _NONNEWLINE_NONSLASH : _ANY - ('\n' | '\\') ;
 
-COMMENT : _BOL (' ' | '\t')*  '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH '\n' %prefer
+COMMENT : _BOL (' ' | '\t')*  '#' _NONNEWLINE* '\n' %prefer
           {
             YYIGNORE;}
         
-        | (' ' | '\t')*  '#' (_NONNEWLINE* "\\\n")* _NONNEWLINE* _NONNEWLINE_NONSLASH _EOL %prefer
+        | (' ' | '\t')*  '#' _NONNEWLINE* _EOL %prefer
           {
 
             YYIGNORE;}
