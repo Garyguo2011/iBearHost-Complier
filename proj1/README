@@ -1,7 +1,7 @@
 THE FILES HERE ARE INTENDED TO BE HELPFUL, NOT TO LIMIT WHAT YOU CAN DO.
 ***IGNORE THEM ENTIRELY, IF YOU PREFER!***  However, as indicated in the handout,
 whatever you turn in must satisfy the following criteria:
-
+ 
 1. 'make' must compile your program from scratch, producing an executable
    file 'apyc' in this directory.
 2. 'make check' must run all your tests against your ./apyc program.
