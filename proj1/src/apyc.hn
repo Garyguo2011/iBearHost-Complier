@@ -301,7 +301,7 @@ upper_bound :
 
 call :
       primary LEFT_PAREN! (expression (','! expression)*  ','!?)? RIGHT_PAREN!       { $$ = $^(CALL, $*); }
-    | typed_id LEFT_PAREN! (expression (','! expression)*  ','!?)? RIGHT_PAREN!      { $$ = $^(CALL, $*); }
+    | compound_type_id LEFT_PAREN! (expression (','! expression)*  ','!?)? RIGHT_PAREN!       { $$ = $^(CALL, $*); }
     ;
 
 /*******************************************/
@@ -563,13 +563,17 @@ type_var :
     ;
 
 type_list :
-     (type ','!)* type              { $$ = $^(TYPE_LIST, $*); }
+     (type ','!)* type?              { $$ = $^(TYPE_LIST, $*); }
     ;
 
 type_id :
+    compound_type_id
+    | identifier                          { $$ = $^(TYPE, $identifier, $^(TYPE_LIST)); }
+    ;
+
+compound_type_id :
       identifier "of"! LEFT_SQUARE_BRACKET! type_list RIGHT_SQUARE_BRACKET!    { $$ = $^(TYPE, $*); }
     | identifier "of"! type               { $$ = $^(TYPE, $identifier, $^(TYPE_LIST, $type)); }
-    | identifier                          { $$ = $^(TYPE, $identifier, $^(TYPE_LIST)); }
     ;
 
 /************************************************/
