@@ -1,0 +1,249 @@
+/* -*- mode: fundamental; c-file-style: "stroustrup"; indent-tabs-mode: nil -*- */
+
+/* AST parser for apyc phases. */
+
+/* Authors: P. N. Hilfinger */
+
+%define semantic_tree_type "AST"
+
+%{
+    #include <string>
+    #include <cstring>
+    #include "apyc.h"
+    #include "ast.h"
+
+    using namespace std;
+
+    static GCINIT _gcdummy;
+
+    static AST_Ptr theTree;
+   
+    /** Return a location string (Unix format) formed from the name of
+     *  the source file producing this AST and the number in NODE (an
+     *  INT token). */
+    static const char* make_ast_loc (AST* node);
+    void parse_error (const char* loc, const char* message, ...);
+%}
+
+%debug
+%define error_function parse_error
+
+%token AND "and"
+%token ASSIGN "assign"
+%token ATTRIBUTEREF "attributeref"
+%token BINOP "binop"
+%token BLOCK "block"
+%token BREAK "break"
+%token CALL "call"
+%token CALL1 "call1"
+%token CLASS "class"
+%token COMPARE "compare"
+%token CONTINUE "continue"
+%token DEDENT
+%token DEF "def"
+%token DICT_DISPLAY "dict_display"
+%token FALSE "False"
+%token FOR "for"
+%token FORMALS_LIST "formals_list"
+%token FUNCTION_TYPE "function_type"
+%token ID
+%token IF "if"
+%token IF_EXPR "if_expr"
+%token INDENT 
+%token INT_LITERAL "int_literal"
+%token LEFT_COMPARE "left_compare"
+%token LIST_DISPLAY "list_display"
+%token METHOD "@method"
+%token MODULE "module"
+%token NATIVE "native"
+%token NEXT_VALUE "next_value"
+%token NONE "None"
+%token NOT "not"
+%token OR "or"
+%token PAIR "pair"
+%token PRINT "print"
+%token PRINTLN "println"
+%token RETURN "return"
+%token SLICE "slice"
+%token SLICE_ASSIGN "slice_assign"
+%token STMT_LIST "stmt_list"
+%token STRING_LITERAL
+%token SUBSCRIPT "subscript"
+%token SUBSCRIPT_ASSIGN "subscript_assign"
+%token TARGET_LIST "target_list"
+%token TRUE "True"
+%token TUPLE "tuple"
+%token TYPE "type"
+%token TYPED_ID "typed_id"
+%token TYPE_FORMALS_LIST "type_formals_list"
+%token TYPE_LIST "type_list"
+%token TYPE_VAR
+%token UNOP "unop"
+%token WHILE "while"
+
+/** Used by semantic analyzer. */
+
+%token NEW
+
+%%
+
+                    /* Lexical Rules */
+
+ID: (_LETTER | "_")  (_LETTER | _DIGIT | "_")* 
+    ;
+
+TYPE_VAR_ID : "$" "#"? (_LETTER | _DIGIT | "_")*
+    ;
+
+INT_LITERAL: _DIGIT+
+    ;
+
+_OCT: '0' .. '7' ;
+
+STRING_LITERAL: '"' (_ANY - '\\' - '"' | '\\' _OCT _OCT _OCT)* '"' 
+    ;
+
+*: ' ' | '\t' | '\n' | '\r'
+    ;
+
+                        /* Main Grammar */
+
+program: expr     { theTree = $expr.value (); }
+    ;
+
+
+expr: "("! ast_node_type num=INT_LITERAL operands ")"!
+                  { $$ = $^($ast_node_type.value (), 
+                            $operands.list_value ());
+                    $$.set_loc (make_ast_loc ($INT_LITERAL.value ()));
+                  }
+    | "(" "id" INT_LITERAL id ")"
+                  { $$ = $id;
+                    $$.set_loc (make_ast_loc ($INT_LITERAL.value ())); }
+    | "(" "int_literal" num=INT_LITERAL val=INT_LITERAL ")"
+                  { $$ = $val;
+                    $$.set_loc (make_ast_loc ($num.value ())); }
+    | "(" "string_literal" INT_LITERAL STRING_LITERAL ")"
+                  { $$ = $STRING_LITERAL;
+                    $$.set_loc (make_ast_loc ($INT_LITERAL.value ())); }
+    | "(" "type_var" INT_LITERAL TYPE_VAR_ID ")"
+                  { $$ = $^ (TYPE_VAR, $TYPE_VAR_ID.value ());
+                    $$.set_loc (make_ast_loc ($INT_LITERAL.value ())); }
+    ;
+
+operands:
+      expr*
+    ;
+
+ast_node_type:
+      "and"
+    | "assign"
+    | "attributeref"
+    | "binop"
+    | "block"
+    | "break"
+    | "call"
+    | "class"
+    | "compare"
+    | "continue"
+    | "def"
+    | "dict_display"
+    | "False"
+    | "for"
+    | "formals_list"
+    | "function_type"
+    | "if"
+    | "if_expr"
+    | "left_compare"
+    | "list_display"
+    | "module"
+    | "native"
+    | "next_value"
+    | "None"
+    | "or"
+    | "pair"
+    | "print"
+    | "println"
+    | "return"
+    | "slice"
+    | "slice_assign"
+    | "stmt_list"
+    | "subscript"
+    | "subscript_assign"
+    | "target_list"
+    | "True"
+    | "tuple"
+    | "type"
+    | "typed_id"
+    | "type_formals_list"
+    | "type_list"
+    | "unop"
+    | "while"
+    ;
+
+id:   ID
+    | ast_node_type
+    | "id" 
+    | "int_literal"
+    | "string_literal"
+    | "type_var"
+    ;
+
+
+%%
+
+static gcstring current_python_file;
+static gcstring current_ast_file;
+
+const char*
+AST::lineNumber ()
+{
+    if (loc () == NULL)
+        return "0";
+    const char* suffix = strrchr (loc (), ':');
+    if (suffix == NULL)
+        return "0";
+    return suffix + 1;
+}
+
+void
+parse_error (const char* loc, const char* message, ...)
+{
+    if (loc == NULL)
+        error ((current_ast_file + ":?").c_str (), message);
+    else {
+        char *place = new char[current_ast_file.size() + 12];
+        sprintf(place, "%s:%d", current_ast_file.c_str (),
+                yylocation_line (loc));
+        error (place, message);
+    }
+    fatal ("bad AST");
+}
+
+static const char*
+make_ast_loc (AST* node)
+{
+    return GC_strdup ((current_python_file + ":" + node->as_string ()).c_str ());
+}
+
+AST_Ptr
+readAst (const gcstring& ast_file_name,
+         const gcstring& python_file_name)
+{
+    current_ast_file = ast_file_name;
+    FILE* f = fopen (ast_file_name.c_str (), "r");
+
+    if (f == NULL) {
+        errorNoFile ("Could not open %s", ast_file_name.c_str ());
+        return NULL;
+    }
+    yypush_lexer (f, ast_file_name);
+    current_python_file = python_file_name;
+
+    theTree = NULL;
+    yyparse ();
+    fclose (f);
+    yypop_lexer ();
+            
+    return theTree;
+}
