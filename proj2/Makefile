@@ -19,6 +19,7 @@ APYC = $(shell echo `pwd`/apyc)
 default: compile
 
 compile:
+	$(MAKE) -C ../proj1 compile
 	$(MAKE) -C src compile
 
 check:
