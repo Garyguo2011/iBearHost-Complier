@@ -5,6 +5,8 @@
 
 import sys
 
+str0 = str
+
 def __truth__(x):
     return bool(x)
 
@@ -114,8 +116,12 @@ def __getslice__list__(S, L, U):
 def __len__list__(S):
     return len(S)
 
+# Command-line arguments
+
 def __argv__():
     return sys.argv
+
+# Input
 
 def __readline__():
     return sys.stdin.readline()

@@ -155,11 +155,10 @@ private:
             i += 1;
             if (s[i-1] == '\\') {
                 v = 0;
-                for (int j = 0; j < 2; j += 1) {
-                        v = v*8 + (s[i] - '0');
-                        i += 1;
-                    }
-                    break;
+                for (int j = 0; j < 3; j += 1) {
+                    v = v*8 + (s[i] - '0');
+                    i += 1;
+                }
             } else {
                 v = s[i-1];
             }

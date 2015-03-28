@@ -2,7 +2,7 @@
 
 APYC = ../apyc
 
-check: check1 check2
+check: check2
 
 check%:
 	$(MAKE) -C .. compile

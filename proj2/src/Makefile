@@ -1,4 +1,4 @@
-# Top-level Makefile for Project 1.
+# Compilation Makefile for Project 2.
 # 
 # Targets:
 #   make [ default ]        Compiles sources in src directory
@@ -31,11 +31,7 @@ CXXFLAGS = -g -Wall
 
 INCLUDES = -I$(LIBHOME)/include
 
-ifeq "$(OS)" "Darwin"
-    OTHER_LIBS = -lpthread
-else
-    OTHER_LIBS = -lpthread -lrt
-endif
+OTHER_LIBS = 
 
 LOADLIBS = -L$(LIBHOME)/lib -lgc $(OTHER_LIBS)
 
