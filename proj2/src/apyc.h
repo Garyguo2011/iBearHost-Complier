@@ -238,10 +238,6 @@ extern Decl* makeClassDecl (const gcstring& name, AST_Ptr params);
 /** Declaraton for the module MAIN.  This always has sequence number 0. */
 extern Decl* makeModuleDecl (const gcstring& name);
 
-/** True iff NAME may not be defined or set by assignment once it has
- *  been defined once. */
-extern bool undefinable (const gcstring& name);
-
 /** Output all Decl nodes to OUT. */
 extern void outputDecls (std::ostream& out);
 
