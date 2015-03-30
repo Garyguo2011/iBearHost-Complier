@@ -84,6 +84,8 @@ unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
         return true;
     }
     subst.bind (t1, t0);
+    if (t1->isTypeVariable ())
+        return true;
     if ((t0->getId () == NULL) != (t1->getId () == NULL))
         return false;
     if (t0->getId () != NULL) {
@@ -282,12 +284,9 @@ Type_Ptr
 makeFuncType (int n)
 {
     gcvector<AST_Ptr> params;
-    for (int i = 0; i < n; i += 1)
+    for (int i = 0; i <= n; i += 1)
         params.push_back(Type::makeVar ());
-    AST_Ptr paramList = 
-        AST::make_tree (TYPE_LIST, &params[0], &params[params.size()]);
-
-    return consTree (FUNCTION_TYPE, Type::makeVar (), paramList)->asType ();
+    return AST::make_tree (FUNCTION_TYPE, &params[0], &params[params.size()]);
 }
 
 bool
@@ -304,13 +303,12 @@ Type_Ptr
 makeMethodType (int n, Decl* clas)
 {
     gcvector<AST_Ptr> params;
+    params.push_back (Type::makeVar ());
     params.push_back (clas->asGenericType ());
     for (int i = 1; i < n; i += 1)
         params.push_back(Type::makeVar ());
-    AST_Ptr paramList = 
-        AST::make_tree (TYPE_LIST, &params[0], &params[params.size()]);
-
-    return consTree (FUNCTION_TYPE, Type::makeVar (), paramList)->asType ();
+    return AST::make_tree (FUNCTION_TYPE, &params[0], &params[params.size()])
+        ->asType();
 }
 
 /*****  TYPE VARIABLES *****/
