@@ -59,6 +59,9 @@ void
 Unifier::swap (Unifier& other)
 {
     bindings.swap (other.bindings);
+    int tmp = _numBound;
+    _numBound = other._numBound;
+    other._numBound = tmp;
 }
 
 

@@ -552,12 +552,6 @@ makeModuleDecl (const gcstring& name)
     return new ModuleDecl (name);
 }
 
-bool
-undefinable (const gcstring& name)
-{
-    return name == "None";
-}
-
 void
 outputDecls (ostream& out)
 {
