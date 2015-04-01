@@ -49,8 +49,10 @@ error (const char* loc, const char* format, ...)
 void
 error (AST_Ptr node, const char* format, ...)
 {
-    if (!node->errorReported ()) {
-        if (reportErrors) 
+    if (node->errorReported ()) 
+        errCount += 1;
+    else {
+        if (reportErrors)
             node->recordError ();
         va_list ap;
         va_start (ap, format);
