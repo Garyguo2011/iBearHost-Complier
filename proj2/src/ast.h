@@ -411,11 +411,6 @@ extern const Unifier IdentityUnifier;
  *  Otherwise, returns false and leaves SUBST unchanged. */
 extern bool unify (Type_Ptr t0, Type_Ptr t1, Unifier& subst);
 
-/** Find a unifier for T0 and T1, then apply it to all type variables,
- *  setting their binding() values, returning true iff successfule.  
- *  Has no effect and returns false if T0 and T1 do not unify. */
-extern bool unify (Type_Ptr t0, Type_Ptr t1);
-
 /** Returns true iff SUBST can be extended to unify T0 and T1.  Does
  *  not modify SUBST. */
 extern bool unifies (Type_Ptr t0, Type_Ptr t1, const Unifier& subst);

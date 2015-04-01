@@ -115,17 +115,6 @@ unify (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
 }
 
 bool
-unify (Type_Ptr t0, Type_Ptr t1)
-{
-    Unifier subst;
-    if (unify1 (t0, t1, subst)) {
-        subst.setBindings ();
-        return true;
-    } else
-        return false;
-}
-
-bool
 unifies (Type_Ptr t0, Type_Ptr t1, const Unifier& subst)
 {
     Unifier s (subst);
@@ -289,7 +278,8 @@ makeFuncType (int n)
     gcvector<AST_Ptr> params;
     for (int i = 0; i <= n; i += 1)
         params.push_back(Type::makeVar ());
-    return AST::make_tree (FUNCTION_TYPE, &params[0], &params[params.size()]);
+    return AST::make_tree (FUNCTION_TYPE, &params[0], &params[params.size()])
+        ->asType ();
 }
 
 bool
@@ -298,7 +288,7 @@ makeFuncType (int n, Type_Ptr type, Unifier& subst)
     type = type->binding ();
     if (! type->isTypeVariable ())
         return (type->returnType () != NULL && type->numParams () == n);
-    unify (type, makeFuncType (n));
+    unify (type, makeFuncType (n), subst);
     return true;
 }
 

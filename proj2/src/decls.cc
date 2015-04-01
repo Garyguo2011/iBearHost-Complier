@@ -161,7 +161,7 @@ const Environ*
 Decl::getEnviron () const
 {
     if (_members == NULL)
-	UNIMPLEMENTED (get_members);
+	UNIMPLEMENTED (getEnviron);
     return _members;
 }
 
