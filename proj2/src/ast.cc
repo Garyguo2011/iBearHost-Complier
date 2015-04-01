@@ -112,8 +112,44 @@ AST::doOuterSemantics ()
 }
 
 void
+AST::collectDeclsASSIGN (Decl* enclosing)
+{
+
+}
+
+void
+AST::collectDeclsDEF (Decl* enclosing)
+{
+    
+}
+void
+AST::collectDeclsCLASS (Decl* enclosing)
+{
+    
+}
+void
+AST::collectDeclsFORMALS_LIST (Decl* enclosing)
+{
+    
+}
+
+void
 AST::collectDecls (Decl* enclosing)
 {
+    switch(this->oper()->syntax()) {
+        case ASSIGN:
+            this -> collectDeclsASSIGN (enclosing);
+            break;
+        case DEF:
+            this -> collectDeclsDEF (enclosing);
+            break;
+        case CLASS:
+            this -> collectDeclsCLASS (enclosing);
+            break;
+        case FORMALS_LIST:
+            this -> collectDeclsFORMALS_LIST (enclosing);
+            break;
+    }
     for_each_child (c, this) {
         c->collectDecls (enclosing);
     } end_for;

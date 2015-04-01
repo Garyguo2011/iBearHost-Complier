@@ -114,6 +114,12 @@ public:
      *  declarations for declarative regions nested within me. */
     virtual void collectDecls (Decl* enclosing);
 
+    /** Subcases of collectDecls */
+    virtual void collectDeclsASSIGN (Decl* enclosing);
+    virtual void collectDeclsDEF (Decl* enclosing);
+    virtual void collectDeclsCLASS (Decl* enclosing);
+    virtual void collectDeclsFORMALS_LIST (Decl* enclosing);
+
     /** Add declarations that result from occurrences of type
      *  variables in type attributions to ENCLOSING. */
     virtual void collectTypeVarDecls (Decl* enclosing);
