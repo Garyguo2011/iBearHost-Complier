@@ -44,7 +44,7 @@ Decl::Decl (const gcstring& name, Decl* container, Environ* members)
 void 
 Decl::print (ostream& out) const
 {
-    out << "(" << declTypeName () << " " << getIndex () << " " << getName();
+    out << "(" << declTypeName () << " " << getIndex () << " " << getName() << " ";
     printContainer (out);
     printPosition (out);
     printType (out);

@@ -209,6 +209,11 @@ protected:
      *  node.  Used to avoid multiple error messages on a node. */
     bool _erroneous;
 
+private:
+    
+    /** Vector of all decls associated with this tree. */
+    gcvector<Decl*> _decls;
+
 };
 
 class AST_Token : public CommonToken<AST, AST_Token, AST_Tree> {

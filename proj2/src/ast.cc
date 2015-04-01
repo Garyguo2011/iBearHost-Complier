@@ -13,6 +13,10 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
+static Environ* classes = new Environ(NULL);
+
+static Decl* main = makeModuleDecl("__main__");
+
 /* Definitions of methods in base class AST. */
 
 AST::AST ()
@@ -71,25 +75,27 @@ AST::getId ()
 int
 AST::numDecls ()
 {
-    return 0;
+    return _decls.size();
 }
 
 Decl*
 AST::getDecl (int k)
 {
-    throw logic_error ("node does not represent a named entity");
+    assert (k >= 0 && k < (int) _decls.size ());
+    return _decls[k];
 }
 
 void
-AST::addDecl (Decl*)
+AST::addDecl (Decl* decl)
 {
-    throw logic_error ("node does not represent a named entity");
+    _decls.push_back (decl);
 }
 
 void
 AST::removeDecl (int k)
 { 
-    throw logic_error ("node does not represent a named entity");
+    assert (k >= 0 && k < (int) _decls.size ());
+    _decls.erase (_decls.begin () + k);
 }
 
 Type_Ptr
@@ -108,24 +114,74 @@ AST::setType (Type_Ptr type, Unifier& subst)
 AST_Ptr
 AST::doOuterSemantics ()
 {
+    this->collectDecls(main);
     return this;
 }
 
 void
 AST::collectDeclsASSIGN (Decl* enclosing)
 {
-
+    AST_Ptr targetList = this->child(this->arity() - 2);
+    switch(targetList->oper()->syntax()) {
+        case TARGET_LIST:
+        {
+            for_each_child(target, targetList) {
+                switch(target->oper()->syntax()) {
+                case ID:
+                {
+                    Decl* decl = makeVarDecl(target->as_string(), enclosing, Type::makeVar());
+                    enclosing->addMember(decl);
+                    target->addDecl(decl);
+                    break;
+                }
+                case ATTRIBUTEREF:
+                    break;
+                }
+            } end_for;
+            break;
+        }
+        case ID:
+        {
+            Decl* decl = makeVarDecl(targetList->as_string(), enclosing, Type::makeVar());
+            enclosing->addMember(decl);
+            targetList->addDecl(decl);
+            break;
+        }
+        case ATTRIBUTEREF:
+            break;
+    }
 }
 
 void
 AST::collectDeclsDEF (Decl* enclosing)
 {
+    AST_Ptr id = this->child(0);
+    AST_Ptr type = this->child(2);
+    Decl* decl;
+    if (type->isType()) {
+        decl = makeFuncDecl(id->as_string(), enclosing, type);  
+    }
+    else {
+        decl = makeFuncDecl(id->as_string(), enclosing, Type::makeVar());
+    }
+
+    enclosing->addMember(decl);
+    this->addDecl(decl);
     
 }
 void
 AST::collectDeclsCLASS (Decl* enclosing)
 {
-    
+    AST_Ptr id = this->child(0);
+    Decl* decl;
+    AST_Ptr params = NULL;
+    if (this->arity() > 1) {
+        params = this->child(1);
+    }
+    decl = makeClassDecl(id->as_string(), params);
+    enclosing->addMember(decl);
+    this->addDecl(decl);
+    classes->define(decl);
 }
 void
 AST::collectDeclsFORMALS_LIST (Decl* enclosing)
@@ -156,7 +212,7 @@ AST::collectDecls (Decl* enclosing)
 }
 
 void
-AST::collectTypeVarDecls (Decl*)
+AST::collectTypeVarDecls (Decl* enclosing)
 {
 }
 
