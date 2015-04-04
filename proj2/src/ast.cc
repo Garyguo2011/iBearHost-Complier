@@ -179,18 +179,25 @@ AST::collectDecls (Decl* enclosing)
                 this->collectTypeVarDecls(decl);
                 dictDecl = decl;
             }
-            // else if (name == "tuple0") {
-
-            // }
-            // else if (name == "tuple1 of [$T0]") {
-
-            // }
-            // else if (name == "tuple2 of [$T1, $T2]"){
-
-            // }
-            // else if (name == "tuple3 of [$T1, $T2, $T3]"){
-
-            // }
+            else if (name == "tuple0") {
+                Decl* decl = makeClassDecl(name, params);
+                tuple0Decl = decl;
+            }
+            else if (name == "tuple1") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple1Decl = decl;
+            }
+            else if (name == "tuple2"){
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple2Decl = decl;
+            }
+            else if (name == "tuple3"){
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple3Decl = decl;
+            }
             /* END */
             
             else {
