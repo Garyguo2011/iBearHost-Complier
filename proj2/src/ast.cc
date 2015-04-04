@@ -142,13 +142,14 @@ AST::collectDecls (Decl* enclosing)
         case CLASS:
         {
             AST_Ptr id = this->child(0);
+            AST_Ptr params = this->child(1);
             const gcstring name = id->as_string();
             if (name == "str") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                Decl* decl = makeClassDecl(name, params);
                 strDecl = decl;
             }
             else if (name == "int") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                Decl* decl = makeClassDecl(name, params);
                 intDecl = decl;
             }
             /** TODO
@@ -159,8 +160,49 @@ AST::collectDecls (Decl* enclosing)
             Please follow examples.
 
             */
+            else if (name == "bool") {
+                Decl* decl = makeClassDecl(name, params);
+                boolDecl = decl;
+            }
+            else if (name == "range") {
+                Decl* decl = makeClassDecl(name, params);
+                rangeDecl = decl;
+            }
+            // need inline substitution
+            else if (name == "list") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                listDecl = decl;
+            }
+            else if (name == "dict") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                dictDecl = decl;
+            }
+            else if (name == "tuple0") {
+                Decl* decl = makeClassDecl(name, params);
+                tuple0Decl = decl;
+            }
+            else if (name == "tuple1") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple1Decl = decl;
+            }
+            else if (name == "tuple2"){
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple2Decl = decl;
+            }
+            else if (name == "tuple3"){
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple3Decl = decl;
+            }
+            /* END */
+            
             else {
                 Decl* decl = enclosing->addClassDecl(this);
+                this->collectTypeVarDecls(decl);
                 if (decl != NULL) {
                     id->addDecl(decl);
                     for_each_child (c, this) {
@@ -206,6 +248,13 @@ AST::collectDecls (Decl* enclosing)
 void
 AST::collectTypeVarDecls (Decl* enclosing)
 {
+    AST_Ptr params = this->child(1);
+    for (unsigned int count = 0; count < params->arity(); count++) {
+        AST_Ptr param = params->child(count);
+        AST_Ptr paramId = param->child(0);
+        Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
+        param->addDecl(paramType);
+    }
 }
 
 void
