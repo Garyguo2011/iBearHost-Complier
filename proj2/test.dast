@@ -1,82 +1,82 @@
 (module 0
     (class 10
-        (id 10 str)
+        (id 10 str 11)
         (type_formals_list 0)
         (stmt_list 11))
     (class 13
-        (id 13 int)
+        (id 13 int 12)
         (type_formals_list 0)
         (stmt_list 14))
     (class 16
-        (id 16 bool)
+        (id 16 bool 13)
         (type_formals_list 0)
         (stmt_list 17))
     (class 19
-        (id 19 range)
+        (id 19 range 14)
         (type_formals_list 0)
         (stmt_list 20))
     (class 22
-        (id 22 list)
+        (id 22 list 16)
         (type_formals_list 22
             (type_var 22 $T))
         (stmt_list 23))
     (class 25
-        (id 25 dict)
+        (id 25 dict 19)
         (type_formals_list 25
             (type_var 25 $Key)
             (type_var 25 $Value))
         (stmt_list 26))
     (class 28
-        (id 28 tuple0)
+        (id 28 tuple0 20)
         (type_formals_list 0)
         (stmt_list 29))
     (class 31
-        (id 31 tuple1)
+        (id 31 tuple1 22)
         (type_formals_list 31
             (type_var 31 $T0))
         (stmt_list 32))
     (class 34
-        (id 34 tuple2)
+        (id 34 tuple2 25)
         (type_formals_list 34
             (type_var 34 $T1)
             (type_var 34 $T2))
         (stmt_list 35))
     (class 37
-        (id 37 tuple3)
+        (id 37 tuple3 29)
         (type_formals_list 37
             (type_var 37 $T1)
             (type_var 37 $T2)
             (type_var 37 $T3))
         (stmt_list 38))
     (def 46
-        (id 46 truth)
+        (id 46 truth 31)
         (formals_list 46
             (typed_id 46
-                (id 46 x)
-                (type_var 0 $#29 0)))
+                (id 46 x 32)
+                (type_var 0 $#29 1)))
         (type 46
             (id 46 bool))
         (native 47
             (string_literal 47 "__truth__")))
     (def 49
-        (id 49 __not__)
+        (id 49 __not__ 34)
         (formals_list 49
             (typed_id 49
-                (id 49 x)
-                (type_var 0 $#30 1)))
+                (id 49 x 35)
+                (type_var 0 $#30 2)))
         (type 49
             (id 49 bool))
         (native 50
             (string_literal 50 "__not__")))
     (def 54
-        (id 54 xrange)
+        (id 54 xrange 37)
         (formals_list 54
             (typed_id 54
-                (id 54 low)
+                (id 54 low 38)
                 (type 54
                     (id 54 int)))
             (typed_id 54
-                (id 54 high)
+                (id 54 high 39)
                 (type 54
                     (id 54 int))))
         (type 54
@@ -84,10 +84,10 @@
         (native 55
             (string_literal 55 "__xrange__")))
     (def 57
-        (id 57 len)
+        (id 57 len 41)
         (formals_list 57
             (typed_id 57
-                (id 57 r)
+                (id 57 r 42)
                 (type 57
                     (id 57 range))))
         (type 57
@@ -95,14 +95,14 @@
         (native 58
             (string_literal 58 "__len__range__")))
     (def 62
-        (id 62 __add__)
+        (id 62 __add__ 44)
         (formals_list 62
             (typed_id 62
-                (id 62 x)
+                (id 62 x 45)
                 (type 62
                     (id 62 int)))
             (typed_id 62
-                (id 62 y)
+                (id 62 y 46)
                 (type 62
                     (id 62 int))))
         (type 62
@@ -110,14 +110,14 @@
         (native 63
             (string_literal 63 "__add__int__")))
     (def 65
-        (id 65 __sub__)
+        (id 65 __sub__ 48)
         (formals_list 65
             (typed_id 65
-                (id 65 x)
+                (id 65 x 49)
                 (type 65
                     (id 65 int)))
             (typed_id 65
-                (id 65 y)
+                (id 65 y 50)
                 (type 65
                     (id 65 int))))
         (type 65
@@ -125,14 +125,14 @@
         (native 66
             (string_literal 66 "__sub__int__")))
     (def 68
-        (id 68 __mul__)
+        (id 68 __mul__ 52)
         (formals_list 68
             (typed_id 68
-                (id 68 x)
+                (id 68 x 53)
                 (type 68
                     (id 68 int)))
             (typed_id 68
-                (id 68 y)
+                (id 68 y 54)
                 (type 68
                     (id 68 int))))
         (type 68
@@ -140,14 +140,14 @@
         (native 69
             (string_literal 69 "__mul__int__")))
     (def 71
-        (id 71 __floordiv__)
+        (id 71 __floordiv__ 56)
         (formals_list 71
             (typed_id 71
-                (id 71 x)
+                (id 71 x 57)
                 (type 71
                     (id 71 int)))
             (typed_id 71
-                (id 71 y)
+                (id 71 y 58)
                 (type 71
                     (id 71 int))))
         (type 71
@@ -155,14 +155,14 @@
         (native 72
             (string_literal 72 "__floordiv__int__")))
     (def 74
-        (id 74 __mod__)
+        (id 74 __mod__ 60)
         (formals_list 74
             (typed_id 74
-                (id 74 x)
+                (id 74 x 61)
                 (type 74
                     (id 74 int)))
             (typed_id 74
-                (id 74 y)
+                (id 74 y 62)
                 (type 74
                     (id 74 int))))
         (type 74
@@ -170,14 +170,14 @@
         (native 75
             (string_literal 75 "__mod__int__")))
     (def 77
-        (id 77 __pow__)
+        (id 77 __pow__ 64)
         (formals_list 77
             (typed_id 77
-                (id 77 x)
+                (id 77 x 65)
                 (type 77
                     (id 77 int)))
             (typed_id 77
-                (id 77 y)
+                (id 77 y 66)
                 (type 77
                     (id 77 int))))
         (type 77
@@ -185,10 +185,10 @@
         (native 78
             (string_literal 78 "__pow__int__")))
     (def 80
-        (id 80 __neg__)
+        (id 80 __neg__ 68)
         (formals_list 80
             (typed_id 80
-                (id 80 x)
+                (id 80 x 69)
                 (type 80
                     (id 80 int))))
         (type 80
@@ -196,10 +196,10 @@
         (native 81
             (string_literal 81 "__neg__int__")))
     (def 83
-        (id 83 __pos__)
+        (id 83 __pos__ 71)
         (formals_list 83
             (typed_id 83
-                (id 83 x)
+                (id 83 x 72)
                 (type 83
                     (id 83 int))))
         (type 83
@@ -207,14 +207,14 @@
         (native 84
             (string_literal 84 "__pos__int__")))
     (def 86
-        (id 86 __lt__)
+        (id 86 __lt__ 74)
         (formals_list 86
             (typed_id 86
-                (id 86 x)
+                (id 86 x 75)
                 (type 86
                     (id 86 int)))
             (typed_id 86
-                (id 86 y)
+                (id 86 y 76)
                 (type 86
                     (id 86 int))))
         (type 86
@@ -222,14 +222,14 @@
         (native 87
             (string_literal 87 "__lt__int__")))
     (def 89
-        (id 89 __gt__)
+        (id 89 __gt__ 78)
         (formals_list 89
             (typed_id 89
-                (id 89 x)
+                (id 89 x 79)
                 (type 89
                     (id 89 int)))
             (typed_id 89
-                (id 89 y)
+                (id 89 y 80)
                 (type 89
                     (id 89 int))))
         (type 89
@@ -237,14 +237,14 @@
         (native 90
             (string_literal 90 "__gt__int__")))
     (def 92
-        (id 92 __le__)
+        (id 92 __le__ 82)
         (formals_list 92
             (typed_id 92
-                (id 92 x)
+                (id 92 x 83)
                 (type 92
                     (id 92 int)))
             (typed_id 92
-                (id 92 y)
+                (id 92 y 84)
                 (type 92
                     (id 92 int))))
         (type 92
@@ -252,14 +252,14 @@
         (native 93
             (string_literal 93 "__le__int__")))
     (def 95
-        (id 95 __ge__)
+        (id 95 __ge__ 86)
         (formals_list 95
             (typed_id 95
-                (id 95 x)
+                (id 95 x 87)
                 (type 95
                     (id 95 int)))
             (typed_id 95
-                (id 95 y)
+                (id 95 y 88)
                 (type 95
                     (id 95 int))))
         (type 95
@@ -267,14 +267,14 @@
         (native 96
             (string_literal 96 "__ge__int__")))
     (def 98
-        (id 98 __eq__)
+        (id 98 __eq__ 90)
         (formals_list 98
             (typed_id 98
-                (id 98 x)
+                (id 98 x 91)
                 (type 98
                     (id 98 int)))
             (typed_id 98
-                (id 98 y)
+                (id 98 y 92)
                 (type 98
                     (id 98 int))))
         (type 98
@@ -282,14 +282,14 @@
         (native 99
             (string_literal 99 "__eq__int__")))
     (def 101
-        (id 101 __ne__)
+        (id 101 __ne__ 94)
         (formals_list 101
             (typed_id 101
-                (id 101 x)
+                (id 101 x 95)
                 (type 101
                     (id 101 int)))
             (typed_id 101
-                (id 101 y)
+                (id 101 y 96)
                 (type 101
                     (id 101 int))))
         (type 101
@@ -297,10 +297,10 @@
         (native 102
             (string_literal 102 "__ne__int__")))
     (def 105
-        (id 105 toint)
+        (id 105 toint 98)
         (formals_list 105
             (typed_id 105
-                (id 105 x)
+                (id 105 x 99)
                 (type 105
                     (id 105 str))))
         (type 105
@@ -308,14 +308,14 @@
         (native 106
             (string_literal 106 "__toint__str__")))
     (def 110
-        (id 110 __add__)
+        (id 110 __add__ 101)
         (formals_list 110
             (typed_id 110
-                (id 110 x)
+                (id 110 x 102)
                 (type 110
                     (id 110 str)))
             (typed_id 110
-                (id 110 y)
+                (id 110 y 103)
                 (type 110
                     (id 110 str))))
         (type 110
@@ -323,14 +323,14 @@
         (native 111
             (string_literal 111 "__add__str__")))
     (def 113
-        (id 113 __mul__)
+        (id 113 __mul__ 105)
         (formals_list 113
             (typed_id 113
-                (id 113 x)
+                (id 113 x 106)
                 (type 113
                     (id 113 str)))
             (typed_id 113
-                (id 113 y)
+                (id 113 y 107)
                 (type 113
                     (id 113 int))))
         (type 113
@@ -338,14 +338,14 @@
         (native 114
             (string_literal 114 "__lmul__str__")))
     (def 116
-        (id 116 __mul__)
+        (id 116 __mul__ 109)
         (formals_list 116
             (typed_id 116
-                (id 116 x)
+                (id 116 x 110)
                 (type 116
                     (id 116 int)))
             (typed_id 116
-                (id 116 y)
+                (id 116 y 111)
                 (type 116
                     (id 116 str))))
         (type 116
@@ -353,14 +353,14 @@
         (native 117
             (string_literal 117 "__rmul__str__")))
     (def 119
-        (id 119 __lt__)
+        (id 119 __lt__ 113)
         (formals_list 119
             (typed_id 119
-                (id 119 x)
+                (id 119 x 114)
                 (type 119
                     (id 119 str)))
             (typed_id 119
-                (id 119 y)
+                (id 119 y 115)
                 (type 119
                     (id 119 str))))
         (type 119
@@ -368,14 +368,14 @@
         (native 120
             (string_literal 120 "__lt__str__")))
     (def 122
-        (id 122 __gt__)
+        (id 122 __gt__ 117)
         (formals_list 122
             (typed_id 122
-                (id 122 x)
+                (id 122 x 118)
                 (type 122
                     (id 122 str)))
             (typed_id 122
-                (id 122 y)
+                (id 122 y 119)
                 (type 122
                     (id 122 str))))
         (type 122
@@ -383,14 +383,14 @@
         (native 123
             (string_literal 123 "__gt__str__")))
     (def 125
-        (id 125 __le__)
+        (id 125 __le__ 121)
         (formals_list 125
             (typed_id 125
-                (id 125 x)
+                (id 125 x 122)
                 (type 125
                     (id 125 str)))
             (typed_id 125
-                (id 125 y)
+                (id 125 y 123)
                 (type 125
                     (id 125 str))))
         (type 125
@@ -398,14 +398,14 @@
         (native 126
             (string_literal 126 "__le__str__")))
     (def 128
-        (id 128 __ge__)
+        (id 128 __ge__ 125)
         (formals_list 128
             (typed_id 128
-                (id 128 x)
+                (id 128 x 126)
                 (type 128
                     (id 128 str)))
             (typed_id 128
-                (id 128 y)
+                (id 128 y 127)
                 (type 128
                     (id 128 str))))
         (type 128
@@ -413,14 +413,14 @@
         (native 129
             (string_literal 129 "__ge__str__")))
     (def 131
-        (id 131 __eq__)
+        (id 131 __eq__ 129)
         (formals_list 131
             (typed_id 131
-                (id 131 x)
+                (id 131 x 130)
                 (type 131
                     (id 131 str)))
             (typed_id 131
-                (id 131 y)
+                (id 131 y 131)
                 (type 131
                     (id 131 str))))
         (type 131
@@ -428,14 +428,14 @@
         (native 132
             (string_literal 132 "__eq__str__")))
     (def 134
-        (id 134 __ne__)
+        (id 134 __ne__ 133)
         (formals_list 134
             (typed_id 134
-                (id 134 x)
+                (id 134 x 134)
                 (type 134
                     (id 134 str)))
             (typed_id 134
-                (id 134 y)
+                (id 134 y 135)
                 (type 134
                     (id 134 str))))
         (type 134
@@ -443,14 +443,14 @@
         (native 135
             (string_literal 135 "__ne__str__")))
     (def 137
-        (id 137 __getitem__)
+        (id 137 __getitem__ 137)
         (formals_list 137
             (typed_id 137
-                (id 137 S)
+                (id 137 S 138)
                 (type 137
                     (id 137 str)))
             (typed_id 137
-                (id 137 k)
+                (id 137 k 139)
                 (type 137
                     (id 137 int))))
         (type 137
@@ -458,18 +458,18 @@
         (native 138
             (string_literal 138 "__getitem__str__")))
     (def 140
-        (id 140 __getslice__)
+        (id 140 __getslice__ 141)
         (formals_list 140
             (typed_id 140
-                (id 140 S)
+                (id 140 S 142)
                 (type 140
                     (id 140 str)))
             (typed_id 140
-                (id 140 L)
+                (id 140 L 143)
                 (type 140
                     (id 140 int)))
             (typed_id 140
-                (id 140 U)
+                (id 140 U 144)
                 (type 140
                     (id 140 int))))
         (type 140
@@ -477,10 +477,10 @@
         (native 141
             (string_literal 141 "__getslice__str__")))
     (def 143
-        (id 143 len)
+        (id 143 len 146)
         (formals_list 143
             (typed_id 143
-                (id 143 S)
+                (id 143 S 147)
                 (type 143
                     (id 143 str))))
         (type 143
@@ -488,44 +488,44 @@
         (native 144
             (string_literal 144 "__len__str__")))
     (def 147
-        (id 147 tostr)
+        (id 147 tostr 149)
         (formals_list 147
             (typed_id 147
-                (id 147 x)
-                (type_var 0 $#31 2)))
+                (id 147 x 150)
+                (type_var 0 $#31 3)))
         (type 147
             (id 147 str))
         (native 148
             (string_literal 148 "__tostr__")))
     (def 152
-        (id 152 __getitem__)
+        (id 152 __getitem__ 152)
         (formals_list 152
             (typed_id 152
-                (id 152 S)
+                (id 152 S 153)
                 (type 152
                     (id 152 list)
                     (type_var 152 $a)))
             (typed_id 152
-                (id 152 k)
+                (id 152 k 154)
                 (type 152
                     (id 152 int))))
         (type_var 152 $a)
         (native 153
             (string_literal 153 "__getitem__list__")))
     (def 155
-        (id 155 __getslice__)
+        (id 155 __getslice__ 156)
         (formals_list 155
             (typed_id 155
-                (id 155 S)
+                (id 155 S 157)
                 (type 155
                     (id 155 list)
                     (type_var 155 $a)))
             (typed_id 155
-                (id 155 L)
+                (id 155 L 158)
                 (type 155
                     (id 155 int)))
             (typed_id 155
-                (id 155 U)
+                (id 155 U 159)
                 (type 155
                     (id 155 int))))
         (type 155
@@ -534,10 +534,10 @@
         (native 156
             (string_literal 156 "__getslice__list__")))
     (def 158
-        (id 158 len)
+        (id 158 len 161)
         (formals_list 158
             (typed_id 158
-                (id 158 S)
+                (id 158 S 162)
                 (type 158
                     (id 158 list)
                     (type_var 158 $a))))
@@ -546,7 +546,7 @@
         (native 159
             (string_literal 159 "__len__list__")))
     (def 162
-        (id 162 argv)
+        (id 162 argv 164)
         (formals_list 0)
         (type 162
             (id 162 list)
@@ -555,75 +555,75 @@
         (native 163
             (string_literal 163 "__argv__")))
     (def 167
-        (id 167 readline)
+        (id 167 readline 166)
         (formals_list 0)
         (type 167
             (id 167 str))
         (native 168
             (string_literal 168 "__readline__")))
     (def 170
-        (id 170 read)
+        (id 170 read 168)
         (formals_list 0)
         (type 170
             (id 170 str))
         (native 171
             (string_literal 171 "__read__")))
     (def 175
-        (id 175 __getitem__)
+        (id 175 __getitem__ 170)
         (formals_list 175
             (typed_id 175
-                (id 175 D)
+                (id 175 D 171)
                 (type 175
                     (id 175 dict)
                     (type 175
                         (id 175 int))
                     (type_var 175 $b)))
             (typed_id 175
-                (id 175 x)
+                (id 175 x 172)
                 (type 175
                     (id 175 int))))
         (type_var 175 $b)
         (native 176
             (string_literal 176 "__getitem__dict__")))
     (def 178
-        (id 178 __getitem__)
+        (id 178 __getitem__ 174)
         (formals_list 178
             (typed_id 178
-                (id 178 D)
+                (id 178 D 175)
                 (type 178
                     (id 178 dict)
                     (type 178
                         (id 178 bool))
                     (type_var 178 $b)))
             (typed_id 178
-                (id 178 x)
+                (id 178 x 176)
                 (type 178
                     (id 178 bool))))
         (type_var 178 $b)
         (native 179
             (string_literal 179 "__getitem__dict__")))
     (def 181
-        (id 181 __getitem__)
+        (id 181 __getitem__ 178)
         (formals_list 181
             (typed_id 181
-                (id 181 D)
+                (id 181 D 179)
                 (type 181
                     (id 181 dict)
                     (type 181
                         (id 181 str))
                     (type_var 181 $b)))
             (typed_id 181
-                (id 181 x)
+                (id 181 x 180)
                 (type 181
                     (id 181 str))))
         (type_var 181 $b)
         (native 182
             (string_literal 182 "__getitem__dict__")))
     (def 184
-        (id 184 len)
+        (id 184 len 182)
         (formals_list 184
             (typed_id 184
-                (id 184 D)
+                (id 184 D 183)
                 (type 184
                     (id 184 dict)
                     (type 184
@@ -634,10 +634,10 @@
         (native 185
             (string_literal 185 "__len__dict__")))
     (def 187
-        (id 187 len)
+        (id 187 len 185)
         (formals_list 187
             (typed_id 187
-                (id 187 D)
+                (id 187 D 186)
                 (type 187
                     (id 187 dict)
                     (type 187
@@ -648,10 +648,10 @@
         (native 188
             (string_literal 188 "__len__dict__")))
     (def 190
-        (id 190 len)
+        (id 190 len 188)
         (formals_list 190
             (typed_id 190
-                (id 190 D)
+                (id 190 D 189)
                 (type 190
                     (id 190 dict)
                     (type 190
@@ -662,14 +662,14 @@
         (native 191
             (string_literal 191 "__len__dict__")))
     (def 194
-        (id 194 __contains__)
+        (id 194 __contains__ 191)
         (formals_list 194
             (typed_id 194
-                (id 194 x)
+                (id 194 x 192)
                 (type 194
                     (id 194 int)))
             (typed_id 194
-                (id 194 D)
+                (id 194 D 193)
                 (type 194
                     (id 194 dict)
                     (type 194
@@ -680,14 +680,14 @@
         (native 195
             (string_literal 195 "__contains__dict__")))
     (def 197
-        (id 197 __contains__)
+        (id 197 __contains__ 195)
         (formals_list 197
             (typed_id 197
-                (id 197 x)
+                (id 197 x 196)
                 (type 197
                     (id 197 bool)))
             (typed_id 197
-                (id 197 D)
+                (id 197 D 197)
                 (type 197
                     (id 197 dict)
                     (type 197
@@ -698,14 +698,14 @@
         (native 198
             (string_literal 198 "__contains__dict__")))
     (def 200
-        (id 200 __contains__)
+        (id 200 __contains__ 199)
         (formals_list 200
             (typed_id 200
-                (id 200 x)
+                (id 200 x 200)
                 (type 200
                     (id 200 str)))
             (typed_id 200
-                (id 200 D)
+                (id 200 D 201)
                 (type 200
                     (id 200 dict)
                     (type 200
@@ -716,14 +716,14 @@
         (native 201
             (string_literal 201 "__contains__dict__")))
     (def 204
-        (id 204 __notcontains__)
+        (id 204 __notcontains__ 203)
         (formals_list 204
             (typed_id 204
-                (id 204 x)
+                (id 204 x 204)
                 (type 204
                     (id 204 int)))
             (typed_id 204
-                (id 204 D)
+                (id 204 D 205)
                 (type 204
                     (id 204 dict)
                     (type 204
@@ -734,14 +734,14 @@
         (native 205
             (string_literal 205 "__notcontains__dict__")))
     (def 207
-        (id 207 __notcontains__)
+        (id 207 __notcontains__ 207)
         (formals_list 207
             (typed_id 207
-                (id 207 x)
+                (id 207 x 208)
                 (type 207
                     (id 207 bool)))
             (typed_id 207
-                (id 207 D)
+                (id 207 D 209)
                 (type 207
                     (id 207 dict)
                     (type 207
@@ -752,14 +752,14 @@
         (native 208
             (string_literal 208 "__notcontains__dict__")))
     (def 210
-        (id 210 __notcontains__)
+        (id 210 __notcontains__ 211)
         (formals_list 210
             (typed_id 210
-                (id 210 x)
+                (id 210 x 212)
                 (type 210
                     (id 210 str)))
             (typed_id 210
-                (id 210 D)
+                (id 210 D 213)
                 (type 210
                     (id 210 dict)
                     (type 210
@@ -770,31 +770,342 @@
         (native 211
             (string_literal 211 "__notcontains__dict__")))
     (def 216
-        (id 216 __is__)
+        (id 216 __is__ 215)
         (formals_list 216
             (typed_id 216
-                (id 216 x)
-                (type_var 0 $#32 3))
+                (id 216 x 216)
+                (type_var 0 $#32 4))
             (typed_id 216
-                (id 216 y)
-                (type_var 0 $#33 4)))
+                (id 216 y 217)
+                (type_var 0 $#33 5)))
         (type 216
             (id 216 bool))
         (native 217
             (string_literal 217 "__is__")))
     (def 219
-        (id 219 __isnot__)
+        (id 219 __isnot__ 219)
         (formals_list 219
             (typed_id 219
-                (id 219 x)
-                (type_var 0 $#34 5))
+                (id 219 x 220)
+                (type_var 0 $#34 6))
             (typed_id 219
-                (id 219 y)
-                (type_var 0 $#35 6)))
+                (id 219 y 221)
+                (type_var 0 $#35 7)))
         (type 219
             (id 219 bool))
         (native 220
             (string_literal 220 "__isnot__")))
     (assign 1
-        (id 1 x)
-        (int_literal 1 5)))
+        (id 1 x 223)
+        (int_literal 1 5))
+    (assign 2
+        (id 2 x)
+        (int_literal 2 7))
+    (assign 3
+        (id 3 x)
+        (int_literal 3 8))
+    (def 4
+        (id 4 f 225)
+        (formals_list 0)
+        (type_var 0 $#36 8)
+        (assign 5
+            (id 5 x 227)
+            (int_literal 5 6)))
+    (class 6
+        (id 6 g 228)
+        (type_formals_list 0)
+        (method 7
+            (id 7 f 229)
+            (formals_list 0)
+            (type_var 0 $#37 9)
+            (stmt_list 8))
+        (method 9
+            (id 9 h 230)
+            (formals_list 0)
+            (type_var 0 $#38 10)
+            (stmt_list 10))))(moduledecl 0 __main__  (index_list 11 12 13 14 16 19 20 22 25 29 31 34 37 41 44 48 52 56 60 64 68 71 74 78 82 86 90 94 98 101 105 109 113 117 121 125 129 133 137 141 146 149 152 156 161 164 166 168 170 174 178 182 185 188 191 195 199 203 207 211 215 219 223 225 228))
+(classdecl 11 str  (index_list) (index_list))
+(classdecl 12 int  (index_list) (index_list))
+(classdecl 13 bool  (index_list) (index_list))
+(classdecl 14 range  (index_list) (index_list))
+(typevardecl 15 $T )
+(classdecl 16 list  (index_list ?) (index_list))
+(typevardecl 17 $Key )
+(typevardecl 18 $Value )
+(classdecl 19 dict  (index_list ? ?) (index_list))
+(classdecl 20 tuple0  (index_list) (index_list))
+(typevardecl 21 $T0 )
+(classdecl 22 tuple1  (index_list ?) (index_list))
+(typevardecl 23 $T1 )
+(typevardecl 24 $T2 )
+(classdecl 25 tuple2  (index_list ? ?) (index_list))
+(typevardecl 26 $T1 )
+(typevardecl 27 $T2 )
+(typevardecl 28 $T3 )
+(classdecl 29 tuple3  (index_list ? ? ?) (index_list))
+(funcdecl 31 truth 0  (type_var 0 $#39 30) (index_list 32))
+(paramdecl 32 x 31  0 (type_var 0 $#29 1))
+(funcdecl 34 __not__ 0  (type_var 0 $#40 33) (index_list 35))
+(paramdecl 35 x 34  0 (type_var 0 $#30 2))
+(funcdecl 37 xrange 0  (type_var 0 $#41 36) (index_list 38 39))
+(paramdecl 38 low 37  0 (type 54
+    (id 54 int)))
+(paramdecl 39 high 37  1 (type 54
+    (id 54 int)))
+(funcdecl 41 len 0  (type_var 0 $#42 40) (index_list 42))
+(paramdecl 42 r 41  0 (type 57
+    (id 57 range)))
+(funcdecl 44 __add__ 0  (type_var 0 $#43 43) (index_list 45 46))
+(paramdecl 45 x 44  0 (type 62
+    (id 62 int)))
+(paramdecl 46 y 44  1 (type 62
+    (id 62 int)))
+(funcdecl 48 __sub__ 0  (type_var 0 $#44 47) (index_list 49 50))
+(paramdecl 49 x 48  0 (type 65
+    (id 65 int)))
+(paramdecl 50 y 48  1 (type 65
+    (id 65 int)))
+(funcdecl 52 __mul__ 0  (type_var 0 $#45 51) (index_list 53 54))
+(paramdecl 53 x 52  0 (type 68
+    (id 68 int)))
+(paramdecl 54 y 52  1 (type 68
+    (id 68 int)))
+(funcdecl 56 __floordiv__ 0  (type_var 0 $#46 55) (index_list 57 58))
+(paramdecl 57 x 56  0 (type 71
+    (id 71 int)))
+(paramdecl 58 y 56  1 (type 71
+    (id 71 int)))
+(funcdecl 60 __mod__ 0  (type_var 0 $#47 59) (index_list 61 62))
+(paramdecl 61 x 60  0 (type 74
+    (id 74 int)))
+(paramdecl 62 y 60  1 (type 74
+    (id 74 int)))
+(funcdecl 64 __pow__ 0  (type_var 0 $#48 63) (index_list 65 66))
+(paramdecl 65 x 64  0 (type 77
+    (id 77 int)))
+(paramdecl 66 y 64  1 (type 77
+    (id 77 int)))
+(funcdecl 68 __neg__ 0  (type_var 0 $#49 67) (index_list 69))
+(paramdecl 69 x 68  0 (type 80
+    (id 80 int)))
+(funcdecl 71 __pos__ 0  (type_var 0 $#50 70) (index_list 72))
+(paramdecl 72 x 71  0 (type 83
+    (id 83 int)))
+(funcdecl 74 __lt__ 0  (type_var 0 $#51 73) (index_list 75 76))
+(paramdecl 75 x 74  0 (type 86
+    (id 86 int)))
+(paramdecl 76 y 74  1 (type 86
+    (id 86 int)))
+(funcdecl 78 __gt__ 0  (type_var 0 $#52 77) (index_list 79 80))
+(paramdecl 79 x 78  0 (type 89
+    (id 89 int)))
+(paramdecl 80 y 78  1 (type 89
+    (id 89 int)))
+(funcdecl 82 __le__ 0  (type_var 0 $#53 81) (index_list 83 84))
+(paramdecl 83 x 82  0 (type 92
+    (id 92 int)))
+(paramdecl 84 y 82  1 (type 92
+    (id 92 int)))
+(funcdecl 86 __ge__ 0  (type_var 0 $#54 85) (index_list 87 88))
+(paramdecl 87 x 86  0 (type 95
+    (id 95 int)))
+(paramdecl 88 y 86  1 (type 95
+    (id 95 int)))
+(funcdecl 90 __eq__ 0  (type_var 0 $#55 89) (index_list 91 92))
+(paramdecl 91 x 90  0 (type 98
+    (id 98 int)))
+(paramdecl 92 y 90  1 (type 98
+    (id 98 int)))
+(funcdecl 94 __ne__ 0  (type_var 0 $#56 93) (index_list 95 96))
+(paramdecl 95 x 94  0 (type 101
+    (id 101 int)))
+(paramdecl 96 y 94  1 (type 101
+    (id 101 int)))
+(funcdecl 98 toint 0  (type_var 0 $#57 97) (index_list 99))
+(paramdecl 99 x 98  0 (type 105
+    (id 105 str)))
+(funcdecl 101 __add__ 0  (type_var 0 $#58 100) (index_list 102 103))
+(paramdecl 102 x 101  0 (type 110
+    (id 110 str)))
+(paramdecl 103 y 101  1 (type 110
+    (id 110 str)))
+(funcdecl 105 __mul__ 0  (type_var 0 $#59 104) (index_list 106 107))
+(paramdecl 106 x 105  0 (type 113
+    (id 113 str)))
+(paramdecl 107 y 105  1 (type 113
+    (id 113 int)))
+(funcdecl 109 __mul__ 0  (type_var 0 $#60 108) (index_list 110 111))
+(paramdecl 110 x 109  0 (type 116
+    (id 116 int)))
+(paramdecl 111 y 109  1 (type 116
+    (id 116 str)))
+(funcdecl 113 __lt__ 0  (type_var 0 $#61 112) (index_list 114 115))
+(paramdecl 114 x 113  0 (type 119
+    (id 119 str)))
+(paramdecl 115 y 113  1 (type 119
+    (id 119 str)))
+(funcdecl 117 __gt__ 0  (type_var 0 $#62 116) (index_list 118 119))
+(paramdecl 118 x 117  0 (type 122
+    (id 122 str)))
+(paramdecl 119 y 117  1 (type 122
+    (id 122 str)))
+(funcdecl 121 __le__ 0  (type_var 0 $#63 120) (index_list 122 123))
+(paramdecl 122 x 121  0 (type 125
+    (id 125 str)))
+(paramdecl 123 y 121  1 (type 125
+    (id 125 str)))
+(funcdecl 125 __ge__ 0  (type_var 0 $#64 124) (index_list 126 127))
+(paramdecl 126 x 125  0 (type 128
+    (id 128 str)))
+(paramdecl 127 y 125  1 (type 128
+    (id 128 str)))
+(funcdecl 129 __eq__ 0  (type_var 0 $#65 128) (index_list 130 131))
+(paramdecl 130 x 129  0 (type 131
+    (id 131 str)))
+(paramdecl 131 y 129  1 (type 131
+    (id 131 str)))
+(funcdecl 133 __ne__ 0  (type_var 0 $#66 132) (index_list 134 135))
+(paramdecl 134 x 133  0 (type 134
+    (id 134 str)))
+(paramdecl 135 y 133  1 (type 134
+    (id 134 str)))
+(funcdecl 137 __getitem__ 0  (type_var 0 $#67 136) (index_list 138 139))
+(paramdecl 138 S 137  0 (type 137
+    (id 137 str)))
+(paramdecl 139 k 137  1 (type 137
+    (id 137 int)))
+(funcdecl 141 __getslice__ 0  (type_var 0 $#68 140) (index_list 142 143 144))
+(paramdecl 142 S 141  0 (type 140
+    (id 140 str)))
+(paramdecl 143 L 141  1 (type 140
+    (id 140 int)))
+(paramdecl 144 U 141  2 (type 140
+    (id 140 int)))
+(funcdecl 146 len 0  (type_var 0 $#69 145) (index_list 147))
+(paramdecl 147 S 146  0 (type 143
+    (id 143 str)))
+(funcdecl 149 tostr 0  (type_var 0 $#70 148) (index_list 150))
+(paramdecl 150 x 149  0 (type_var 0 $#31 3))
+(funcdecl 152 __getitem__ 0  (type_var 0 $#71 151) (index_list 153 154))
+(paramdecl 153 S 152  0 (type 152
+    (id 152 list)
+    (type_var 152 $a)))
+(paramdecl 154 k 152  1 (type 152
+    (id 152 int)))
+(funcdecl 156 __getslice__ 0  (type_var 0 $#72 155) (index_list 157 158 159))
+(paramdecl 157 S 156  0 (type 155
+    (id 155 list)
+    (type_var 155 $a)))
+(paramdecl 158 L 156  1 (type 155
+    (id 155 int)))
+(paramdecl 159 U 156  2 (type 155
+    (id 155 int)))
+(funcdecl 161 len 0  (type_var 0 $#73 160) (index_list 162))
+(paramdecl 162 S 161  0 (type 158
+    (id 158 list)
+    (type_var 158 $a)))
+(funcdecl 164 argv 0  (type_var 0 $#74 163) (index_list))
+(funcdecl 166 readline 0  (type_var 0 $#75 165) (index_list))
+(funcdecl 168 read 0  (type_var 0 $#76 167) (index_list))
+(funcdecl 170 __getitem__ 0  (type_var 0 $#77 169) (index_list 171 172))
+(paramdecl 171 D 170  0 (type 175
+    (id 175 dict)
+    (type 175
+        (id 175 int))
+    (type_var 175 $b)))
+(paramdecl 172 x 170  1 (type 175
+    (id 175 int)))
+(funcdecl 174 __getitem__ 0  (type_var 0 $#78 173) (index_list 175 176))
+(paramdecl 175 D 174  0 (type 178
+    (id 178 dict)
+    (type 178
+        (id 178 bool))
+    (type_var 178 $b)))
+(paramdecl 176 x 174  1 (type 178
+    (id 178 bool)))
+(funcdecl 178 __getitem__ 0  (type_var 0 $#79 177) (index_list 179 180))
+(paramdecl 179 D 178  0 (type 181
+    (id 181 dict)
+    (type 181
+        (id 181 str))
+    (type_var 181 $b)))
+(paramdecl 180 x 178  1 (type 181
+    (id 181 str)))
+(funcdecl 182 len 0  (type_var 0 $#80 181) (index_list 183))
+(paramdecl 183 D 182  0 (type 184
+    (id 184 dict)
+    (type 184
+        (id 184 int))
+    (type_var 184 $b)))
+(funcdecl 185 len 0  (type_var 0 $#81 184) (index_list 186))
+(paramdecl 186 D 185  0 (type 187
+    (id 187 dict)
+    (type 187
+        (id 187 bool))
+    (type_var 187 $b)))
+(funcdecl 188 len 0  (type_var 0 $#82 187) (index_list 189))
+(paramdecl 189 D 188  0 (type 190
+    (id 190 dict)
+    (type 190
+        (id 190 str))
+    (type_var 190 $b)))
+(funcdecl 191 __contains__ 0  (type_var 0 $#83 190) (index_list 192 193))
+(paramdecl 192 x 191  0 (type 194
+    (id 194 int)))
+(paramdecl 193 D 191  1 (type 194
+    (id 194 dict)
+    (type 194
+        (id 194 int))
+    (type_var 194 $b)))
+(funcdecl 195 __contains__ 0  (type_var 0 $#84 194) (index_list 196 197))
+(paramdecl 196 x 195  0 (type 197
+    (id 197 bool)))
+(paramdecl 197 D 195  1 (type 197
+    (id 197 dict)
+    (type 197
+        (id 197 bool))
+    (type_var 197 $b)))
+(funcdecl 199 __contains__ 0  (type_var 0 $#85 198) (index_list 200 201))
+(paramdecl 200 x 199  0 (type 200
+    (id 200 str)))
+(paramdecl 201 D 199  1 (type 200
+    (id 200 dict)
+    (type 200
+        (id 200 str))
+    (type_var 200 $b)))
+(funcdecl 203 __notcontains__ 0  (type_var 0 $#86 202) (index_list 204 205))
+(paramdecl 204 x 203  0 (type 204
+    (id 204 int)))
+(paramdecl 205 D 203  1 (type 204
+    (id 204 dict)
+    (type 204
+        (id 204 int))
+    (type_var 204 $b)))
+(funcdecl 207 __notcontains__ 0  (type_var 0 $#87 206) (index_list 208 209))
+(paramdecl 208 x 207  0 (type 207
+    (id 207 bool)))
+(paramdecl 209 D 207  1 (type 207
+    (id 207 dict)
+    (type 207
+        (id 207 bool))
+    (type_var 207 $b)))
+(funcdecl 211 __notcontains__ 0  (type_var 0 $#88 210) (index_list 212 213))
+(paramdecl 212 x 211  0 (type 210
+    (id 210 str)))
+(paramdecl 213 D 211  1 (type 210
+    (id 210 dict)
+    (type 210
+        (id 210 str))
+    (type_var 210 $b)))
+(funcdecl 215 __is__ 0  (type_var 0 $#89 214) (index_list 216 217))
+(paramdecl 216 x 215  0 (type_var 0 $#32 4))
+(paramdecl 217 y 215  1 (type_var 0 $#33 5))
+(funcdecl 219 __isnot__ 0  (type_var 0 $#90 218) (index_list 220 221))
+(paramdecl 220 x 219  0 (type_var 0 $#34 6))
+(paramdecl 221 y 219  1 (type_var 0 $#35 7))
+(vardecl 223 x 0  (type_var 0 $#91 222))
+(funcdecl 225 f 0  (type_var 0 $#92 224) (index_list 227))
+(vardecl 227 x 225  (type_var 0 $#93 226))
+(classdecl 228 g  (index_list) (index_list 229 230))
+(funcdecl 229 f 228  ? (index_list))
+(funcdecl 230 h 228  ? (index_list))

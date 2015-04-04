@@ -13,8 +13,6 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
-static Environ* classes = new Environ(NULL);
-
 static Decl* main = makeModuleDecl("__main__");
 
 /* Definitions of methods in base class AST. */
@@ -119,96 +117,71 @@ AST::doOuterSemantics ()
 }
 
 void
-AST::collectDeclsASSIGN (Decl* enclosing)
-{
-    AST_Ptr targetList = this->child(this->arity() - 2);
-    switch(targetList->oper()->syntax()) {
-        case TARGET_LIST:
-        {
-            for_each_child(target, targetList) {
-                switch(target->oper()->syntax()) {
-                case ID:
-                {
-                    Decl* decl = makeVarDecl(target->as_string(), enclosing, Type::makeVar());
-                    enclosing->addMember(decl);
-                    target->addDecl(decl);
-                    break;
-                }
-                case ATTRIBUTEREF:
-                    break;
-                }
-            } end_for;
-            break;
-        }
-        case ID:
-        {
-            Decl* decl = makeVarDecl(targetList->as_string(), enclosing, Type::makeVar());
-            enclosing->addMember(decl);
-            targetList->addDecl(decl);
-            break;
-        }
-        case ATTRIBUTEREF:
-            break;
-    }
-}
-
-void
-AST::collectDeclsDEF (Decl* enclosing)
-{
-    AST_Ptr id = this->child(0);
-    AST_Ptr type = this->child(2);
-    Decl* decl;
-    if (type->isType()) {
-        decl = makeFuncDecl(id->as_string(), enclosing, type);  
-    }
-    else {
-        decl = makeFuncDecl(id->as_string(), enclosing, Type::makeVar());
-    }
-
-    enclosing->addMember(decl);
-    this->addDecl(decl);
-    
-}
-void
-AST::collectDeclsCLASS (Decl* enclosing)
-{
-    AST_Ptr id = this->child(0);
-    Decl* decl;
-    AST_Ptr params = NULL;
-    if (this->arity() > 1) {
-        params = this->child(1);
-    }
-    decl = makeClassDecl(id->as_string(), params);
-    enclosing->addMember(decl);
-    this->addDecl(decl);
-    classes->define(decl);
-}
-void
-AST::collectDeclsFORMALS_LIST (Decl* enclosing)
-{
-    
-}
-
-void
 AST::collectDecls (Decl* enclosing)
 {
     switch(this->oper()->syntax()) {
         case ASSIGN:
-            this -> collectDeclsASSIGN (enclosing);
+        {
+            this->child(0)->addTargetDecls(enclosing);
+            this->child(1)->collectDecls(enclosing);
             break;
+        }
         case DEF:
-            this -> collectDeclsDEF (enclosing);
+        case METHOD:
+        {
+            AST_Ptr id = this->child(0);
+            Decl* decl = enclosing->addDefDecl(id);
+            if (decl != NULL) {
+                id->addDecl(decl);
+                for_each_child (c, this) {
+                    c->collectDecls (decl);
+                } end_for;
+            }
             break;
+        }
         case CLASS:
-            this -> collectDeclsCLASS (enclosing);
+        {
+            AST_Ptr id = this->child(0);
+            Decl* decl = enclosing->addClassDecl(this);
+            if (decl != NULL) {
+                id->addDecl(decl);
+                for_each_child (c, this) {
+                    c->collectDecls (decl);
+                } end_for;
+            }
             break;
+        }
         case FORMALS_LIST:
-            this -> collectDeclsFORMALS_LIST (enclosing);
+        {
+            for (unsigned int count = 0; count < this -> arity(); count++) {
+                AST_Ptr param = this->child(count);
+                Decl* decl;
+                if (param->oper()->syntax() == TYPED_ID) {
+                    decl = makeParamDecl(param->child(0)->as_string(),
+                                        enclosing,
+                                        count,
+                                        param->child(1));
+                    param->child(0)->addDecl(decl);
+                }
+                else {
+                    decl = makeParamDecl(param->as_string(),
+                                        enclosing,
+                                        count,
+                                        Type::makeVar());
+                    param->addDecl(decl);
+                }
+                enclosing->addMember(decl);
+            }
             break;
+        }
+        default:
+        {
+            for_each_child (c, this) {
+                c->collectDecls (enclosing);
+            } end_for;
+            break;
+        }
     }
-    for_each_child (c, this) {
-        c->collectDecls (enclosing);
-    } end_for;
 }
 
 void
@@ -219,9 +192,45 @@ AST::collectTypeVarDecls (Decl* enclosing)
 void
 AST::addTargetDecls (Decl* enclosing)
 {
-    for_each_child (c, this) {
-        c->addTargetDecls (enclosing);
-    } end_for;
+    switch(this->oper()->syntax()) {
+        case TARGET_LIST:
+        {
+            for_each_child(target, this) {
+                switch(target->oper()->syntax()) {
+                    case ID:
+                    {
+                        Decl* decl = enclosing->addVarDecl(target);
+                        if (decl != NULL) {
+                            target->addDecl(decl);
+                        }
+                        break;
+                    }
+                    case ATTRIBUTEREF:
+                    {
+                        // TODO
+                        break;
+                    }
+                    case TYPED_ID:
+                    {
+                        // TODO
+                        break;
+                    }
+                }
+            } end_for;
+            break;
+        }
+        case ID:
+        {
+            Decl* decl = enclosing->addVarDecl(this);
+            if (decl != NULL) {
+                this->addDecl(decl);
+            }
+            break;
+        }
+        case ATTRIBUTEREF:
+            // TODO
+            break;
+    }
 }
 
 AST_Ptr

@@ -13,6 +13,8 @@ static GCINIT _gcdummy;
 
 const Environ* theEmptyEnviron = new Environ (NULL);
 
+Environ* classes = new Environ (NULL);
+
 Environ::Environ (const Environ* enclosing)
     : enclosure (enclosing) 
 {
