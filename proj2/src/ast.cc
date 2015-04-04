@@ -202,6 +202,7 @@ AST::collectDecls (Decl* enclosing)
             
             else {
                 Decl* decl = enclosing->addClassDecl(this);
+                this->collectTypeVarDecls(decl);
                 if (decl != NULL) {
                     id->addDecl(decl);
                     for_each_child (c, this) {
@@ -252,7 +253,7 @@ AST::collectTypeVarDecls (Decl* enclosing)
         AST_Ptr param = params->child(count);
         AST_Ptr paramId = param->child(0);
         Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
-        paramId->addDecl(paramType);
+        param->addDecl(paramType);
     }
 }
 

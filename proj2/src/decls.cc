@@ -24,6 +24,7 @@ Decl* strDecl;
 Decl* dictDecl;
 Decl* boolDecl;
 Decl* fileDecl;
+// TODO: FileDecl missing
 Decl* rangeDecl;
 
 /** List of declarations corresponding to the module and actual
