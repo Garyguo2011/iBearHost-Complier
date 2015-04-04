@@ -142,13 +142,14 @@ AST::collectDecls (Decl* enclosing)
         case CLASS:
         {
             AST_Ptr id = this->child(0);
+            AST_Ptr params = this->child(1);
             const gcstring name = id->as_string();
             if (name == "str") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                Decl* decl = makeClassDecl(name, params);
                 strDecl = decl;
             }
             else if (name == "int") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                Decl* decl = makeClassDecl(name, params);
                 intDecl = decl;
             }
             /** TODO
@@ -160,34 +161,36 @@ AST::collectDecls (Decl* enclosing)
 
             */
             else if (name == "bool") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
-                boolDecl = decl
+                Decl* decl = makeClassDecl(name, params);
+                boolDecl = decl;
             }
             else if (name == "range") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
-                rangeDecl = decl
+                Decl* decl = makeClassDecl(name, params);
+                rangeDecl = decl;
             }
             // need inline substitution
-            else if (name == "list of [$T]") {
-
+            else if (name == "list") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                listDecl = decl;
             }
-            else if (name == "dict of [$Key, $Value]") {
-
+            else if (name == "dict") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                dictDecl = decl;
             }
-            else if (name == "tuple0") {
+            // else if (name == "tuple0") {
 
-            }
-            else if (name == "tuple1 of [$T0]") {
+            // }
+            // else if (name == "tuple1 of [$T0]") {
 
-            }
-            else if (name == "tuple2 of [$T1, $T2]"){
+            // }
+            // else if (name == "tuple2 of [$T1, $T2]"){
 
-            }
-            else if (name == "tuple3 of [$T1, $T2, $T3]"){
+            // }
+            // else if (name == "tuple3 of [$T1, $T2, $T3]"){
 
-            }
-
-
+            // }
             /* END */
             
             else {
@@ -237,6 +240,13 @@ AST::collectDecls (Decl* enclosing)
 void
 AST::collectTypeVarDecls (Decl* enclosing)
 {
+    AST_Ptr params = this->child(1);
+    for (unsigned int count = 0; count < params->arity(); count++) {
+        AST_Ptr param = params->child(count);
+        AST_Ptr paramId = param->child(0);
+        Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
+        paramId->addDecl(paramType);
+    }
 }
 
 void
