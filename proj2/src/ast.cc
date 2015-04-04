@@ -159,6 +159,37 @@ AST::collectDecls (Decl* enclosing)
             Please follow examples.
 
             */
+            else if (name == "bool") {
+                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                boolDecl = decl
+            }
+            else if (name == "range") {
+                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                rangeDecl = decl
+            }
+            // need inline substitution
+            else if (name == "list of [$T]") {
+
+            }
+            else if (name == "dict of [$Key, $Value]") {
+
+            }
+            else if (name == "tuple0") {
+
+            }
+            else if (name == "tuple1 of [$T0]") {
+
+            }
+            else if (name == "tuple2 of [$T1, $T2]"){
+
+            }
+            else if (name == "tuple3 of [$T1, $T2, $T3]"){
+
+            }
+
+
+            /* END */
+            
             else {
                 Decl* decl = enclosing->addClassDecl(this);
                 if (decl != NULL) {
