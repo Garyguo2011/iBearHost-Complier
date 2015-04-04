@@ -29,7 +29,9 @@ protected:
     AST_Ptr doOuterSemantics () {
         outer_environ = new Environ (NULL);
         for_each_child_var (c, this) {
+            fprintf(stderr, "going through stmts \n");
             c = c->doOuterSemantics ();
+            fprintf(stderr, "handled a statement \n");
         } end_for;
         return this;
     }
