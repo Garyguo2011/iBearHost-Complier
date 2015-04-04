@@ -224,14 +224,16 @@ AST::addTargetDecls (Decl* enclosing)
                         }
                         break;
                     }
-                    case ATTRIBUTEREF:
-                    {
-                        // TODO
-                        break;
-                    }
                     case TYPED_ID:
                     {
                         // TODO
+                        AST_Ptr id = target->child(0);
+                        Type_Ptr type = (Type_Ptr) target->child(1);
+                        Decl* decl = enclosing->addVarDecl(id);
+                        if (decl != NULL) {
+                            decl->setType(type);
+                            id->addDecl(decl);
+                        }
                         break;
                     }
                 }
@@ -246,9 +248,18 @@ AST::addTargetDecls (Decl* enclosing)
             }
             break;
         }
-        case ATTRIBUTEREF:
+        case TYPED_ID:
+        {
             // TODO
+            AST_Ptr id = this->child(0);
+            Type_Ptr type = (Type_Ptr) this->child(1);
+            Decl* decl = enclosing->addVarDecl(id);
+            if (decl != NULL) {
+                decl->setType(type);
+                id->addDecl(decl);
+            }
             break;
+        }
     }
 }
 
