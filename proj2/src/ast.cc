@@ -142,12 +142,31 @@ AST::collectDecls (Decl* enclosing)
         case CLASS:
         {
             AST_Ptr id = this->child(0);
-            Decl* decl = enclosing->addClassDecl(this);
-            if (decl != NULL) {
-                id->addDecl(decl);
-                for_each_child (c, this) {
-                    c->collectDecls (decl);
-                } end_for;
+            const gcstring name = id->as_string();
+            if (name == "str") {
+                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                strDecl = decl;
+            }
+            else if (name == "int") {
+                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+                intDecl = decl;
+            }
+            /** TODO
+            
+            Make class declarations for all other classes in prelude.
+            Make sure to initialize the proper variable in decls.cc, eg inDecl, strDecl
+
+            Please follow examples.
+
+            */
+            else {
+                Decl* decl = enclosing->addClassDecl(this);
+                if (decl != NULL) {
+                    id->addDecl(decl);
+                    for_each_child (c, this) {
+                        c->collectDecls (decl);
+                    } end_for;
+                }
             }
             break;
         }
