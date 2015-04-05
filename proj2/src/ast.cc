@@ -119,6 +119,7 @@ AST::doOuterSemantics ()
     this->collectDecls(fileDecl);
     dast = this->resolveSimpleIds(fileDecl->getEnviron());
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
+    dast = dast->resolveStaticSelections(fileDecl->getEnviron());
     return dast;
     //return this;
 }
@@ -413,6 +414,24 @@ AST::resolveAllocators (const Environ* env)
 AST_Ptr
 AST::resolveStaticSelections (const Environ* env)
 {
+    if (this->oper()->syntax() == ATTRIBUTEREF) {
+        AST_Ptr id0 = this->child(0);
+        Decl* decl = classes->find(id0->as_string());
+        if (decl != NULL) {
+            AST_Ptr id1 = this->child(1);
+            if (env->find(id1->as_string()) != NULL) {
+                if (id1->oper()->syntax() == METHOD) {
+                    id1->addDecl(decl);
+                } else {
+                    fprintf(stderr, "No instance variable allowed in a class!\n");
+                }
+            } else {
+                fprintf(stderr, "Method no found!\n");
+            }
+        } else {
+            fprintf(stderr, "Class not found.\n");
+        }
+    }
     for_each_child_var (c, this) {
         c = c->resolveStaticSelections (env);
     } end_for;

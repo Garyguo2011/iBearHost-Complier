@@ -1,1 +1,5 @@
-x :: dict of [str, int] = {"a": 0, "b": 1, "c":2}
+class A:
+	def x():
+		return 1
+a = A()
+A.x()
