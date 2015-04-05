@@ -46,6 +46,7 @@
 %token FOR "for"
 %token FORMALS_LIST "formals_list"
 %token FUNCTION_TYPE "function_type"
+%token EXPR_LIST "expr_list"
 %token ID
 %token IF "if"
 %token IF_EXPR "if_expr"
@@ -83,7 +84,7 @@
 
 /** Used by semantic analyzer. */
 
-%token NEW
+%token NEW "new"
 
 %%
 

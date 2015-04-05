@@ -3,3 +3,6 @@ class A:
 		return 1
 a = A()
 A.x()
+class trivial:
+	pass
+trivial()

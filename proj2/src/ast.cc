@@ -119,9 +119,9 @@ AST::doOuterSemantics ()
     this->collectDecls(fileDecl);
     dast = this->resolveSimpleIds(fileDecl->getEnviron());
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
+    dast = dast->resolveAllocators(fileDecl->getEnviron());
     dast = dast->resolveStaticSelections(fileDecl->getEnviron());
     return dast;
-    //return this;
 }
 
 void
@@ -339,13 +339,23 @@ AST::resolveSimpleIds (const Environ* env)
     switch(this->oper()->syntax()) {
         case ID:
         {
-            // find ID in env
+            Decl_Vector decls;
             gcstring name = this->as_string();
-            Decl* decl = env->find(name);
-            if (decl == NULL){
-            } else{
-                this->addDecl(decl);
-            }
+            if (classes->find(name) != NULL){
+                return consTree(TYPE, this);
+            } 
+            env->find(name, decls);
+            if (decls.size() == 0){
+                fprintf(stderr, "decl not found with \n");
+            } 
+            else {
+                for (Decl_Vector::const_iterator i = decls.begin (); 
+                     i != decls.end (); 
+                     i++)
+                {
+                    this->addDecl(*i);
+                }
+            } 
             break;
         }
         case CLASS:
@@ -364,11 +374,6 @@ AST::resolveSimpleIds (const Environ* env)
             for_each_child_var (c, this) {
                 c = c->resolveSimpleIds (func_env);
             } end_for;
-            break;
-        }
-        case CALL:
-        {
-            // call different function
             break;
         }
         case ATTRIBUTEREF:
@@ -405,6 +410,24 @@ AST::resolveSimpleTypeIds (const Environ* env)
 AST_Ptr
 AST::resolveAllocators (const Environ* env)
 {
+    if (this->oper()->syntax() == CALL) {
+    }
+    if (this->oper()->syntax() == CALL && 
+        this->child(0)->oper()->syntax() == TYPE) {
+        AST_Ptr init_tree = make_id("__init__", "0");
+        AST_Ptr new_tree = consTree(NEW, this->child(0));
+        std::vector <AST_Ptr> temp;
+        temp.push_back(new_tree);
+        if (this->arity() == 2){
+            AST_Ptr expr_tree = this->child(1);
+            for (int i = 0; i < expr_tree->arity(); i++){
+                temp.push_back(expr_tree->child(i));
+            }
+        }
+        AST_Ptr* new_args = &temp[0];
+        AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
+        return consTree(CALL1, init_tree, new_expr_tree);            
+    }
     for_each_child_var (c, this) {
         c = c->resolveAllocators (env);
     } end_for;
