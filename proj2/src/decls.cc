@@ -24,6 +24,7 @@ Decl* strDecl;
 Decl* dictDecl;
 Decl* boolDecl;
 Decl* fileDecl;
+// TODO: FileDecl missing
 Decl* rangeDecl;
 
 /** List of declarations corresponding to the module and actual
@@ -160,8 +161,9 @@ Decl::getTypeArity () const
 const Environ*
 Decl::getEnviron () const
 {
-    if (_members == NULL)
-	UNIMPLEMENTED (get_members);
+    if (_members == NULL) {
+        return NULL;
+    }
     return _members;
 }
 
@@ -634,12 +636,6 @@ protected:
         AST_Ptr id = clazz->child(0);
         if (canAddClass(id)) {
             AST_Ptr params = clazz->child(1);
-            for (unsigned int count = 0; count < params->arity(); count++) {
-                AST_Ptr param = params->child(count);
-                AST_Ptr paramId = param->child(0);
-                Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
-                paramId->addDecl(paramType);
-            }
             Decl* decl = makeClassDecl (id->as_string (), params);
             classes->define(decl);
             addMember(decl);

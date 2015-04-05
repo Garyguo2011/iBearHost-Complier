@@ -15,6 +15,7 @@ static GCINIT _gcdummy;
 
 static Decl* main = makeModuleDecl("__main__");
 
+
 /* Definitions of methods in base class AST. */
 
 AST::AST ()
@@ -60,8 +61,12 @@ AST::asType ()
 
 bool
 AST::isType ()
-{
-    return false;
+{   
+    int syntax = this->oper()->syntax();
+    if (syntax == TYPE_VAR || syntax == FUNCTION_TYPE || syntax == TYPE){
+        return true;
+    }
+    return false; 
 }
 
 AST_Ptr
@@ -79,7 +84,7 @@ AST::numDecls ()
 Decl*
 AST::getDecl (int k)
 {
-    assert (k >= 0 && k < (int) _decls.size ());
+    //assert (k >= 0 && k < (int) _decls.size ());
     return _decls[k];
 }
 
@@ -112,8 +117,11 @@ AST::setType (Type_Ptr type, Unifier& subst)
 AST_Ptr
 AST::doOuterSemantics ()
 {
+    AST_Ptr dast;
     this->collectDecls(main);
-    return this;
+    dast = this->resolveSimpleIds(main->getEnviron());
+    return dast;
+    //return this;
 }
 
 void
@@ -142,14 +150,17 @@ AST::collectDecls (Decl* enclosing)
         case CLASS:
         {
             AST_Ptr id = this->child(0);
+            AST_Ptr params = this->child(1);
             const gcstring name = id->as_string();
             if (name == "str") {
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 strDecl = decl;
+                id->addDecl(decl);
             }
             else if (name == "int") {
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 intDecl = decl;
+                id->addDecl(decl);
             }
             /** TODO
             
@@ -159,39 +170,58 @@ AST::collectDecls (Decl* enclosing)
             Please follow examples.
 
             */
+
             else if (name == "bool") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
-                boolDecl = decl
+                Decl* decl = makeClassDecl(name, params);
+                boolDecl = decl;
+                id->addDecl(decl);
             }
             else if (name == "range") {
-                Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
-                rangeDecl = decl
+                Decl* decl = makeClassDecl(name, params);
+                rangeDecl = decl;
+                id->addDecl(decl);
             }
             // need inline substitution
-            else if (name == "list of [$T]") {
-
+            else if (name == "list") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                listDecl = decl;
+                id->addDecl(decl);
             }
-            else if (name == "dict of [$Key, $Value]") {
-
+            else if (name == "dict") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                dictDecl = decl;
+                id->addDecl(decl);
             }
             else if (name == "tuple0") {
-
+                Decl* decl = makeClassDecl(name, params);
+                tuple0Decl = decl;
+                id->addDecl(decl);
             }
-            else if (name == "tuple1 of [$T0]") {
-
+            else if (name == "tuple1") {
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple1Decl = decl;
+                id->addDecl(decl);
             }
-            else if (name == "tuple2 of [$T1, $T2]"){
-
+            else if (name == "tuple2"){
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple2Decl = decl;
+                id->addDecl(decl);
             }
-            else if (name == "tuple3 of [$T1, $T2, $T3]"){
-
+            else if (name == "tuple3"){
+                Decl* decl = makeClassDecl(name, params);
+                this->collectTypeVarDecls(decl);
+                tuple3Decl = decl;
+                id->addDecl(decl);
             }
-
-
             /* END */
             
             else {
                 Decl* decl = enclosing->addClassDecl(this);
+                this->collectTypeVarDecls(decl);
                 if (decl != NULL) {
                     id->addDecl(decl);
                     for_each_child (c, this) {
@@ -237,6 +267,14 @@ AST::collectDecls (Decl* enclosing)
 void
 AST::collectTypeVarDecls (Decl* enclosing)
 {
+
+    AST_Ptr params = this->child(1);
+    for (unsigned int count = 0; count < params->arity(); count++) {
+        AST_Ptr param = params->child(count);
+        AST_Ptr paramId = param->child(0);
+        Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
+        param->addDecl(paramType);
+    }
 }
 
 void
@@ -286,9 +324,58 @@ AST::addTargetDecls (Decl* enclosing)
 AST_Ptr
 AST::resolveSimpleIds (const Environ* env)
 {
-    for_each_child (c, this) {
-        c->resolveSimpleIds (env);
-    } end_for;
+    switch(this->oper()->syntax()) {
+        case ID:
+        {
+            // find ID in env
+            gcstring name = this->as_string();
+            Decl* decl = env->find(name);
+            if (decl == NULL){
+            } else{
+                this->addDecl(decl);
+            }
+            break;
+        }
+        case TYPE:
+        {
+            
+        }
+        case CLASS:
+        {           
+            AST_Ptr id = this->child(0);
+            const Environ* class_env = id->getDecl()->getEnviron();
+            for_each_child_var (c, this) {
+                c = c->resolveSimpleIds (class_env);
+            } end_for;
+            break;
+        }
+        case DEF:
+        {
+            AST_Ptr id = this->child(0);
+            const Environ* func_env = id->getDecl()->getEnviron();
+            for_each_child_var (c, this) {
+                c = c->resolveSimpleIds (func_env);
+            } end_for;
+            break;
+        }
+        case CALL:
+        {
+            // call different function
+            break;
+        }
+        case ATTRIBUTEREF:
+        {
+            // call different function
+            break;
+        }
+        default:
+        {        
+            for_each_child_var (c, this) {
+                c = c->resolveSimpleIds (env);
+            } end_for;
+            break;
+        }   
+    }
     return this;
 }
 
