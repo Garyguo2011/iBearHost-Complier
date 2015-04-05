@@ -83,7 +83,12 @@ Decl*
 AST::getDecl (int k)
 {
     //assert (k >= 0 && k < (int) _decls.size ());
-    return _decls[k];
+    if ( _decls.size() > k) {
+        return _decls[k];
+    }
+    else {
+        return NULL;
+    }
 }
 
 void
@@ -341,7 +346,9 @@ AST::resolveSimpleIds (const Environ* env)
         {
             Decl_Vector decls;
             gcstring name = this->as_string();
-            if (classes->find(name) != NULL){
+            Decl* decl = classes->find(name);
+            if (decl != NULL){
+                this->addDecl(decl);
                 return consTree(TYPE, this);
             } 
             env->find(name, decls);
@@ -378,7 +385,13 @@ AST::resolveSimpleIds (const Environ* env)
         }
         case ATTRIBUTEREF:
         {
-            // call different function
+            int count = 0;
+            for_each_child_var (c, this) {
+                if (count == 0) {
+                    c = c->resolveSimpleIds (env);
+                }
+                count++;
+            } end_for;
             break;
         }
         default:
@@ -439,17 +452,20 @@ AST::resolveStaticSelections (const Environ* env)
 {
     if (this->oper()->syntax() == ATTRIBUTEREF) {
         AST_Ptr id0 = this->child(0);
-        Decl* decl = classes->find(id0->as_string());
+        Decl* decl = id0->getDecl();
         if (decl != NULL) {
             AST_Ptr id1 = this->child(1);
-            if (env->find(id1->as_string()) != NULL) {
-                if (id1->oper()->syntax() == METHOD) {
-                    id1->addDecl(decl);
-                } else {
-                    fprintf(stderr, "No instance variable allowed in a class!\n");
+            Decl_Vector decls;
+            decl->getEnviron()->find(id1->as_string(), decls);
+
+            for (Decl_Vector::const_iterator i = decls.begin (); 
+                     i != decls.end (); 
+                     i++)
+            {
+                if ((*i)->isMethod()) {
+                    id1->addDecl((*i));
+                    return id1;
                 }
-            } else {
-                fprintf(stderr, "Method no found!\n");
             }
         } else {
             fprintf(stderr, "Class not found.\n");
