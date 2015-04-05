@@ -126,6 +126,7 @@ AST::doOuterSemantics ()
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
     dast = dast->resolveAllocators(fileDecl->getEnviron());
     dast = dast->resolveStaticSelections(fileDecl->getEnviron());
+    dast->resolveTypesOuter(fileDecl);
     return dast;
 }
 
@@ -485,112 +486,6 @@ AST::freezeDecls (bool frozen)
     } end_for;
 }
 
-void 
-AST::resolveTypesOuter(Decl* context)
-{
-    switch(this->oper()->syntax()) {
-        /* dev-xg */
-        case LIST_DISPLAY:
-        {
-            break;
-        }
-        case TUPLE:
-        {
-            break;
-        }
-        case INT_LITERAL:
-        {
-            break;
-        }
-        case STRING_LITERAL:
-        {
-            break;
-        }
-        case NONE:
-        {
-            break;
-        }
-        case TRUE:
-        {
-            break;
-        }
-        case FALSE:
-        {
-            break;
-        }
-        /* dev-jz */
-        case AND:
-        {
-            break;
-        }
-        case OR:
-        {
-            break;
-        }
-        case CALL:
-        {
-            break;
-        }
-        case CALL1:
-        {
-            break;
-        }
-
-        case ASSIGN:
-        {
-            break;
-        }
-        /* dev-jz */
-
-        /* dev-xh */
-        case FOR:
-        {
-            break;
-        }
-        case WHILE:
-        {
-            break;
-        }
-        case IF:
-        {
-            break;
-        }
-        case RETURN:
-        {
-            break;
-        }
-        case PRINT:
-        {
-            break;
-        }
-        /* dev-xh */
-        case TYPED_ID:
-        {
-            Type_Ptr type = this->child(1);
-            AST_Ptr id = this->child(0);
-            int decl_count = 0;
-            Type_Ptr myType;
-            for (int i = 0; i < this->numDecls(); i++) {
-                if (type->child(0)->as_string() == 
-                    id->getDecl(i)->getType()) {
-                    myType = id->getDecl(i)->getType();
-                    decl_count++;
-                }
-            }
-            if (decl_count != 1) {
-                fprintf(stderr, "error, multiple decls of this type");
-            }
-            else {
-                this->setType(myType);
-            }
-            break;
-        }
-        case ATTRIBUTEREF:
-        {
-            break;
-        }
-    }
-}
 
 void
 AST::resolveTypes (Decl* context, Unifier& subst)
