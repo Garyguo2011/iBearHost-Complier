@@ -80,7 +80,7 @@ try:
         Usage()
     base, _ = splitext(source)
     if outFile is None:
-        if phase == 1:
+        if phase == '1':
             outFile = base + ".ast"
         else:
             outFile = base + ".dast"
@@ -88,7 +88,7 @@ except GetoptError:
     Usage()
 
 try:
-    if phase == 1:
+    if phase == '1':
         phase1(source, outFile, debugParser)
     else:
         preludeSource = join(HERE, "lib", "prelude.py")
