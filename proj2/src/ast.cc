@@ -410,11 +410,9 @@ AST_Ptr
 AST::resolveAllocators (const Environ* env)
 {
     if (this->oper()->syntax() == CALL) {
-        fprintf(stderr, "we found a call! \n" );
     }
     if (this->oper()->syntax() == CALL && 
         this->child(0)->oper()->syntax() == TYPE) {
-        fprintf(stderr, "found allocator, creating call1 node \n");
         AST_Ptr init_tree = make_id("__init__", "0");
         AST_Ptr new_tree = consTree(NEW, this->child(0));
         std::vector <AST_Ptr> temp;
