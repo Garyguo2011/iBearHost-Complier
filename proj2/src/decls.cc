@@ -161,8 +161,9 @@ Decl::getTypeArity () const
 const Environ*
 Decl::getEnviron () const
 {
-    if (_members == NULL)
-	UNIMPLEMENTED (get_members);
+    if (_members == NULL) {
+        return NULL;
+    }
     return _members;
 }
 
