@@ -118,6 +118,7 @@ AST::doOuterSemantics ()
     AST_Ptr dast;
     this->collectDecls(fileDecl);
     dast = this->resolveSimpleIds(fileDecl->getEnviron());
+    dast->resolveSimpleTypeIds(fileDecl->getEnviron());
     return dast;
     //return this;
 }
@@ -388,6 +389,13 @@ AST::resolveSimpleIds (const Environ* env)
 void
 AST::resolveSimpleTypeIds (const Environ* env)
 {
+    if (this->oper()->syntax() == TYPE) {
+        AST_Ptr id = this->child(0);
+        Decl* decl = classes->find(id->as_string());
+        if (decl != NULL) {
+            this->addDecl(decl);
+        }
+    }
     for_each_child (c, this) {
         c->resolveSimpleTypeIds (env);
     } end_for;

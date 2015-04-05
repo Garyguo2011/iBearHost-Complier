@@ -584,5 +584,6 @@ extern AST_Ptr consTree (int syntax, AST_Ptr c0, AST_Ptr c1,
  *  beyond the last child. */
 extern AST_Ptr consTree (int syntax, AST_Ptr* first, AST_Ptr* limit);
 
+
 #endif
 
