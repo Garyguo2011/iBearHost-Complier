@@ -345,7 +345,7 @@ AST::resolveSimpleIds (const Environ* env)
             } 
             Decl* decl = env->find(name);
             if (decl == NULL){
-                fprintf(stderr, "decl not found \n");
+                fprintf(stderr, "decl not found with \n");
             } else{
                 this->addDecl(decl);
             } break;
@@ -375,9 +375,6 @@ AST::resolveSimpleIds (const Environ* env)
             if (this->child(0)->oper()->syntax() == TYPE){
                 return this->resolveAllocators(classes);
             } else{
-                // for_each_child_var (c, this) {
-                //     c = c->resolveSimpleIds (env);
-                // } end_for;
                 gcstring name = this->as_string();
                 Decl* decl = env->find(name);
                 if (decl == NULL){
@@ -424,9 +421,20 @@ AST::resolveAllocators (const Environ* env)
     if (decl == NULL){
         return this;    
     } else {
-
-    }
-    
+        AST_Ptr init_tree = make_id("__init__", "0");
+        AST_Ptr new_tree = consTree(NEW, this->child(0));
+        std::vector <AST_Ptr> temp;
+        temp.push_back(new_tree);
+        if (this->arity() == 2){
+            AST_Ptr expr_tree = this->child(1);
+            for (int i = 0; i < expr_tree->arity(); i++){
+                temp.push_back(expr_tree->child(i));
+            }
+        }
+        AST_Ptr* new_args = &temp[0];
+        AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
+        return consTree(CALL1, init_tree, new_expr_tree);            
+    }     
 }
 
 AST_Ptr
