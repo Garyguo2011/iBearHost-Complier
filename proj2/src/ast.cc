@@ -13,8 +13,6 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
-static Decl* main = makeModuleDecl("__main__");
-
 
 /* Definitions of methods in base class AST. */
 
@@ -118,8 +116,8 @@ AST_Ptr
 AST::doOuterSemantics ()
 {
     AST_Ptr dast;
-    this->collectDecls(main);
-    dast = this->resolveSimpleIds(main->getEnviron());
+    this->collectDecls(fileDecl);
+    dast = this->resolveSimpleIds(fileDecl->getEnviron());
     return dast;
     //return this;
 }
@@ -294,14 +292,16 @@ AST::addTargetDecls (Decl* enclosing)
                         }
                         break;
                     }
-                    case ATTRIBUTEREF:
-                    {
-                        // TODO
-                        break;
-                    }
                     case TYPED_ID:
                     {
                         // TODO
+                        AST_Ptr id = target->child(0);
+                        Type_Ptr type = (Type_Ptr) target->child(1);
+                        Decl* decl = enclosing->addVarDecl(id);
+                        if (decl != NULL) {
+                            decl->setType(type);
+                            id->addDecl(decl);
+                        }
                         break;
                     }
                 }
@@ -316,9 +316,18 @@ AST::addTargetDecls (Decl* enclosing)
             }
             break;
         }
-        case ATTRIBUTEREF:
+        case TYPED_ID:
+        {
             // TODO
+            AST_Ptr id = this->child(0);
+            Type_Ptr type = (Type_Ptr) this->child(1);
+            Decl* decl = enclosing->addVarDecl(id);
+            if (decl != NULL) {
+                decl->setType(type);
+                id->addDecl(decl);
+            }
             break;
+        }
     }
 }
 
