@@ -117,7 +117,6 @@ AST::setType (Type_Ptr type, Unifier& subst)
 AST_Ptr
 AST::doOuterSemantics ()
 {
-    fprintf(stderr, "compiling a stmt \n");
     AST_Ptr dast;
     this->collectDecls(main);
     dast = this->resolveSimpleIds(main->getEnviron());
@@ -151,14 +150,17 @@ AST::collectDecls (Decl* enclosing)
         case CLASS:
         {
             AST_Ptr id = this->child(0);
+            AST_Ptr params = this->child(1);
             const gcstring name = id->as_string();
             if (name == "str") {
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 strDecl = decl;
+                id->addDecl(decl);
             }
             else if (name == "int") {
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 intDecl = decl;
+                id->addDecl(decl);
             }
             /** TODO
             
@@ -168,49 +170,55 @@ AST::collectDecls (Decl* enclosing)
             Please follow examples.
 
             */
-<<<<<<< HEAD
-=======
+
             else if (name == "bool") {
                 Decl* decl = makeClassDecl(name, params);
                 boolDecl = decl;
+                id->addDecl(decl);
             }
             else if (name == "range") {
                 Decl* decl = makeClassDecl(name, params);
                 rangeDecl = decl;
+                id->addDecl(decl);
             }
             // need inline substitution
             else if (name == "list") {
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 listDecl = decl;
+                id->addDecl(decl);
             }
             else if (name == "dict") {
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 dictDecl = decl;
+                id->addDecl(decl);
             }
             else if (name == "tuple0") {
                 Decl* decl = makeClassDecl(name, params);
                 tuple0Decl = decl;
+                id->addDecl(decl);
             }
             else if (name == "tuple1") {
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple1Decl = decl;
+                id->addDecl(decl);
             }
             else if (name == "tuple2"){
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple2Decl = decl;
+                id->addDecl(decl);
             }
             else if (name == "tuple3"){
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple3Decl = decl;
+                id->addDecl(decl);
             }
             /* END */
             
->>>>>>> fb1c814b73b32e8e426ae43920ad8e8a677b5d41
             else {
                 Decl* decl = enclosing->addClassDecl(this);
                 this->collectTypeVarDecls(decl);
@@ -259,8 +267,7 @@ AST::collectDecls (Decl* enclosing)
 void
 AST::collectTypeVarDecls (Decl* enclosing)
 {
-<<<<<<< HEAD
-=======
+
     AST_Ptr params = this->child(1);
     for (unsigned int count = 0; count < params->arity(); count++) {
         AST_Ptr param = params->child(count);
@@ -268,7 +275,6 @@ AST::collectTypeVarDecls (Decl* enclosing)
         Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
         param->addDecl(paramType);
     }
->>>>>>> fb1c814b73b32e8e426ae43920ad8e8a677b5d41
 }
 
 void
@@ -318,30 +324,28 @@ AST::addTargetDecls (Decl* enclosing)
 AST_Ptr
 AST::resolveSimpleIds (const Environ* env)
 {
-    fprintf(stderr, "resolving ids \n");
     switch(this->oper()->syntax()) {
         case ID:
         {
             // find ID in env
-            fprintf(stderr, "handling simple id! \n");
             gcstring name = this->as_string();
             Decl* decl = env->find(name);
             if (decl == NULL){
-                fprintf(stderr, "error! decl not found");
             } else{
                 this->addDecl(decl);
             }
             break;
         }
+        case TYPE:
+        {
+            
+        }
         case CLASS:
         {           
-            fprintf(stderr, "handling class node \n");
             AST_Ptr id = this->child(0);
             const Environ* class_env = id->getDecl()->getEnviron();
             for_each_child_var (c, this) {
-                fprintf(stderr, "class stmt! \n");
                 c = c->resolveSimpleIds (class_env);
-                fprintf(stderr, "finished stmt! \n");
             } end_for;
             break;
         }
@@ -365,15 +369,13 @@ AST::resolveSimpleIds (const Environ* env)
             break;
         }
         default:
-        {
-            fprintf(stderr, "here! \n" );            
+        {        
             for_each_child_var (c, this) {
                 c = c->resolveSimpleIds (env);
             } end_for;
             break;
         }   
     }
-    fprintf(stderr, "about to return resolved node \n");
     return this;
 }
 
