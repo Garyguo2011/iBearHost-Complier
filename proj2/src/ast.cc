@@ -328,14 +328,18 @@ AST::resolveSimpleIds (const Environ* env)
     switch(this->oper()->syntax()) {
         case ID:
         {
-            // find ID in env
+            // find ID in envhyththrth
+
             gcstring name = this->as_string();
+            if (classes->find(name) != NULL){
+                return consTree(TYPE, this);
+            } 
             Decl* decl = env->find(name);
             if (decl == NULL){
+                fprintf(stderr, "decl not found \n");
             } else{
                 this->addDecl(decl);
-            }
-            break;
+            } break;
         }
         case CLASS:
         {           
@@ -358,6 +362,22 @@ AST::resolveSimpleIds (const Environ* env)
         case CALL:
         {
             // call different function
+
+            if (this->child(0)->oper()->syntax() == TYPE){
+                return this->resolveAllocators(classes);
+            } else{
+                // for_each_child_var (c, this) {
+                //     c = c->resolveSimpleIds (env);
+                // } end_for;
+                gcstring name = this->as_string();
+                Decl* decl = env->find(name);
+                if (decl == NULL){
+                    fprintf(stderr, "function decl not found \n" );
+                } else{
+                    this->child(0)->addDecl(decl);
+                }
+
+            }
             break;
         }
         case ATTRIBUTEREF:
@@ -387,10 +407,17 @@ AST::resolveSimpleTypeIds (const Environ* env)
 AST_Ptr
 AST::resolveAllocators (const Environ* env)
 {
-    for_each_child_var (c, this) {
-        c = c->resolveAllocators (env);
-    } end_for;
-    return this;
+    // for_each_child_var (c, this) {
+    //     c = c->resolveAllocators (env);
+    // } end_for;
+    gcstring name = this->as_string();
+    Decl* decl = env->find(name);
+    if (decl == NULL){
+        return this;    
+    } else {
+
+    }
+    
 }
 
 AST_Ptr
