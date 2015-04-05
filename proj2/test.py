@@ -1,0 +1,3 @@
+class trivial:
+	pass
+trivial()

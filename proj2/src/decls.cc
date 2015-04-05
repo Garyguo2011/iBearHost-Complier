@@ -595,7 +595,9 @@ protected:
 Decl*
 makeClassDecl (const gcstring& name, AST_Ptr params)
 {
-    return new ClassDecl (name, params);
+    Decl* decl = new ClassDecl (name, params);
+    classes->define(decl);
+    return decl;
 }
 
 class ModuleDecl : public Decl {
@@ -637,7 +639,6 @@ protected:
         if (canAddClass(id)) {
             AST_Ptr params = clazz->child(1);
             Decl* decl = makeClassDecl (id->as_string (), params);
-            classes->define(decl);
             addMember(decl);
             return decl;
         }

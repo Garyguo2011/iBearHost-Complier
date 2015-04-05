@@ -84,7 +84,7 @@
 
 /** Used by semantic analyzer. */
 
-%token NEW
+%token NEW "new"
 
 %%
 
