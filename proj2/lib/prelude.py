@@ -1,14 +1,14 @@
-# The standard prelude.
+# # The standard prelude.
 
-# NOTE: You may want to phase this in gently, with just a portion of the
-#       definitions at first, to keep the sizes of your trees under control
-#       during development.
+# # NOTE: You may want to phase this in gently, with just a portion of the
+# #       definitions at first, to keep the sizes of your trees under control
+# #       during development.
 
-# The builtin classes have no __init__ method, and so cannot be allocated
-# directly.  Instances are created by other constructs.
+# # The builtin classes have no __init__ method, and so cannot be allocated
+# # directly.  Instances are created by other constructs.
 
-class str:
-   pass
+# class str:
+#    pass
 
 class int:
    pass

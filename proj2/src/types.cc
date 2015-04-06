@@ -19,7 +19,6 @@ void
 AST::resolveTypesOuter (Decl* context) 
 {
     freezeDecls (true);
-
     freezeDecls (false);
 }
 

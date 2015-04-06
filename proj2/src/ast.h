@@ -203,10 +203,15 @@ protected:
      *  node.  Used to avoid multiple error messages on a node. */
     bool _erroneous;
 
+    
+    /** Type of me */
+    Type_Ptr _type;
+
 private:
     
     /** Vector of all decls associated with this tree. */
     gcvector<Decl*> _decls;
+
 
 };
 

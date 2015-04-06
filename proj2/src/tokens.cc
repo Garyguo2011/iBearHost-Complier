@@ -43,6 +43,7 @@ public:
     Type_Ptr getType () {
         if (_type == NULL)
             _type = computeType ();
+        fprintf(stderr, "getting type \n");
         return _type;
     }
 
@@ -91,6 +92,7 @@ protected:
     }
 
     Type_Ptr computeType () {
+        fprintf(stderr, "computing int types \n");
         return intDecl->asType ();
     }
 

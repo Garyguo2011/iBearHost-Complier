@@ -32,6 +32,7 @@ protected:
         for_each_child_var (c, this) {
             c = c->doOuterSemantics ();
         } end_for;
+        fprintf(stderr, "we're done with outer semantics \n");
         return this;
     }
 
