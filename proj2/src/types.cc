@@ -19,7 +19,7 @@ void
 AST::resolveTypesOuter (Decl* context) 
 {
     freezeDecls (true);
-    // FILL THIS IN
+
     freezeDecls (false);
 }
 
@@ -140,49 +140,85 @@ Type::getType ()
 AST_Ptr
 Type::getId ()
 {
-    return NULL;
+    if (isFunctionType() && isUnbound()) {
+        return NULL;
+    } else {
+        return this->child(0);
+    }
 }
 
 int
 Type::numParams ()
 {
+    if (isFunctionType()) {
+        return this->child(1)->arity();
+    }
     return -1;
 }
 
 Type_Ptr
 Type::returnType ()
 {
+    if (isFunctionType()) {
+        return (Type_Ptr) this->child(0);
+    }
     return NULL;
 }
 
 Type_Ptr
 Type::paramType (int k)
 {
-    throw range_error ("function type has no parameters");
+    if (isFunctionType()) {
+        if (0 <= k && k < numParams()) {
+            return (Type_Ptr) this->child(1)->child(k);
+        } else {
+            throw range_error ("function type has no parameters");
+        }
+    }
 }
 
 int
 Type::numTypeParams ()
 {
-    return -1;
+    return numParams() + 1;
 }
 
 Type_Ptr
 Type::typeParam (int k)
 {
-    throw range_error ("type has no type parameters");
+    if (0 <= k && k < numTypeParams()) {
+        if (k == 0) {
+            return this->returnType();
+        } else {
+            return this->paramType(k-1);
+        }
+    } else {
+        throw range_error ("type has no type parameters");
+    }
 }
 
 Type_Ptr
 Type::boundFunctionType ()
 {
+    if (isFunctionType()){
+        if (this->arity() <= 1){
+            return NULL;
+        } else {
+            std::vector <AST_Ptr> new_list;
+            for (int i = 1; i < this->child(1)->arity(); i++){
+                new_list.push_back(this->child(1)->child(i));
+            }
+            Type_Ptr new_type_list = (Type_Ptr) AST::make_tree(TYPE_LIST, &new_list[0], &new_list[new_list.size()]);
+            return (Type_Ptr) consTree(FUNCTION_TYPE, this->child(0), new_type_list);
+        }
+    }
     return NULL;
 }
     
 const Environ*
 Type::getEnviron ()
 {
-    return theEmptyEnviron;
+    return this->getDecl()->getEnviron();
 }
 
 Type_Ptr
@@ -403,6 +439,12 @@ int TypeVar_AST::next_uid = 0;
 /***** FUNCTION TYPES *****/
 
 class FunctionType_AST: public Type {
+
+public:
+    bool isFunctionType() {
+        return true;
+    }
+
 protected:
 
     int numParams () {

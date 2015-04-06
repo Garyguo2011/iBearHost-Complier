@@ -595,7 +595,9 @@ protected:
 Decl*
 makeClassDecl (const gcstring& name, AST_Ptr params)
 {
-    return new ClassDecl (name, params);
+    Decl* decl = new ClassDecl (name, params);
+    classes->define(decl);
+    return decl;
 }
 
 class ModuleDecl : public Decl {
@@ -637,7 +639,6 @@ protected:
         if (canAddClass(id)) {
             AST_Ptr params = clazz->child(1);
             Decl* decl = makeClassDecl (id->as_string (), params);
-            classes->define(decl);
             addMember(decl);
             return decl;
         }
@@ -649,7 +650,8 @@ protected:
 Decl*
 makeModuleDecl (const gcstring& name)
 {
-    return new ModuleDecl (name);
+    fileDecl = new ModuleDecl (name);
+    return fileDecl;
 }
 
 bool
@@ -661,6 +663,7 @@ undefinable (const gcstring& name)
 void
 outputDecls (ostream& out)
 {
+    out << endl;
     for (size_t i = 0; i < allDecls.size (); i += 1) {
 	if (!allDecls[i]->isInternal ()) {
 	    allDecls[i]->print (out);

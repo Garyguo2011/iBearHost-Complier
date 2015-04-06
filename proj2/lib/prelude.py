@@ -8,10 +8,10 @@
 # directly.  Instances are created by other constructs.
 
 class str:
-    pass
+   pass
 
 class int:
-    pass
+   pass
 
 class bool:
     pass

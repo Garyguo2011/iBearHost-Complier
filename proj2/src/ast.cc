@@ -13,8 +13,6 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
-static Decl* main = makeModuleDecl("__main__");
-
 
 /* Definitions of methods in base class AST. */
 
@@ -85,7 +83,12 @@ Decl*
 AST::getDecl (int k)
 {
     //assert (k >= 0 && k < (int) _decls.size ());
-    return _decls[k];
+    if ( _decls.size() > k) {
+        return _decls[k];
+    }
+    else {
+        return NULL;
+    }
 }
 
 void
@@ -118,10 +121,13 @@ AST_Ptr
 AST::doOuterSemantics ()
 {
     AST_Ptr dast;
-    this->collectDecls(main);
-    dast = this->resolveSimpleIds(main->getEnviron());
+    this->collectDecls(fileDecl);
+    dast = this->resolveSimpleIds(fileDecl->getEnviron());
+    dast->resolveSimpleTypeIds(fileDecl->getEnviron());
+    dast = dast->resolveAllocators(fileDecl->getEnviron());
+    dast = dast->resolveStaticSelections(fileDecl->getEnviron());
+    dast->resolveTypesOuter(fileDecl);
     return dast;
-    //return this;
 }
 
 void
@@ -267,7 +273,6 @@ AST::collectDecls (Decl* enclosing)
 void
 AST::collectTypeVarDecls (Decl* enclosing)
 {
-
     AST_Ptr params = this->child(1);
     for (unsigned int count = 0; count < params->arity(); count++) {
         AST_Ptr param = params->child(count);
@@ -293,14 +298,16 @@ AST::addTargetDecls (Decl* enclosing)
                         }
                         break;
                     }
-                    case ATTRIBUTEREF:
-                    {
-                        // TODO
-                        break;
-                    }
                     case TYPED_ID:
                     {
                         // TODO
+                        AST_Ptr id = target->child(0);
+                        Type_Ptr type = (Type_Ptr) target->child(1);
+                        Decl* decl = enclosing->addVarDecl(id);
+                        if (decl != NULL) {
+                            decl->setType(type);
+                            id->addDecl(decl);
+                        }
                         break;
                     }
                 }
@@ -315,9 +322,18 @@ AST::addTargetDecls (Decl* enclosing)
             }
             break;
         }
-        case ATTRIBUTEREF:
+        case TYPED_ID:
+        {
             // TODO
+            AST_Ptr id = this->child(0);
+            Type_Ptr type = (Type_Ptr) this->child(1);
+            Decl* decl = enclosing->addVarDecl(id);
+            if (decl != NULL) {
+                decl->setType(type);
+                id->addDecl(decl);
+            }
             break;
+        }
     }
 }
 
@@ -325,20 +341,38 @@ AST_Ptr
 AST::resolveSimpleIds (const Environ* env)
 {
     switch(this->oper()->syntax()) {
-        case ID:
-        {
-            // find ID in env
-            gcstring name = this->as_string();
-            Decl* decl = env->find(name);
-            if (decl == NULL){
-            } else{
-                this->addDecl(decl);
-            }
-            break;
-        }
         case TYPE:
         {
-            
+            Decl_Vector decls;
+            AST_Ptr id = this->child(0);
+            gcstring name = id->as_string();
+            Decl* decl = classes->find(name);
+            if (decl != NULL && id->numDecls() == 0){
+                id->addDecl(decl);
+            } 
+        }
+        case ID:
+        {
+            Decl_Vector decls;
+            gcstring name = this->as_string();
+            Decl* decl = classes->find(name);
+            if (decl != NULL && this->numDecls() == 0){;
+                this->addDecl(decl);
+                return consTree(TYPE, this, consTree(TYPE_LIST));
+            } 
+            env->find(name, decls);
+            if (decls.size() == 0){
+                //fprintf(stderr, "decl not found with \n");
+            } 
+            else {
+                for (Decl_Vector::const_iterator i = decls.begin (); 
+                     i != decls.end (); 
+                     i++)
+                {
+                    this->addDecl(*i);
+                }
+            } 
+            break;
         }
         case CLASS:
         {           
@@ -358,18 +392,19 @@ AST::resolveSimpleIds (const Environ* env)
             } end_for;
             break;
         }
-        case CALL:
-        {
-            // call different function
-            break;
-        }
         case ATTRIBUTEREF:
         {
-            // call different function
+            int count = 0;
+            for_each_child_var (c, this) {
+                if (count == 0) {
+                    c = c->resolveSimpleIds (env);
+                }
+                count++;
+            } end_for;
             break;
         }
         default:
-        {        
+        {
             for_each_child_var (c, this) {
                 c = c->resolveSimpleIds (env);
             } end_for;
@@ -382,6 +417,13 @@ AST::resolveSimpleIds (const Environ* env)
 void
 AST::resolveSimpleTypeIds (const Environ* env)
 {
+    if (this->oper()->syntax() == TYPE) {
+        AST_Ptr id = this->child(0);
+        Decl* decl = classes->find(id->as_string());
+        if (decl != NULL) {
+            this->addDecl(decl);
+        }
+    }
     for_each_child (c, this) {
         c->resolveSimpleTypeIds (env);
     } end_for;
@@ -390,6 +432,28 @@ AST::resolveSimpleTypeIds (const Environ* env)
 AST_Ptr
 AST::resolveAllocators (const Environ* env)
 {
+    if (this->oper()->syntax() == CALL) {
+    }
+    if (this->oper()->syntax() == CALL && 
+        this->child(0)->oper()->syntax() == TYPE) {
+        AST_Ptr init_tree = make_id("__init__", "0");
+        gcstring name = this->child(0)->child(0)->as_string();
+        Decl* decl = classes->find(name);
+        Decl* init_decl = decl->getEnviron()->find_immediate("__init__");
+        init_tree->addDecl(init_decl);
+        AST_Ptr new_tree = consTree(NEW, this->child(0));
+        std::vector <AST_Ptr> temp;
+        temp.push_back(new_tree);
+        if (this->arity() == 2){
+            AST_Ptr expr_tree = this->child(1);
+            for (int i = 0; i < expr_tree->arity(); i++){
+                temp.push_back(expr_tree->child(i));
+            }
+        }
+        AST_Ptr* new_args = &temp[0];
+        AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
+        return consTree(CALL1, init_tree, new_expr_tree);            
+    }
     for_each_child_var (c, this) {
         c = c->resolveAllocators (env);
     } end_for;
@@ -399,6 +463,27 @@ AST::resolveAllocators (const Environ* env)
 AST_Ptr
 AST::resolveStaticSelections (const Environ* env)
 {
+    if (this->oper()->syntax() == ATTRIBUTEREF) {
+        AST_Ptr id0 = this->child(0);
+        Decl* decl = id0->getDecl();
+        if (decl != NULL) {
+            AST_Ptr id1 = this->child(1);
+            Decl_Vector decls;
+            decl->getEnviron()->find(id1->as_string(), decls);
+
+            for (Decl_Vector::const_iterator i = decls.begin (); 
+                     i != decls.end (); 
+                     i++)
+            {
+                if ((*i)->isMethod()) {
+                    id1->addDecl((*i));
+                    return id1;
+                }
+            }
+        } else {
+            fprintf(stderr, "Class not found.\n");
+        }
+    }
     for_each_child_var (c, this) {
         c = c->resolveStaticSelections (env);
     } end_for;
@@ -413,9 +498,146 @@ AST::freezeDecls (bool frozen)
     } end_for;
 }
 
+
 void
 AST::resolveTypes (Decl* context, Unifier& subst)
 {
+        // switch(this->oper()->syntax()) {
+    //     /* dev-xg */
+    //     case LIST_DISPLAY:
+    //     {
+    //         break;
+    //     }
+    //     case TUPLE:
+    //     {
+    //         break;
+    //     }
+    //     case INT_LITERAL:
+    //     {
+    //         break;
+    //     }
+    //     case STRING_LITERAL:
+    //     {
+    //         break;
+    //     }
+    //     case NONE:
+    //     {
+    //         break;
+    //     }
+    //     case TRUE:
+    //     {
+    //         break;
+    //     }
+    //     case FALSE:
+    //     {
+    //         break;
+    //     }
+    //     /* dev-jz */
+    //     case ID:
+    //     {
+    //         break;
+    //     }
+    //     case AND:
+    //     {
+
+    //         Type_Ptr type0 = this->child(0)->getDecl()->getType();
+    //         Type_Ptr type1 = this->child(1)->getDecl()->getType();
+    //         if (type0->as_string() == type1->as_string()) {
+    //             if (type0->as_string() == "bool") {
+    //                 this->getDecl()->setType(type0);
+    //             } else {
+    //                 fprintf(stderr, "Type not allowed!\n");
+    //             }
+    //         } else {
+    //             fprintf(stderr, "Type doesn't match!\n");
+    //         }
+    //         break;
+    //     }
+    //     case OR:
+    //     {
+    //         Type_Ptr type0 = this->child(0)->getDecl()->getType();
+    //         Type_Ptr type1 = this->child(1)->getDecl()->getType();
+    //         if (type0->as_string() == type1->as_string()) {
+    //             if (type0->as_string() == "bool") {
+    //                 this->getDecl()->setType(type0);
+    //             } else {
+    //                 fprintf(stderr, "Type not allowed!\n");
+    //             }
+    //         } else {
+    //             fprintf(stderr, "Type doesn't match!\n");
+    //         }
+    //         break;
+    //     }
+    //     case CALL:
+    //     {
+    //         break;
+    //     }
+    //     case CALL1:
+    //     {
+    //         break;
+    //     }
+
+    //     case ASSIGN:
+    //     {
+    //         Type_Ptr type0 = this->child(0)->getDecl()->getType();
+    //         Type_Ptr type1 = this->child(1)->getDecl()->getType();
+    //         if (type0->as_string() == type1->as_string()) {
+    //             this->getDecl()->setType(type0);
+    //         } else {
+    //             fprintf(stderr, "Type doesn't match!\n");
+    //         }
+    //         break;
+    //     }
+    //     /* dev-jz */
+
+    //     /* dev-xh */
+    //     case FOR:
+    //     {
+    //         break;
+    //     }
+    //     case WHILE:
+    //     {
+    //         break;
+    //     }
+    //     case IF:
+    //     {
+    //         break;
+    //     }
+    //     case RETURN:
+    //     {
+    //         break;
+    //     }
+    //     case PRINT:
+    //     {
+    //         break;
+    //     }
+    //     /* dev-xh */
+    //     case TYPED_ID:
+    //     {
+    //         Type_Ptr type = this->child(1)->getDecl()->getType();
+    //         AST_Ptr id = this->child(0);
+    //         int decl_count = 0;
+    //         Type_Ptr myType;
+    //         for (int i = 0; i < this->numDecls(); i++) {
+    //             if (type->child(0)->as_string() == 
+    //                 id->getDecl(i)->getType()->as_string()) {
+    //                 myType = id->getDecl(i)->getType();
+    //                 decl_count++;
+    //             }
+    //         }
+    //         if (decl_count != 1) {
+    //             fprintf(stderr, "error, multiple decls of this type");
+    //         }
+    //         else {
+    //             this->getDecl()->setType(myType);
+    //         }
+    //         break;
+    //     }
+    //     case ATTRIBUTEREF:
+    //     {
+    //         break;
+    //     }
+    // }
     for_each_child_var (c, this) {
         c->resolveTypes (context, subst);
     } end_for;

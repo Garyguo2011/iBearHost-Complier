@@ -280,6 +280,10 @@ public:
         return true;
     }
 
+    bool isUnbound () {
+        return (this->binding() == this);
+    }
+
     bool isFunctionType () {
         return false;
     }
@@ -583,6 +587,7 @@ extern AST_Ptr consTree (int syntax, AST_Ptr c0, AST_Ptr c1,
  *  array of AST_Ptrs indicating the first child and the position
  *  beyond the last child. */
 extern AST_Ptr consTree (int syntax, AST_Ptr* first, AST_Ptr* limit);
+
 
 #endif
 
