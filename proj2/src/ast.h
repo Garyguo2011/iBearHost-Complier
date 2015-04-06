@@ -280,6 +280,10 @@ public:
         return true;
     }
 
+    bool isUnbound () {
+        return (this->binding() == this);
+    }
+
     bool isFunctionType () {
         return false;
     }
