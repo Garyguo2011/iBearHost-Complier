@@ -347,7 +347,8 @@ protected:
 
     Type_Ptr binding () {
         Decl* me = getDecl ();
-        assert (me != NULL && me->getAst () != NULL);
+        if (me == NULL || me->getAst () == NULL)
+            return this;
         Type_Ptr b = me->getAst ()->asType ();
         if (b->_binding == this)
             return b;
