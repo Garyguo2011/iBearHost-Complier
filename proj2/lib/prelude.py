@@ -155,6 +155,12 @@ def __getitem__(S::list of $a, k::int)::$a:
 def __getslice__(S::list of $a, L::int, U::int)::list of $a:
     native "__getslice__list__"
 
+def __setitem__(S::list of $a, k::int, val::$a):
+    native "__setitem__list__"
+
+def __setslice__(S::list of $a, a::int, b::int, val::list of $a):
+    native "__setslice__list__"
+
 def len(S::list of $a)::int:
     native "__len__list__"
 
@@ -180,6 +186,15 @@ def __getitem__(D::dict of [bool, $b], x::bool)::$b:
 
 def __getitem__(D::dict of [str, $b], x::str)::$b:
     native "__getitem__dict__"
+
+def __setitem__(S::dict of [int, $b], k::int, val::$b):
+    native "__setitem__dict__"
+
+def __setitem__(S::dict of [bool, $b], k::bool, val::$b):
+    native "__setitem__dict__"
+
+def __setitem__(S::dict of [str, $b], k::int, val::$b):
+    native "__setitem__dict__"
 
 def len(D::dict of [int, $b])::int:
     native "__len__dict__"

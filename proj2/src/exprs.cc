@@ -28,19 +28,89 @@ static GCINIT _gcdummy;
  * There are examples in this and other files.
  */
 
+/*****   Typed_Tree   *****/
+
+Type_Ptr
+Typed_Tree::getType ()
+{
+    if (_type == NULL)
+        _type = computeType ();
+    return _type;
+}
+
+bool
+Typed_Tree::setType (Type_Ptr type, Unifier& subst)
+{
+    if (_type == NULL)
+        _type = Type::makeVar ();
+    return unify (_type, type, subst);
+}
+
+void
+Typed_Tree::resolveTypes (Decl* context, Unifier& subst)
+{
+    AST_Tree::resolveTypes (context, subst);
+    getType ();
+}
+
+Type_Ptr
+Typed_Tree::computeType ()
+{
+    return Type::makeVar ();
+}
+
 /* The following is an EXAMPLE of a potentially useful AST class
  * structure, showing the macros you can use to set up base classes
  * and their subtypes. */
+
+/*****   NONE, TRUE, FALSE     *****/
+
+class None_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS (None_AST, Typed_Tree);
+
+};
+
+NODE_FACTORY(None_AST, NONE);
+
+class True_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS (True_AST, Typed_Tree);
+
+    Type_Ptr computeType () {
+        return boolDecl->asType ();
+    }
+
+};
+
+NODE_FACTORY(True_AST, TRUE);
+
+
+class False_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS (False_AST, Typed_Tree);
+
+    Type_Ptr computeType () {
+        return boolDecl->asType ();
+    }
+
+};
+
+NODE_FACTORY(False_AST, FALSE);
+
 
 /*****   CALLS    *****/
 
 /** The supertype of "callable" things, including ordinary calls,
  *  binary operators, unary operators, subscriptions, and slices. */
 
-class Callable : public AST_Tree {
+class Callable : public Typed_Tree {
 protected:
 
-    NODE_BASE_CONSTRUCTORS (Callable, AST_Tree);
+    NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
     
     /** Returns the expression representing the quantity that is
      *  called to evaluate this expression. */

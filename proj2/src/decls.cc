@@ -473,9 +473,9 @@ protected:
 	AST_Ptr id = make_id (getName ().c_str (), NULL);
 	id->addDecl (const_cast<ClassDecl*> (this));
 
-        return consTree (TYPE, id,
-			 AST::make_tree (TYPE_LIST, params, params+arity))
-            ->asType ();
+	AST_Ptr result = consTree (TYPE, id);
+	result->append (params, params+arity);
+	return result->asType ();
     }
 
     Type_Ptr asType (int arity, Type_Ptr t0, Type_Ptr t1) const {

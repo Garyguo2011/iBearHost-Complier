@@ -200,7 +200,10 @@ DB(AST* x)
 void
 DB(Type* x)
 {
-    AST::dump(x, cerr);
+    if (x == NULL)
+        cerr << "(null)";
+    else
+        x->print (cerr, 0);
     cerr << endl;
 }
 

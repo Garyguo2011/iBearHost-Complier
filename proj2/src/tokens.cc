@@ -46,19 +46,17 @@ public:
         return _type;
     }
 
-protected:
-
-    AST_Ptr resolveTypes (Decl* context, int& resolved, int& ambiguities, 
-                          bool& errors) {
-        if (_type == NULL) {
-            _type = computeType ();
-        }
-        return this;
+    bool setType (Type_Ptr type, Unifier& subst) {
+        if (_type == NULL)
+            _type = Type::makeVar ();
+        return unify (_type, type, subst);
     }
+
+protected:
 
     /** Computes my type, which is then cached by getType(). */
     virtual Type_Ptr computeType () {
-        return NULL;
+        return Type::makeVar ();
     }
 
     Type_Ptr _type;

@@ -26,60 +26,58 @@ AST::resolveTypesOuter (Decl* context)
 
 /*****   UNIFIER  *****/
 
-const Unifier IdentityUnifier;
-
 bool
 Unifier::isBound (Type_Ptr x) const
 {
-    TypeMap::const_iterator m = bindings.find (x);
-    return m != bindings.end () && (*m).second != x;
+    return x->binding () != x;
 }
 
 Type_Ptr
 Unifier::binding (Type_Ptr x) const
 {
-    while (true) {
-        TypeMap::const_iterator k = bindings.find (x);
-        if (k == bindings.end () || x == (*k).second)
-            return x;
-        x = k->second;
-    }
+    return x->binding ();
 }
 
 void
 Unifier::bind (Type_Ptr x, Type_Ptr y)
 {
-    Type_Ptr x1 = binding (x);
-    if (x1->isTypeVariable () && bindings.count (x1) == 0)
-        _numBound += 1;
-    bindings[x1] = binding (y);
+    assert (x != NULL && y != NULL);
+    x = x->binding ();
+    y = y->binding ();
+    _bindings.push_back (x);
+    x->bind (y);
+    _numBound += 1;
 }
     
 void
-Unifier::swap (Unifier& other)
-{
-    bindings.swap (other.bindings);
-    int tmp = _numBound;
-    _numBound = other._numBound;
-    other._numBound = tmp;
-}
-
-
-void
 Unifier::setBindings ()
 {
-    for (TypeMap::iterator k = bindings.begin (); k != bindings.end (); k++)
-        k->first->setTypeBinding (k->second);
+    _bindings.clear ();
+    _numBound = 0;
 }
 
+void
+Unifier::transfer (Unifier& other)
+{
+    _bindings.insert (_bindings.end (), 
+                      other._bindings.begin (), other._bindings.end ());
+    other._bindings.clear ();
+}
+
+
+Unifier::~Unifier ()
+{
+    for (size_t k = 0; k < _bindings.size (); k += 1)
+        _bindings[k]->unbind ();
+}
 
 /** As for unify, but SUBST has an undefined state if result is
  *  false. */
 static bool
 unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
 {
-    t0 = subst.binding (t0);
-    t1 = subst.binding (t1);
+    t0 = t0->binding ();
+    t1 = t1->binding ();
     if (t0 == t1)
         return true;
     if (t0->isTypeVariable ()) {
@@ -107,18 +105,19 @@ unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
 bool
 unify (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
 {
-    Unifier s (subst);
-    if (unify1 (t0, t1, subst))
+    Unifier s;
+    if (unify1 (t0, t1, subst)) {
+        subst.transfer (s);
         return true;
-    s.swap (subst);
+    }
     return false;
 }
 
 bool
-unifies (Type_Ptr t0, Type_Ptr t1, const Unifier& subst)
+unifies (Type_Ptr t0, Type_Ptr t1)
 {
-    Unifier s (subst);
-    return unify1 (t0, t1, s);
+    Unifier s;
+    return unify (t0, t1, s);
 }
 
 
@@ -192,7 +191,24 @@ Type::makeVar ()
 Type_Ptr
 Type::binding ()
 {
-    return this;
+    Type_Ptr type;
+    type = this;
+    while (type->_binding != type)
+        type = type->_binding;
+    return type;
+}
+
+void
+Type::bind (Type_Ptr type)
+{
+    assert (_binding == this);
+    _binding = type;
+}
+
+void
+Type::unbind ()
+{
+    _binding = this;
 }
 
 bool
@@ -236,20 +252,19 @@ freshen (Type_Ptr type, TypeMap& freshMap)
     Type_Ptr type1 = type->binding ();
     if (type1 != type)
         result = freshen (type1, freshMap);
-    else if (type->isTypeVariable ())
+    else if (type1->isTypeVariable ())
         result = Type::makeVar ();
-    else if (type->numTypeParams () == 0)
-        result = type;
     else {
-        result = consTree (type->oper ()->syntax ())->asType ();
+        result = consTree (type1->oper ()->syntax ())->asType ();
         freshMap[type] = result;
-
-        for (size_t i = 0; i < type->arity () - type->numTypeParams (); i += 1)
-            result->append (type->child (i));
-        for (int i = 0; i < type->numTypeParams (); i += 1) {
-            Type_Ptr p0 = type->typeParam (i);
-            result->append (freshen (p0, freshMap));
-        }
+        for_each_child (c, type1) {
+            AST_Ptr c1;
+            if (c->asType () != NULL)
+                c1 = freshen (c->asType (), freshMap);
+            else 
+                c1 = c;
+            result->append (c1);
+        } end_for;
     }
     freshMap[type] = result;
     return result;
@@ -258,8 +273,11 @@ freshen (Type_Ptr type, TypeMap& freshMap)
 Type_Ptr
 freshen (Type_Ptr type)
 {
-    TypeMap freshMap;
-    return freshen (type, freshMap);
+    if (type->hasFreeVariables (type)) {
+        TypeMap freshMap;
+        return freshen (type, freshMap);
+    } else
+        return type->binding ();
 }
 
 void
@@ -268,7 +286,11 @@ freshen (gcvector<Type_Ptr>& types)
     TypeMap freshMap;
 
     for (size_t i = 0; i < types.size (); i += 1) {
-        types[i] = freshen (types[i], freshMap);
+        if (Type::hasFreeVariables (types[i])) {
+            for (size_t j = 0; j < types.size (); j += 1)
+                types[j] = freshen (types[j], freshMap);
+            break;
+        }
     }
 }
 
@@ -325,12 +347,11 @@ protected:
 
     Type_Ptr binding () {
         Decl* me = getDecl ();
-        if (me == NULL)
-            return this;
+        assert (me != NULL && me->getAst () != NULL);
         Type_Ptr b = me->getAst ()->asType ();
-        if (b == NULL || b == this)
+        if (b->_binding == this)
             return b;
-        return b->binding ();
+        return b->_binding->binding ();
     }
 
     void setTypeBinding (Type_Ptr type) {

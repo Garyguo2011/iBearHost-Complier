@@ -67,12 +67,11 @@ public:
      *  multiple lines. */
     void print (std::ostream& out, int indent);
 
-    /** For nodes that represent types, return the node with a static
-     *  type that reveals its Type operations.  Returns NULL on node types
-     *  that do not represent types. */
+    /** For nodes derived from Type, return the node with static type Type.
+     *  Returns NULL on other node types. */
     virtual Type_Ptr asType ();
 
-    /** True if I represent a type. */
+    /** True if I am a Type or an id that denotes a type. */
     virtual bool isType ();
 
     /** For nodes representing formal parameters, ids, or attribute
@@ -261,7 +260,9 @@ protected:
  *  ASTs with operations that apply only to certain subtypes.  This
  *  class is intended to factor out the operations specific to types. */
 class Type : public AST_Tree {
+
     friend class TypeVar_AST;
+    friend class Unifier;
 
 public:
 
@@ -332,14 +333,24 @@ public:
     /** True if I contain any unbound type variables. */
     static bool hasFreeVariables(Type_Ptr type);
 
-    NODE_BASE_CONSTRUCTORS (Type, AST_Tree);
+    NODE_BASE_CONSTRUCTORS_INIT (Type, AST_Tree, _binding (this));
 
 protected:
 
+    /** Bind me to TYPE, assuming I am unbound. */
+    void bind (Type_Ptr type);
+
+    /** Unbind me. */
+    void unbind ();
+
     /** Used internally by hasFreeVariables to do most of the work,
-     *  avoiding circular traversals.  VISITED records nodes already
-     *  seen. */
-    bool hasFreeVariables (ASTSet& visited);
+     *  avoiding circular traversals. */
+    virtual bool hasFreeVariables (ASTSet& visited);
+
+private:
+
+    /** Type to which I am bound, or myself if unbound. */
+    Type_Ptr _binding;
 
 };
 
@@ -369,14 +380,10 @@ public:
     /** A Unifier in which all values bind to themselves. */
     Unifier () : _numBound (0) {}
  
-    /** Copy constructor. */
-    explicit Unifier (const Unifier& source) 
-        : _numBound (source._numBound), bindings (source.bindings) { }
-
     /** True iff X is currently bound to a value other than itself. */
     bool isBound (Type_Ptr x) const;
 
-    /** The current binding of X.  */
+    /** The current binding of X.  Always the same as X->binding(). */
     Type_Ptr binding (Type_Ptr x) const;
 
     /** The number of type variables bound in me. */
@@ -389,38 +396,33 @@ public:
      *  bound to y'. */
     void bind(Type_Ptr x, Type_Ptr y);
 
-    /** For each type variable in this mapping, update the type bound
-     *  to its Decl with its value in the mapping.  Used after
-     *  unification to (in effect) replace type variables with the
-     *  types they are bound to. */
+    /** Make all current bindings recorded in me permanent by deleting
+     *  all of them so that they are not unbound when I am finalized. */
     void setBindings ();
 
-    /** Exchange my contents with that of OTHER. */
-    void swap (Unifier& other);
+    /** Transfer all bindings recorded in OTHER to me, removing them
+     *  from OTHER. */
+    void transfer (Unifier& other);
+
+    /** Unbind all bindings recorded in me. */
+    ~Unifier ();
 
 private:
+    /** Copy constructor not allowed. */
+    Unifier (const Unifier& source) { }
 
     int _numBound;
-    TypeMap bindings;
+    std::vector<Type_Ptr> _bindings;
 
 };
 
-extern const Unifier IdentityUnifier;
-
 /** Extend SUBST so that T0 unifies with T1, returning true iff successful.
- *  Otherwise, returns false and leaves SUBST unchanged. */
+ *  Otherwise, returns false and leaves bindings and SUBST unchanged. */
 extern bool unify (Type_Ptr t0, Type_Ptr t1, Unifier& subst);
 
-/** Returns true iff SUBST can be extended to unify T0 and T1.  Does
- *  not modify SUBST. */
-extern bool unifies (Type_Ptr t0, Type_Ptr t1, const Unifier& subst);
-
-/** Shorthand for the case where we start from an identity
- *  substitution. */
-static inline bool unifies (Type_Ptr t0, Type_Ptr t1)
-{
-    return unifies (t0, t1, IdentityUnifier);
-}
+/** Returns true iff T0 unifies with T1.  Does not modify any current
+ *  bindings. */
+extern bool unifies (Type_Ptr t0, Type_Ptr t1);
 
 /** The supertype of AST_Trees that represent expressions that have a
  *  type. */
