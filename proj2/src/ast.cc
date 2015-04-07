@@ -107,13 +107,19 @@ AST::removeDecl (int k)
 Type_Ptr
 AST::getType ()
 {
-    throw logic_error ("node does not represent something with a type");
+    return _type;
 }
 
 bool
 AST::setType (Type_Ptr type, Unifier& subst)
 {
-    throw logic_error ("node does not represent something with a type");
+    if (_type == NULL) {
+        _type = type;
+        return true;
+    }
+    else {
+        return unify(_type, type, subst);
+    }
 }
 
 /** Default does nothing. */
@@ -127,6 +133,9 @@ AST::doOuterSemantics ()
     dast = dast->resolveAllocators(fileDecl->getEnviron());
     dast = dast->resolveStaticSelections(fileDecl->getEnviron());
     dast->resolveTypesOuter(fileDecl);
+    Unifier* subst = new Unifier();
+    dast->resolveTypes(fileDecl, *subst);
+    subst->setBindings();
     return dast;
 }
 
@@ -162,11 +171,13 @@ AST::collectDecls (Decl* enclosing)
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 strDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "int") {
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 intDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             /** TODO
             
@@ -181,11 +192,13 @@ AST::collectDecls (Decl* enclosing)
                 Decl* decl = makeClassDecl(name, params);
                 boolDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "range") {
                 Decl* decl = makeClassDecl(name, params);
                 rangeDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             // need inline substitution
             else if (name == "list") {
@@ -193,35 +206,41 @@ AST::collectDecls (Decl* enclosing)
                 this->collectTypeVarDecls(decl);
                 listDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "dict") {
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 dictDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple0") {
                 Decl* decl = makeClassDecl(name, params);
                 tuple0Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple1") {
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple1Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple2"){
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple2Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple3"){
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple3Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             /* END */
             
@@ -498,149 +517,150 @@ AST::freezeDecls (bool frozen)
     } end_for;
 }
 
+/*
+(5,6, "Gary")
+int    int    str 
+(type (id tuple3) (typelist (type (id int)) (type (id int)) (type (id str)) )
+*/
 
 void
 AST::resolveTypes (Decl* context, Unifier& subst)
 {
-        // switch(this->oper()->syntax()) {
-    //     /* dev-xg */
-    //     case LIST_DISPLAY:
-    //     {
-    //         break;
-    //     }
-    //     case TUPLE:
-    //     {
-    //         break;
-    //     }
-    //     case INT_LITERAL:
-    //     {
-    //         break;
-    //     }
-    //     case STRING_LITERAL:
-    //     {
-    //         break;
-    //     }
-    //     case NONE:
-    //     {
-    //         break;
-    //     }
-    //     case TRUE:
-    //     {
-    //         break;
-    //     }
-    //     case FALSE:
-    //     {
-    //         break;
-    //     }
-    //     /* dev-jz */
-    //     case ID:
-    //     {
-    //         break;
-    //     }
-    //     case AND:
-    //     {
-
-    //         Type_Ptr type0 = this->child(0)->getDecl()->getType();
-    //         Type_Ptr type1 = this->child(1)->getDecl()->getType();
-    //         if (type0->as_string() == type1->as_string()) {
-    //             if (type0->as_string() == "bool") {
-    //                 this->getDecl()->setType(type0);
-    //             } else {
-    //                 fprintf(stderr, "Type not allowed!\n");
-    //             }
-    //         } else {
-    //             fprintf(stderr, "Type doesn't match!\n");
-    //         }
-    //         break;
-    //     }
-    //     case OR:
-    //     {
-    //         Type_Ptr type0 = this->child(0)->getDecl()->getType();
-    //         Type_Ptr type1 = this->child(1)->getDecl()->getType();
-    //         if (type0->as_string() == type1->as_string()) {
-    //             if (type0->as_string() == "bool") {
-    //                 this->getDecl()->setType(type0);
-    //             } else {
-    //                 fprintf(stderr, "Type not allowed!\n");
-    //             }
-    //         } else {
-    //             fprintf(stderr, "Type doesn't match!\n");
-    //         }
-    //         break;
-    //     }
-    //     case CALL:
-    //     {
-    //         break;
-    //     }
-    //     case CALL1:
-    //     {
-    //         break;
-    //     }
-
-    //     case ASSIGN:
-    //     {
-    //         Type_Ptr type0 = this->child(0)->getDecl()->getType();
-    //         Type_Ptr type1 = this->child(1)->getDecl()->getType();
-    //         if (type0->as_string() == type1->as_string()) {
-    //             this->getDecl()->setType(type0);
-    //         } else {
-    //             fprintf(stderr, "Type doesn't match!\n");
-    //         }
-    //         break;
-    //     }
-    //     /* dev-jz */
-
-    //     /* dev-xh */
-    //     case FOR:
-    //     {
-    //         break;
-    //     }
-    //     case WHILE:
-    //     {
-    //         break;
-    //     }
-    //     case IF:
-    //     {
-    //         break;
-    //     }
-    //     case RETURN:
-    //     {
-    //         break;
-    //     }
-    //     case PRINT:
-    //     {
-    //         break;
-    //     }
-    //     /* dev-xh */
-    //     case TYPED_ID:
-    //     {
-    //         Type_Ptr type = this->child(1)->getDecl()->getType();
-    //         AST_Ptr id = this->child(0);
-    //         int decl_count = 0;
-    //         Type_Ptr myType;
-    //         for (int i = 0; i < this->numDecls(); i++) {
-    //             if (type->child(0)->as_string() == 
-    //                 id->getDecl(i)->getType()->as_string()) {
-    //                 myType = id->getDecl(i)->getType();
-    //                 decl_count++;
-    //             }
-    //         }
-    //         if (decl_count != 1) {
-    //             fprintf(stderr, "error, multiple decls of this type");
-    //         }
-    //         else {
-    //             this->getDecl()->setType(myType);
-    //         }
-    //         break;
-    //     }
-    //     case ATTRIBUTEREF:
-    //     {
-    //         break;
-    //     }
-    // }
     for_each_child_var (c, this) {
         c->resolveTypes (context, subst);
     } end_for;
+    switch(this->oper()->syntax()) {
+        case LIST_DISPLAY:
+        {
+            break;
+        }
+        // case INT_LITERAL:
+        // {
+        //     this->setType(intDecl->asType(), subst);
+        //     break;
+        // }
+        case TUPLE:
+        {
+            switch(this->arity()) {
+                case 0:
+                {
+                    this->setType(tuple0Decl->asType(), subst);
+                    break;
+                }
+                case 1:
+                {
+                    Type_Ptr* types = (Type_Ptr*)malloc(sizeof(Type_Ptr));
+                    types[0] = this->child(0)->getType();
+                    // this->child(0);
+                    this->setType(tuple1Decl->asType(1, types), subst);
+                    free(types);
+                    break; 
+                }
+                case 2:
+                {
+                    Type_Ptr* types = (Type_Ptr*) malloc (2 * sizeof(Type_Ptr));
+                    types[0] = this->child(0)->getType();
+                    types[1] = this->child(1)->getType();
+                    this->setType(tuple1Decl->asType(1, types), subst);
+                    free(types);
+                    break;
+                    // fprintf(stderr, "tuple of size 2\n");                    
+                    // fprintf(stderr, "setting type \n");             
+                    //fprintf(stderr, "%d \n", this->setType(tuple2Decl->asType(2, types), subst));
+                    //fprintf(stderr, "type is set \n");
+                    // break; 
+                }
+                case 3:
+                {
+                    Type_Ptr* types = (Type_Ptr*) malloc (3 * sizeof(Type_Ptr));
+                    types[0] = this->child(0)->getType();
+                    types[1] = this->child(1)->getType();
+                    types[2] = this->child(2)->getType();
+                    this->setType(tuple3Decl->asType(3, types), subst);
+                    free(types);
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+            break;
+        }
+        case STRING_LITERAL:
+        {
+            break;
+        }
+        case NONE:
+        {
+            break;
+        }
+        case TRUE:
+        {
+            break;
+        }
+        case FALSE:
+        {
+            break;
+        }
+        case ID:
+        {
+            break;
+        }
+        case AND:
+        {
+            break;
+        }
+        case OR:
+        {
+            break;
+        }
+        case CALL:
+        {
+            break;
+        }
+        case CALL1:
+        {
+            break;
+        }
+
+        case ASSIGN:
+        {
+            break;
+        }
+        case FOR:
+        {
+            break;
+        }
+        case WHILE:
+        {
+            break;
+        }
+        case IF:
+        {
+            break;
+        }
+        case RETURN:
+        {
+            break;
+        }
+        case PRINT:
+        {
+            break;
+        }
+        case TYPED_ID:
+        {
+            break;
+        }
+        case ATTRIBUTEREF:
+        {
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
 }
 
 bool
