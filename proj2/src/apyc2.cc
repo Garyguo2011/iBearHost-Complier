@@ -114,18 +114,13 @@ phase2 (const gcstring& preludeSrc, const gcstring& preludeASTFile,
 
     tree = post1 (tree, preludeTree);
 
-    fprintf(stderr, "doing outer semantics! \n");
-
     tree = tree->doOuterSemantics ();
-
-    fprintf(stderr, "number of errors %d \n", numErrors());
 
     if (numErrors () == 0) {
         if (freopen (outASTFile.c_str (), "w", stdout) == NULL) {
             errorNoFile ("Could not open %s", outASTFile.c_str ());
             return;	
         }
-        fprintf(stderr, "writing to dast file \n");
         tree->print (cout, 0);
         outputDecls (cout);
     }
@@ -168,8 +163,6 @@ main (int argc, char* argv[])
     } else {
         astOutFile = outfile;
     }
-
-    fprintf(stderr, "printing dast \n");
 
     phase2(preludeSrc, preludeASTFile, progSrc, progASTFile, astOutFile);
 

@@ -107,7 +107,6 @@ AST::removeDecl (int k)
 Type_Ptr
 AST::getType ()
 {
-    fprintf(stderr, "getting type \n");
     return _type;
 }
 
@@ -116,11 +115,9 @@ AST::setType (Type_Ptr type, Unifier& subst)
 {
     if (_type == NULL) {
         _type = type;
-        fprintf(stderr, "type is set!!!!! \n");
         return true;
     }
     else {
-        fprintf(stderr, "we're unifying \n");
         return unify(_type, type, subst);
     }
 }
@@ -529,6 +526,11 @@ AST::resolveTypes (Decl* context, Unifier& subst)
         {
             break;
         }
+        // case INT_LITERAL:
+        // {
+        //     this->setType(intDecl->asType(), subst);
+        //     break;
+        // }
         case TUPLE:
         {
             switch(this->arity()) {
@@ -539,32 +541,35 @@ AST::resolveTypes (Decl* context, Unifier& subst)
                 }
                 case 1:
                 {
-                    Type_Ptr* types;
+                    Type_Ptr* types = (Type_Ptr*)malloc(sizeof(Type_Ptr));
                     types[0] = this->child(0)->getType();
+                    // this->child(0);
                     this->setType(tuple1Decl->asType(1, types), subst);
+                    free(types);
                     break; 
                 }
                 case 2:
                 {
-                    
-                    fprintf(stderr, "tuple of size 2\n");
-                    Type_Ptr* types;
+                    Type_Ptr* types = (Type_Ptr*) malloc (2 * sizeof(Type_Ptr));
                     types[0] = this->child(0)->getType();
-                    //types[1] = this->child(1)->getType();  
-                    
-                    fprintf(stderr, "setting type \n");             
+                    types[1] = this->child(1)->getType();
+                    this->setType(tuple1Decl->asType(1, types), subst);
+                    free(types);
+                    break;
+                    // fprintf(stderr, "tuple of size 2\n");                    
+                    // fprintf(stderr, "setting type \n");             
                     //fprintf(stderr, "%d \n", this->setType(tuple2Decl->asType(2, types), subst));
                     //fprintf(stderr, "type is set \n");
-                    
-                    break; 
+                    // break; 
                 }
                 case 3:
                 {
-                    Type_Ptr* types;
+                    Type_Ptr* types = (Type_Ptr*) malloc (3 * sizeof(Type_Ptr));
                     types[0] = this->child(0)->getType();
                     types[1] = this->child(1)->getType();
                     types[2] = this->child(2)->getType();
                     this->setType(tuple3Decl->asType(3, types), subst);
+                    free(types);
                     break;
                 }
                 default:
@@ -572,10 +577,6 @@ AST::resolveTypes (Decl* context, Unifier& subst)
                     break;
                 }
             }
-            break;
-        }
-        case INT_LITERAL:
-        {
             break;
         }
         case STRING_LITERAL:
