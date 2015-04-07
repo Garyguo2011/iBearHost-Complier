@@ -174,11 +174,13 @@ AST::collectDecls (Decl* enclosing)
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 strDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "int") {
                 Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
                 intDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             /** TODO
             
@@ -193,11 +195,13 @@ AST::collectDecls (Decl* enclosing)
                 Decl* decl = makeClassDecl(name, params);
                 boolDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "range") {
                 Decl* decl = makeClassDecl(name, params);
                 rangeDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             // need inline substitution
             else if (name == "list") {
@@ -205,35 +209,41 @@ AST::collectDecls (Decl* enclosing)
                 this->collectTypeVarDecls(decl);
                 listDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "dict") {
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 dictDecl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple0") {
                 Decl* decl = makeClassDecl(name, params);
                 tuple0Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple1") {
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple1Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple2"){
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple2Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             else if (name == "tuple3"){
                 Decl* decl = makeClassDecl(name, params);
                 this->collectTypeVarDecls(decl);
                 tuple3Decl = decl;
                 id->addDecl(decl);
+                enclosing->addMember(decl);
             }
             /* END */
             

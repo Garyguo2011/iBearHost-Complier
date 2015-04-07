@@ -4,5 +4,5 @@ def f(x :: int) :: int:
 		return 6
 	x = 9
 	return x
-t :: int = f(a)
+t :: int = 9
 print(t)

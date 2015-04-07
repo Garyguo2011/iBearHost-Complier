@@ -7,8 +7,8 @@
 # # The builtin classes have no __init__ method, and so cannot be allocated
 # # directly.  Instances are created by other constructs.
 
-# class str:
-#    pass
+class str:
+   pass
 
 class int:
    pass
