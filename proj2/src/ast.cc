@@ -81,7 +81,7 @@ AST::getDecl (int k)
 }
 
 void
-AST::addDecl (Decl*)
+AST::addDecl (Decl* decl)
 {
     throw logic_error ("node does not represent a named entity");
 }
@@ -113,7 +113,7 @@ AST::doOuterSemantics ()
     this->collectDecls(fileDecl);
     dast = this->resolveSimpleIds(fileDecl->getEnviron());
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
-    // dast = dast->resolveAllocators(fileDecl->getEnviron());
+    dast = dast->resolveAllocators(fileDecl->getEnviron());
     // dast = dast->resolveStaticSelections(fileDecl->getEnviron());
     // dast->resolveTypesOuter(fileDecl);
     // Unifier* subst = new Unifier();

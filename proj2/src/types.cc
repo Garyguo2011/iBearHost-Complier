@@ -399,7 +399,7 @@ protected:
     }
 
     void addDecl (Decl* decl) {
-       // assert (_me == NULL);
+       assert (_me == NULL);
         _me = decl;
     }
 

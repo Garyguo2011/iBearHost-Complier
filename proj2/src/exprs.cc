@@ -196,47 +196,20 @@ NODE_FACTORY (Unop_AST, UNOP);
 
 // FIXME: There are others as well.
 
-/** ID */
-class ID_AST : public AST_Tree {
-    NODE_CONSTRUCTORS(ID_AST, AST_Tree);
+// /** ID */
+// class ID_AST : public AST_Tree {
+// protected:
+//     NODE_CONSTRUCTORS(ID_AST, AST_Tree);
 
-    AST_Ptr getId()
-    {
-        return child(0);
-    }
+//     AST_Ptr getId()
+//     {
+//         return child(0);
+//     }
 
-    void addTargetDecls (Decl* enclosing) {
-        Decl* decl = enclosing -> addVarDecl(this);
-        if (decl != NULL) {
-            this->addDecl(decl);
-        }
-    }
 
-    AST_Ptr resolveSimpleIds (const Environ* env)
-    {
-        Decl_Vector decls;
-        AST_Ptr id = child(0);
-        gcstring name = id->as_string();
-        Decl* decl = classes->find(name);
-        if (decl != NULL && this->numDecls() == 0){
-            this->addDecl(decl);
-            return consTree(TYPE, this, consTree(TYPE_LIST));
-        }
-        env->find(name, decls);
-        if (decls.size() == 0){
-            fprintf(stderr, "decl not found\n");
-        } else {
-            for (Decl_Vector::const_iterator i = decls.begin(); 
-                i != decls.end();
-                i++){
-                this->addDecl(*i);
-            }
-        }
-        return this;
-    }
-};
+// };
 
-NODE_FACTORY(ID_AST, ID);
+// NODE_FACTORY(ID_AST, ID);
 
 /** subscriptions */
 class Subscript_AST : public Callable {
