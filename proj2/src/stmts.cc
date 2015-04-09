@@ -178,7 +178,7 @@ protected:
 
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
-        AST_Ptr id = this->child(0)
+        AST_Ptr id = child(0);
         const Environ* class_env = id->getDecl()->getEnviron();
         for_each_child_var (c, this){
             c = c->resolveSimpleIds (class_env);
@@ -187,11 +187,11 @@ protected:
     }
 
     void collectTypeVarDecls (Decl* enclosing){
-        AST_Ptr params = this->child(1);
+        AST_Ptr params = child(1);
         for (unsigned int count = 0; count < params->arity(); count++){
             AST_Ptr param = params->child(count);
             AST_Ptr paramId = param->child(0);
-            Decl* paramType = makeTypeVarDecl(ParamId->as_string(), param);
+            Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
             param->addDecl(paramType);
         }
     }
@@ -297,10 +297,18 @@ class Assign_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Assign_AST, AST_Tree);
 
-<<<<<<< HEAD
+    void collectDecls (Decl* enclosing)
+    {
+        child(0)->addTargetDecls(enclosing);
+        child(1)->collectDecls(enclosing);
+    }
+};
+
+NODE_FACTORY(Assign_AST, ASSIGN);
+
 class Type_AST : public AST_Tree {
 protected:
-    Type_AST resolveSimpleIds (const Environ* env)
+    AST_Ptr resolveSimpleIds (const Environ* env)
     {
         AST_Ptr id = this->child(0);
         gcstring name = id->as_string();
@@ -323,14 +331,3 @@ protected:
 };
 
 NODE_FACTORY(Type_AST, TYPE);
-=======
-    void collectDecls (Decl* enclosing)
-    {
-        child(0)->addTargetDecls(enclosing);
-        child(1)->collectDecls(enclosing);
-    }
-
-};
->>>>>>> 61deb22123fe96aef96e6bbb1d73f3f5df30292b
-
-NODE_FACTORY(Assign_AST, ASSIGN);

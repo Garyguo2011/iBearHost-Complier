@@ -14,6 +14,7 @@ class Decl;
 class Environ;
 
 extern const Environ* theEmptyEnviron;
+extern Environ* classes;
 
 /** A dummy class whose sole purpose is to provide a constructor that
  *  initializes the garbage collector (required for Darwin).  Put a
@@ -149,6 +150,15 @@ public:
     /** A view of all member Decls I contain (modules, classes). */
     virtual const Environ* getEnviron () const;
 
+    /** Whether it is legal to add this variable to members */
+    virtual bool canAddVar (AST_Ptr id);
+
+    /** Whether it is legal to add this func def to members */
+    virtual bool canAddFunc (AST_Ptr id);
+
+    /** Whether it is legal to add this class to members */
+    virtual bool canAddClass (AST_Ptr id);
+
     /** Add DECL to the end of my list of member Decls. */
     virtual void addMember (Decl* new_member);
 
@@ -160,6 +170,10 @@ public:
     /** Create a declaration of ID appropriate for a 'def' to my
      *  members.  Returns the resulting declaration. */
     virtual Decl* addDefDecl (AST_Ptr id);
+
+    /** Create a declaration of ID appropriate for a 'class' to my
+     *  members.  Returns the resulting declaration. */
+    virtual Decl* addClassDecl (AST_Ptr id);
 
     /** True iff the entity I represent can be assigned to or defined
      *  by assignment. */

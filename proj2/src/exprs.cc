@@ -164,7 +164,7 @@ protected:
             return AST::make_tree(CALL1, &temp[0], &temp[temp.size()]);
         } else {
             for_each_child_var (c, this) {
-                c = c->resolveAllocators (env)l;
+                c = c->resolveAllocators (env);
             } end_for;
         }
         return this;
@@ -210,6 +210,7 @@ class ID_AST : public AST_Tree {
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
         Decl_Vector decls;
+        AST_Ptr id = child(0);
         gcstring name = id->as_string();
         Decl* decl = classes->find(name);
         if (decl != NULL && this->numDecls() == 0){
