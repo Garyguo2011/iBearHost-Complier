@@ -513,7 +513,9 @@ protected:
 Decl*
 makeClassDecl (const gcstring& name, AST_Ptr params)
 {
-    return new ClassDecl (name, params);
+    Decl* decl = new ClassDecl (name, params);
+    classes->define(decl);
+    return decl;
 }
 
 class ModuleDecl : public Decl {
