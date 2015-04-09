@@ -108,7 +108,17 @@ AST::setType (Type_Ptr type, Unifier& subst)
 AST_Ptr
 AST::doOuterSemantics ()
 {
-    return this;
+    AST_Ptr dast;
+    this->collectDecls(fileDecl);
+    dast = this->resolveSimpleIds(fileDecl->getEnviron());
+    dast->resolveSimpleTypeIds(fileDecl->getEnviron());
+    dast = dast->resolveAllocators(fileDecl->getEnviron());
+    dast = dast->resolveStaticSelections(fileDecl->getEnviron());
+    dast->resolveTypesOuter(fileDecl);
+    Unifier* subst = new Unifier();
+    dast->resolveTypes(fileDecl, *subst);
+    subst->setBindings();
+    return dast;
 }
 
 void
@@ -122,6 +132,14 @@ AST::collectDecls (Decl* enclosing)
 void
 AST::collectTypeVarDecls (Decl*)
 {
+    AST_Ptr params = this->child(1);
+    for (unsigned int count = 0; count < params->arity(); count++) {
+        AST_Ptr param = params->child(count);
+        AST_Ptr paramId = param->child(0);
+        Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
+        param->addDecl(paramType);
+    }
+
 }
 
 void

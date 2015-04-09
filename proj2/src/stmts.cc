@@ -252,7 +252,9 @@ protected:
                 c->addDecl(temp);
             }
         }
-
+    }
+    void addTargetDecls (Decl* enclosing) {
+        child(0) -> addTargetDecls(enclosing);
     }
 };
 
