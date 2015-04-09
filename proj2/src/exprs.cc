@@ -150,7 +150,7 @@ NODE_FACTORY (Call_AST, CALL);
 
 /** A binary operator. */
 class Binop_AST : public Callable {
-
+protected:
     NODE_CONSTRUCTORS (Binop_AST, Callable);
 
 };    
@@ -159,7 +159,7 @@ NODE_FACTORY (Binop_AST, BINOP);
 
 /** A unary operator. */
 class Unop_AST : public Callable {
-
+protected:
     NODE_CONSTRUCTORS (Unop_AST, Callable);
 
 };    

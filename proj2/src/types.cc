@@ -462,5 +462,5 @@ protected:
     NODE_CONSTRUCTORS(TypeList0_AST, Type);
 };
 
-NODE_FACTORY(TypeList0_AST, Type);
+NODE_FACTORY(TypeList0_AST, TYPE_LIST);
 

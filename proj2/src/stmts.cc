@@ -100,6 +100,15 @@ NODE_FACTORY(While_AST, WHILE);
 class For_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(For_AST, AST_Tree);
+
+    void collectDecls (Decl* enclosing) {
+        AST_Ptr target = child(0);
+        for (size_t i = 1; i < arity (); i += 1) {
+            child (i)->collectDecls (enclosing);
+        }
+        target->addTargetDecls (enclosing);
+
+    }
 };
 
 NODE_FACTORY(For_AST, FOR);
@@ -108,6 +117,18 @@ NODE_FACTORY(For_AST, FOR);
 class Def_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Def_AST, AST_Tree);
+
+    void collectDecls (Decl* enclosing)
+    {
+        AST_Ptr id = child(0);
+        Decl* decl = enclosing->addDefDecl(id);
+        if (decl != NULL) {
+            id->addDecl(decl);
+            for_each_child(c, this) {
+                c->collectDecls(decl);
+            } end_for;
+        }
+    }
 };
 
 NODE_FACTORY(Def_AST, DEF);
@@ -124,6 +145,20 @@ NODE_FACTORY(Method_AST, METHOD);
 class Formalslist_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Formalslist_AST, AST_Tree);
+
+    void collectDecls (Decl* enclosing)
+    {
+        for_each_child(c, this) {
+            AST_Ptr id = c->getId();
+            gcstring name = id->as_string();
+            c->addDecl(enclosing);
+        } end_for;
+
+        for_each_child(c, this) {
+            c->collectTypeVarDecls(enclosing);
+        } end_for;
+    }
+
 };
 
 NODE_FACTORY(Formalslist_AST, FORMALS_LIST);
@@ -132,9 +167,36 @@ NODE_FACTORY(Formalslist_AST, FORMALS_LIST);
 class Class_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Class_AST, AST_Tree);
+
+    void collectDecls (Decl* enclosing) {
+        AST_Ptr id = child(0);
+        AST_Ptr typeFormals = child(1);
+        AST_Ptr block = child(2);
+        const gcstring name = id->as_string();
+        const Environ* env = enclosing->getEnviron();
+
+        Decl* decl = makeClassDecl(name, typeFormals);
+        if (env->find(name) != NULL) {
+            fprintf(stderr, "This type for class has been defined.\n");
+        } else {
+            enclosing->addMember(decl);
+        }
+
+        id->addDecl(decl);
+        typeFormals->collectDecls(decl);
+        block->collectDecls(decl);
+    }
 };
 
 NODE_FACTORY(Class_AST, CLASS);
+
+/** Block */
+class Block_AST : public AST_Tree {
+protected:
+    NODE_CONSTRUCTORS(Block_AST, AST_Tree);
+};
+
+NODE_FACTORY(Block_AST, BLOCK);
 
 /** Native */
 class Native_AST : public AST_Tree {
@@ -148,6 +210,22 @@ NODE_FACTORY(Native_AST, NATIVE);
 class TypeFormalsList_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(TypeFormalsList_AST, AST_Tree);
+
+    void collectDecls(Decl* enclosing)
+    {
+        for (unsigned int count = 0; count < this -> arity(); count++) {
+            AST_Ptr c = child(count);
+            const Environ* env = enclosing->getEnviron();
+            const gcstring name = c->as_string();
+            if (env->find(name) != NULL) {
+                fprintf(stderr, "This type has been defined previously. \n");
+            } else {
+                Decl* temp = makeParamDecl(name, enclosing, count, Type::makeVar());
+                c->addDecl(temp);
+            }
+        }
+    }
+
 };
 
 NODE_FACTORY(TypeFormalsList_AST, TYPE_FORMALS_LIST);
@@ -156,6 +234,26 @@ NODE_FACTORY(TypeFormalsList_AST, TYPE_FORMALS_LIST);
 class TypedID_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(TypedID_AST, AST_Tree);
+
+    void collectTypeVarDecls (Decl* enclosing)
+    {
+        child(1)->collectTypeVarDecls(enclosing);
+    }
+    void collectDecls (Decl* enclosing)
+    {
+        for (unsigned int count = 0; count < this -> arity(); count++) {
+            AST_Ptr c = child(count);
+            gcstring name = c->child(0)->as_string();
+            const Environ* env = enclosing->getEnviron();
+            if (env->find(name) != NULL) {
+                fprintf(stderr, "This type has been defined previously. \n");
+            } else {
+                Decl* temp = makeParamDecl(name, enclosing, count, c->child(1));
+                c->addDecl(temp);
+            }
+        }
+
+    }
 };
 
 NODE_FACTORY(TypedID_AST, TYPED_ID);
@@ -164,9 +262,13 @@ NODE_FACTORY(TypedID_AST, TYPED_ID);
 class Assign_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Assign_AST, AST_Tree);
+
+    void collectDecls (Decl* enclosing)
+    {
+        child(0)->addTargetDecls(enclosing);
+        child(1)->collectDecls(enclosing);
+    }
+
 };
 
 NODE_FACTORY(Assign_AST, ASSIGN);
-
-
-
