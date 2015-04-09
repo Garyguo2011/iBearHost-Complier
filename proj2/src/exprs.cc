@@ -220,6 +220,29 @@ class Attributeref_AST : public Typed_Tree {
 protected:
 
     NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
+
+    AST_Ptr resolveStaticSelections (const Environ* env) {
+        AST_Ptr id0 = this->child(0);
+        Decl* decl = id0->getDecl();
+        if (decl != NULL) {
+            AST_Ptr id1 = this->child(1);
+            Decl_Vector decls;
+            decl->getEnviron()->find(id1->as_string(), decls);
+
+            for (Decl_Vector::const_iterator i = decls.begin ();
+                     i != decls.end ();
+                     i++)
+            {
+                if ((*i)->isMethod()) {
+                    id1->addDecl((*i));
+                    return id1;
+                }
+            }
+        } else {
+            fprintf(stderr, "Class not found.\n");
+        }
+        return this;
+    }
 };
 
 NODE_FACTORY(Attributeref_AST, ATTRIBUTEREF);
