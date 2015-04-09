@@ -200,6 +200,11 @@ NODE_FACTORY (Unop_AST, UNOP);
 class ID_AST : public AST_Tree {
     NODE_CONSTRUCTORS(ID_AST, AST_Tree);
 
+    AST_Ptr getId()
+    {
+        return child(0);
+    }
+
     void addTargetDecls (Decl* enclosing) {
         Decl* decl = enclosing -> addVarDecl(this);
         if (decl != NULL) {

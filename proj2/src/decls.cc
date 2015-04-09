@@ -406,10 +406,11 @@ makeInstanceDecl (const gcstring& name, Decl* cls, AST_Ptr type)
 
 class TypeVarDecl : public Decl {
 public:
-
+    AST_Ptr _canonical;
     TypeVarDecl (const gcstring& name, AST_Ptr canonical)
         :  Decl (name, NULL) {
         setAst (canonical);
+        _canonical = canonical;
     }
 
 protected:
@@ -422,8 +423,9 @@ protected:
         return getAst () != NULL && getAst ()->arity () == 0;
     }
 
-    void printContainer (ostream&) const {
-    }
+    void printContainer (ostream& out) const {
+        _canonical->print(out, 0);
+    };
 
 };
 

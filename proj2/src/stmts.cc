@@ -102,6 +102,7 @@ protected:
     NODE_CONSTRUCTORS(For_AST, AST_Tree);
 
     void collectDecls (Decl* enclosing) {
+        //fprintf(stderr, "collectDecls For\n");
         AST_Ptr target = child(0);
         for (size_t i = 1; i < arity (); i += 1) {
             child (i)->collectDecls (enclosing);
@@ -129,6 +130,7 @@ protected:
 
     void collectDecls (Decl* enclosing)
     {
+        //fprintf(stderr, "collectDecls def\n");
         AST_Ptr id = child(0);
         Decl* decl = enclosing->addDefDecl(id);
         if (decl != NULL) {
@@ -157,11 +159,7 @@ protected:
 
     void collectDecls (Decl* enclosing)
     {
-        for_each_child(c, this) {
-            AST_Ptr id = c->getId();
-            gcstring name = id->as_string();
-            c->addDecl(enclosing);
-        } end_for;
+        // fprintf(stderr, "collectDecls Formalslist\n");
 
         for_each_child(c, this) {
             c->collectTypeVarDecls(enclosing);
@@ -199,24 +197,24 @@ protected:
     NODE_CONSTRUCTORS(Class_AST, AST_Tree);
 
     void collectDecls (Decl* enclosing) {
+        //fprintf(stderr, "collectDecls class\n");
         AST_Ptr id = child(0);
         AST_Ptr typeFormals = child(1);
         AST_Ptr block = child(2);
         const gcstring name = id->as_string();
-        const Environ* env = enclosing->getEnviron();
 
         Decl* decl = makeClassDecl(name, typeFormals);
-        if (env->find(name) != NULL) {
-            fprintf(stderr, "This type for class has been defined.\n");
-        } else {
-            enclosing->addMember(decl);
+        if (decl != NULL) {
+            if (name != "str" || name != "int" || name != "bool" || name != "range" || name != "tuple0") {
+                collectTypeVarDecls(decl);
+            }
+
+            id->addDecl(decl);
+            typeFormals->collectDecls(decl);
+            block->collectDecls(decl);
+            // enclosing->addMember(decl);
+            // fprintf(stderr, "addMember?\n");
         }
-        if (name != "str" || name != "int" || name != "bool" || name != "range" || name != "tuple0") {
-            collectTypeVarDecls(decl);
-        }
-        id->addDecl(decl);
-        typeFormals->collectDecls(decl);
-        block->collectDecls(decl);
     }
 };
 
@@ -245,6 +243,7 @@ protected:
 
     void collectDecls(Decl* enclosing)
     {
+        //fprintf(stderr, "collectDecls TypeFormalsList\n");
         for (unsigned int count = 0; count < this -> arity(); count++) {
             AST_Ptr c = child(count);
             const Environ* env = enclosing->getEnviron();
@@ -252,8 +251,8 @@ protected:
             if (env->find(name) != NULL) {
                 fprintf(stderr, "This type has been defined previously. \n");
             } else {
-                Decl* temp = makeParamDecl(name, enclosing, count, Type::makeVar());
-                c->addDecl(temp);
+                // Decl* temp = makeTypeVarDecl(name, c);
+                // c->addDecl(temp);
             }
         }
     }
@@ -267,12 +266,18 @@ class TypedID_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(TypedID_AST, AST_Tree);
 
+    AST_Ptr getId()
+    {
+        return child(0);
+    }
+
     void collectTypeVarDecls (Decl* enclosing)
     {
         child(1)->collectTypeVarDecls(enclosing);
     }
     void collectDecls (Decl* enclosing)
     {
+        //fprintf(stderr, "collectDecls TypedID\n");
         for (unsigned int count = 0; count < this -> arity(); count++) {
             AST_Ptr c = child(count);
             gcstring name = c->child(0)->as_string();
@@ -280,6 +285,7 @@ protected:
             if (env->find(name) != NULL) {
                 fprintf(stderr, "This type has been defined previously. \n");
             } else {
+                //fprintf(stderr, "TypedID makeParamDecl\n");
                 Decl* temp = makeParamDecl(name, enclosing, count, c->child(1));
                 c->addDecl(temp);
             }
@@ -299,6 +305,7 @@ protected:
 
     void collectDecls (Decl* enclosing)
     {
+        //fprintf(stderr, "collectDecls assign\n");
         child(0)->addTargetDecls(enclosing);
         child(1)->collectDecls(enclosing);
     }
