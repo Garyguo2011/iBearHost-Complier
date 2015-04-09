@@ -181,7 +181,9 @@ protected:
         } else {
             enclosing->addMember(decl);
         }
-
+        if (name != "str" || name != "int" || name != "bool" || name != "range" || name != "tuple0") {
+            collectTypeVarDecls(decl);
+        }
         id->addDecl(decl);
         typeFormals->collectDecls(decl);
         block->collectDecls(decl);
