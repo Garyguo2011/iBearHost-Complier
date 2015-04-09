@@ -178,7 +178,7 @@ NODE_FACTORY (Call_AST, CALL);
 
 /** A binary operator. */
 class Binop_AST : public Callable {
-
+protected:
     NODE_CONSTRUCTORS (Binop_AST, Callable);
 
 };    
@@ -187,7 +187,7 @@ NODE_FACTORY (Binop_AST, BINOP);
 
 /** A unary operator. */
 class Unop_AST : public Callable {
-
+protected:
     NODE_CONSTRUCTORS (Unop_AST, Callable);
 
 };    
@@ -280,6 +280,37 @@ protected:
         return this;
     }
     NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
+
+    AST_Ptr getId() {
+        return child(1);
+    }
+
+    void addDecl(Decl* decl) {
+        getId()->addDecl(decl);
+    }
+
+    AST_Ptr resolveStaticSelections (const Environ* env) {
+        AST_Ptr id0 = this->child(0);
+        Decl* decl = id0->getDecl();
+        AST_Ptr id1 = getId();
+        if (decl != NULL) {
+            Decl_Vector decls;
+            decl->getEnviron()->find(id1->as_string(), decls);
+
+            for (Decl_Vector::const_iterator i = decls.begin ();
+                     i != decls.end ();
+                     i++)
+            {
+                if ((*i)->isMethod()) {
+                    id1->addDecl((*i));
+                    return id1;
+                }
+            }
+        } else {
+            fprintf(stderr, "Class not found.\n");
+        }
+        return id1;
+    }
 };
 
 NODE_FACTORY(Attributeref_AST, ATTRIBUTEREF);
