@@ -107,6 +107,15 @@ NODE_FACTORY(For_AST, FOR);
 /** def */
 class Def_AST : public AST_Tree {
 protected:
+    AST_Ptr resolveSimpleIds (const Environ* env)
+    {
+        AST_Ptr id = this->child(0);
+        const Environ* func_env = id->getDecl()->getEnviron();
+        for_each_child_var (c, this) {
+            c = c->resolveSimpleIds(func_env);
+        } end_for;
+        return this;
+    }
     NODE_CONSTRUCTORS(Def_AST, AST_Tree);
 };
 
@@ -131,6 +140,27 @@ NODE_FACTORY(Formalslist_AST, FORMALS_LIST);
 /** Class */
 class Class_AST : public AST_Tree {
 protected:
+
+    AST_Ptr resolveSimpleIds (const Environ* env)
+    {
+        AST_Ptr id = this->child(0)
+        const Environ* class_env = id->getDecl()->getEnviron();
+        for_each_child_var (c, this){
+            c = c->resolveSimpleIds (class_env);
+        } end_for;
+        return this;
+    }
+
+    void collectTypeVarDecls (Decl* enclosing){
+        AST_Ptr params = this->child(1);
+        for (unsigned int count = 0; count < params->arity(); count++){
+            AST_Ptr param = params->child(count);
+            AST_Ptr paramId = param->child(0);
+            Decl* paramType = makeTypeVarDecl(ParamId->as_string(), param);
+            param->addDecl(paramType);
+        }
+    }
+
     NODE_CONSTRUCTORS(Class_AST, AST_Tree);
 };
 
@@ -172,5 +202,29 @@ protected:
 
 NODE_FACTORY(Assign_AST, ASSIGN);
 
+class Type_AST : public AST_Tree {
+protected:
+    Type_AST resolveSimpleIds (const Environ* env)
+    {
+        AST_Ptr id = this->child(0);
+        gcstring name = id->as_string();
+        Decl* decl = classes->find(name);
+        if (decl != NULL && id->numDecls() == 0){
+            id->addDecl(decl);
+        }
+        return this;
+    }
 
+    void resolveSimpleTypeIds (const Environ* env)
+    {
+        AST_Ptr id = this->child(0);
+        Decl* decl = classes->find(id->as_string());
+        if (decl != NULL){
+            this->addDecl(decl);
+        }
+    }
+    NODE_CONSTRUCTORS(Type_AST, AST_Tree);
+};
+
+NODE_FACTORY(Type_AST, TYPE);
 

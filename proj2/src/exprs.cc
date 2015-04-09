@@ -141,6 +141,34 @@ protected:
 class Call_AST : public Callable {
 protected:
 
+    AST_Ptr resolveAllocators (const Environ* env){
+        if (this->child(0)->oper()->syntax() == TYPE){
+            AST_Ptr init_tree = make_id("__init__", "0");
+            gcstring name = this->child(0)->child(0)->as_string();
+            Decl* decl = classes->find(name);
+            Decl* init_decl = decl->getEnviron()->find_immediate("__init__");
+            init_tree->addDecl(init_decl);
+            AST_Ptr new_tree = consTree(NEW, this->child(0));
+            std::vector <AST_Ptr> temp;
+            temp.push_back(init_tree);
+            temp.push_back(consTree(NEW, this->child(0)));
+            if (this->arity() >= 2){
+                // AST_Ptr expr_tree = this->child(1);
+                for (int i = 1; i < this->arity(); i++){
+                temp.push_back(this->child(i));
+                }
+            }
+            AST_Ptr* new_args = &temp[0];
+            // AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
+            // return AST::make_tree(CALL1, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
+            return AST::make_tree(CALL1, &temp[0], &temp[temp.size()]);
+        } else {
+            for_each_child_var (c, this) {
+                c = c->resolveAllocators (env)l;
+            } end_for;
+        }
+        return this;
+    }
     NODE_CONSTRUCTORS (Call_AST, Callable);
 
 
@@ -177,6 +205,28 @@ class ID_AST : public AST_Tree {
         if (decl != NULL) {
             this->addDecl(decl);
         }
+    }
+
+    AST_Ptr resolveSimpleIds (const Environ* env)
+    {
+        Decl_Vector decls;
+        gcstring name = id->as_string();
+        Decl* decl = classes->find(name);
+        if (decl != NULL && this->numDecls() == 0){
+            this->addDecl(decl);
+            return consTree(TYPE, this, consTree(TYPE_LIST));
+        }
+        env->find(name, decls);
+        if (decls.size() == 0){
+            fprintf(stderr, "decl not found\n");
+        } else {
+            for (Decl_Vector::const_iterator i = decls.begin(); 
+                i != decls.end();
+                i++){
+                this->addDecl(*i);
+            }
+        }
+        return this;
     }
 };
 
@@ -218,7 +268,17 @@ NODE_FACTORY(LeftCompare_AST, LEFT_COMPARE);
 /** Attributeref */
 class Attributeref_AST : public Typed_Tree {
 protected:
-
+    AST_Ptr resolveSimpleIds (const Environ* env)
+    {
+        int count = 0;
+        for_each_child_var (c, this){
+            if (count == 0){
+                c = c->resolveSimpleIds(env);
+            }
+            count++;
+        } end_for;
+        return this;
+    }
     NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
 };
 

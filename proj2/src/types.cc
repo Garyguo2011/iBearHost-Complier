@@ -237,6 +237,8 @@ Type::hasFreeVariables (ASTSet& visited)
     return false;
 }
 
+
+
 void
 Type::setTypeBinding (Type_Ptr type)
 {
