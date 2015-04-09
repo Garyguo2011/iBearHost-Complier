@@ -168,6 +168,20 @@ NODE_FACTORY (Unop_AST, UNOP);
 
 // FIXME: There are others as well.
 
+/** ID */
+class ID_AST : public AST_Tree {
+    NODE_CONSTRUCTORS(ID_AST, AST_Tree);
+
+    void addTargetDecls (Decl* enclosing) {
+        Decl* decl = enclosing -> addVarDecl(this);
+        if (decl != NULL) {
+            this->addDecl(decl);
+        }
+    }
+};
+
+NODE_FACTORY(ID_AST, ID);
+
 /** subscriptions */
 class Subscript_AST : public Callable {
     NODE_CONSTRUCTORS(Subscript_AST, Callable);

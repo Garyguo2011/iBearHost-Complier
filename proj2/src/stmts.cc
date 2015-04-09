@@ -156,6 +156,10 @@ NODE_FACTORY(TypeFormalsList_AST, TYPE_FORMALS_LIST);
 class TypedID_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(TypedID_AST, AST_Tree);
+
+    void addTargetDecls (Decl* enclosing) {
+        child(0) -> addTargetDecls(enclosing);
+    }
 };
 
 NODE_FACTORY(TypedID_AST, TYPED_ID);
