@@ -456,3 +456,11 @@ protected:
 
 NODE_FACTORY (ClassType_AST, TYPE);
 
+/** TypeList0 */
+class TypeList0_AST : public Type {
+protected:
+    NODE_CONSTRUCTORS(TypeList0_AST, Type);
+};
+
+NODE_FACTORY(TypeList0_AST, Type);
+

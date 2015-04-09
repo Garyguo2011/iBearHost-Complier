@@ -168,3 +168,104 @@ NODE_FACTORY (Unop_AST, UNOP);
 
 // FIXME: There are others as well.
 
+/** subscriptions */
+class Subscript_AST : public Callable {
+    NODE_CONSTRUCTORS(Subscript_AST, Callable);
+};
+
+NODE_FACTORY (Subscript_AST, SUBSCRIPT);
+
+/** slices */
+class Slice_AST : public Callable {
+    NODE_CONSTRUCTORS(Slice_AST, Callable);
+};
+
+NODE_FACTORY (Slice_AST, SLICE);
+
+/** Compare */
+class Compare_AST : public Binop_AST {
+protected:
+    
+    NODE_CONSTRUCTORS(Compare_AST, Binop_AST);
+
+};
+
+NODE_FACTORY(Compare_AST, COMPARE);
+
+/** Left Compare */
+class LeftCompare_AST : public Binop_AST {
+protected:
+
+    NODE_CONSTRUCTORS(LeftCompare_AST, Binop_AST);
+};
+
+NODE_FACTORY(LeftCompare_AST, LEFT_COMPARE);
+
+/** Attributeref */
+class Attributeref_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
+};
+
+NODE_FACTORY(Attributeref_AST, ATTRIBUTEREF);
+
+/** Tuple */
+class Tuple_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS(Tuple_AST, Typed_Tree);
+};
+
+NODE_FACTORY(Tuple_AST, TUPLE);
+
+/** TargetList (to be modified) */
+class TargetList_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS(TargetList_AST, Typed_Tree);
+};
+
+NODE_FACTORY(TargetList_AST, TARGET_LIST);
+
+/** List Display */
+class ListDisplay_AST : public Typed_Tree {
+protected:
+    NODE_CONSTRUCTORS(ListDisplay_AST, Typed_Tree);
+};
+
+NODE_FACTORY(ListDisplay_AST, LIST_DISPLAY);
+
+/** Dictionary Display */
+class DictDisplay_AST : public Typed_Tree {
+protected:
+    NODE_CONSTRUCTORS(DictDisplay_AST, Typed_Tree);
+};
+
+NODE_FACTORY(DictDisplay_AST, DICT_DISPLAY);
+
+/** If expression (to be organized. )*/
+class IfExpr_AST : public Typed_Tree {
+protected:
+    NODE_CONSTRUCTORS(IfExpr_AST, Typed_Tree);
+};
+
+NODE_FACTORY(IfExpr_AST, IF_EXPR);
+
+/** And (to be organized) */
+class And_AST : public Typed_Tree {
+protected:
+    NODE_CONSTRUCTORS(And_AST, Typed_Tree);
+};
+
+NODE_FACTORY(And_AST, AND);
+
+/** OR (to be organized) */
+class Or_AST : public Typed_Tree {
+protected:
+    NODE_CONSTRUCTORS(Or_AST, Typed_Tree);
+};
+
+NODE_FACTORY(Or_AST, OR);
+
+
