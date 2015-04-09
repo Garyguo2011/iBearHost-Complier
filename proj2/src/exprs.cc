@@ -221,11 +221,19 @@ protected:
 
     NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
 
+    AST_Ptr getId() {
+        return child(1);
+    }
+
+    void addDecl(Decl* decl) {
+        getId()->addDecl(decl);
+    }
+
     AST_Ptr resolveStaticSelections (const Environ* env) {
         AST_Ptr id0 = this->child(0);
         Decl* decl = id0->getDecl();
         if (decl != NULL) {
-            AST_Ptr id1 = this->child(1);
+            AST_Ptr id1 = getId();
             Decl_Vector decls;
             decl->getEnviron()->find(id1->as_string(), decls);
 
@@ -241,7 +249,7 @@ protected:
         } else {
             fprintf(stderr, "Class not found.\n");
         }
-        return this;
+        return id1;
     }
 };
 
