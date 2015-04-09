@@ -430,7 +430,10 @@ primary: atom
     | call
     ;
 
-attributeref: primary "."! identifier 
+attributeref: 
+      primary "."! identifier 
+                { $$ = $^(ATTRIBUTEREF, $*); }
+    | parameterized_type "."! identifier
                 { $$ = $^(ATTRIBUTEREF, $*); }
     ;
 
