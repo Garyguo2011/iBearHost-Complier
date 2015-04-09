@@ -24,6 +24,7 @@ Decl* strDecl;
 Decl* dictDecl;
 Decl* boolDecl;
 Decl* fileDecl;
+// TODO: FileDecl missing
 Decl* rangeDecl;
 
 /** List of declarations corresponding to the module and actual
@@ -44,7 +45,7 @@ Decl::Decl (const gcstring& name, Decl* container, Environ* members)
 void 
 Decl::print (ostream& out) const
 {
-    out << "(" << declTypeName () << " " << getIndex () << " " << getName();
+    out << "(" << declTypeName () << " " << getIndex () << " " << getName() << " ";
     printContainer (out);
     printPosition (out);
     printType (out);
@@ -74,11 +75,11 @@ Decl::printType (ostream& out) const {
 void
 Decl::printMembersList (ostream& out) const {
     if (_members != NULL) {
-	out << " (index_list";
-	const gcvector<Decl*>& members = getEnviron ()->get_members ();
-	for (size_t i = 0; i < members.size (); i += 1)
-	    out << " " << members[i]->getIndex ();
-	out << ")";
+        out << " (index_list";
+        const gcvector<Decl*>& members = getEnviron ()->get_members ();
+        for (size_t i = 0; i < members.size (); i += 1)
+            out << " " << members[i]->getIndex ();
+        out << ")";
     }
 }
 
@@ -161,15 +162,77 @@ const Environ*
 Decl::getEnviron () const
 {
     if (_members == NULL)
-	UNIMPLEMENTED (getEnviron);
+        UNIMPLEMENTED (getEnviron);
     return _members;
+}
+
+/* Determine whether this decl can add a variable
+ * of given id to its members
+ */
+bool
+Decl::canAddVar (AST_Ptr id)
+{
+    Decl_Vector exists;
+    const gcstring name = id->as_string();
+    _members->find_immediate(name, exists);
+    bool found = false;
+    for (Decl_Vector::const_iterator i = exists.begin ();
+         i != exists.end ();
+         i++) {
+        if ((*i)->getName() == name) {
+            if ((*i)->declTypeName() == "classdecl" ||
+                (*i)->declTypeName() == "funcdecl") {
+                id->recordError();
+                return false;
+            }
+            else if ((*i)->declTypeName() == "vardecl") {
+                found = true;
+            }
+        }
+    }
+    return !found;
+}
+
+/* Determine whether this decl can add a function
+ * of given id to its members
+ */
+bool
+Decl::canAddFunc (AST_Ptr id)
+{
+    Decl_Vector exists;
+    const gcstring name = id->as_string();
+    _members->find_immediate(name, exists);
+    for (Decl_Vector::const_iterator i = exists.begin ();
+         i != exists.end ();
+         i++) {
+        if ((*i)->getName() == name) {
+            if ((*i)->declTypeName() == "vardecl" ||
+                (*i)->declTypeName() == "classdecl") {
+                id->recordError();
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+/* Determine whether this decl can add a classkjjkk
+ * of given id to its members
+ */
+bool
+Decl::canAddClass (AST_Ptr id)
+{
+    if (classes->find_immediate(id->as_string()) == NULL) {
+        return true;
+    }
+    return false;
 }
 
 void
 Decl::addMember (Decl* new_member)
 {
     if (_members == NULL)
-	UNIMPLEMENTED (addMember);
+        UNIMPLEMENTED (addMember);
     _members->define (new_member);
 }
 
@@ -180,6 +243,11 @@ Decl::addVarDecl (AST_Ptr) {
 
 Decl*
 Decl::addDefDecl (AST_Ptr) {
+    UNIMPLEMENTED (addDefDecl);
+}
+
+Decl*
+Decl::addClassDecl (AST_Ptr) {
     UNIMPLEMENTED (addDefDecl);
 }
 
@@ -214,7 +282,7 @@ Decl::declTypeName () const
 class TypedDecl : public Decl {
 protected:
     TypedDecl (const gcstring& name, Decl* container, AST_Ptr type,
-	       Environ* members = NULL) 
+           Environ* members = NULL)
         :  Decl (name, container, members),
            _type (type == NULL ? NULL : type->asType ()) {
     }
@@ -222,10 +290,10 @@ protected:
 public:
 
     Type_Ptr getType () const {
-	if (isFrozen () || _type == NULL)
-	    return _type;
-	else
-	    return freshen (_type);
+        if (isFrozen () || _type == NULL)
+            return _type;
+        else
+            return freshen (_type);
     }
 
     void setType (Type_Ptr type) {
@@ -260,7 +328,7 @@ protected:
     }
 
     bool assignable () const {
-	return true;
+        return true;
     }
 
 };
@@ -295,7 +363,7 @@ protected:
     }
 
     bool assignable () const {
-	return true;
+        return true;
     }
 
 private:
@@ -325,7 +393,7 @@ protected:
     }
 
     bool assignable () const {
-	return true;
+        return true;
     }
 
 };
@@ -341,20 +409,20 @@ public:
 
     TypeVarDecl (const gcstring& name, AST_Ptr canonical)
         :  Decl (name, NULL) {
-	setAst (canonical);
+        setAst (canonical);
     }
 
 protected:
 
+    const char* declTypeName () const {
+        return "typevardecl";
+    }
+
     bool isInternal () const {
-	return getAst () != NULL && getAst ()->arity () == 0;
+        return getAst () != NULL && getAst ()->arity () == 0;
     }
 
     void printContainer (ostream&) const {
-    }
-
-    const char* declTypeName () const {
-        return "typevardecl";
     }
 
 };
@@ -369,7 +437,7 @@ class FuncDecl : public TypedDecl {
 public:
 
     FuncDecl (const gcstring& name, Decl* container, AST_Ptr type,
-	Environ* env)
+        Environ* env)
         :  TypedDecl (name, container, type, env) {
     }
 
@@ -384,15 +452,21 @@ protected:
     }
 
     Decl* addVarDecl (AST_Ptr id) {
-	Decl* decl = makeVarDecl (id->as_string (), this, Type::makeVar ());
-	addMember (decl);
-	return decl;
+        if (canAddVar(id)) {
+            Decl* decl = makeVarDecl (id->as_string (), this, Type::makeVar ());
+            addMember (decl);
+            return decl;
+        }
+        return NULL;
     }
 
     Decl* addDefDecl (AST_Ptr id) {
-	Decl* decl = makeFuncDecl (id->as_string (), this, NULL);
-	addMember (decl);
-	return decl;
+        if (canAddFunc(id)) {
+            Decl* decl = makeFuncDecl (id->as_string (), this, Type::makeVar ());
+            addMember (decl);
+            return decl;
+        }
+        return NULL;
     }
 };
 
@@ -400,7 +474,7 @@ Decl*
 makeFuncDecl (const gcstring& name, Decl* container, AST_Ptr type)
 {
     return new FuncDecl (name, container, type,
-			 new Environ (container->getEnviron ()));
+             new Environ (container->getEnviron ()));
 }
 
 class MethodDecl : public FuncDecl {
@@ -408,13 +482,13 @@ public:
 
     MethodDecl (const gcstring& name, Decl* container, AST_Ptr type)
         :  FuncDecl (name, container, type,
-		     new Environ (container->getEnviron ()->get_enclosure ())) {
+             new Environ (container->getEnviron ()->get_enclosure ())) {
     }
 
 protected:
 
     bool isMethod () const {
-	return true;
+        return true;
     }
 
 private:
@@ -438,8 +512,12 @@ public:
 
 protected:
 
+    const char* declTypeName () const {
+        return "classdecl";
+    }
+
     bool isType () const {
-	return true;
+    return true;
     }
 
     void printContainer (ostream&) const {
@@ -447,35 +525,31 @@ protected:
 
     void printTypeParams (ostream& out) const {
         out << " (index_list";
-	for_each_child (c, _params) {
-	    Decl* decl = c->getDecl ();
-	    if (decl == NULL)
-		out << " ?";
-	    else
-		out << " " << decl->getIndex ();
-	} end_for;
-	out << ")";
-    }
-
-    const char* declTypeName () const {
-        return "classdecl";
+        for_each_child (c, _params) {
+            Decl* decl = c->getDecl ();
+            if (decl == NULL)
+            out << " ?";
+            else
+            out << " " << decl->getIndex ();
+        } end_for;
+        out << ")";
     }
 
     Type_Ptr asType (int arity, Type_Ptr* params0) const {
         AST_Ptr* params = (AST_Ptr*) params0;
         if (getTypeArity () != -1 && getTypeArity () != arity) {
-	    throw range_error ("wrong number of type parameters");
+            throw range_error ("wrong number of type parameters");
         }
         for (int i = 0; i < arity; i += 1)
             if (params[i] == NULL)
                 throw domain_error ("attempt to pass null type parameter");
 
-	AST_Ptr id = make_id (getName ().c_str (), NULL);
-	id->addDecl (const_cast<ClassDecl*> (this));
+        AST_Ptr id = make_id (getName ().c_str (), NULL);
+        id->addDecl (const_cast<ClassDecl*> (this));
 
-	AST_Ptr result = consTree (TYPE, id);
-	result->append (params, params+arity);
-	return result->asType ();
+        AST_Ptr result = consTree (TYPE, id);
+        result->append (params, params+arity);
+        return result->asType ();
     }
 
     Type_Ptr asType (int arity, Type_Ptr t0, Type_Ptr t1) const {
@@ -492,19 +566,25 @@ protected:
     }
 
     Decl* addVarDecl (AST_Ptr id) {
-	Decl* decl = makeInstanceDecl (id->as_string (), this, Type::makeVar ());
-	addMember (decl);
-	return decl;
+        if (canAddVar(id)) {
+            Decl* decl = makeInstanceDecl (id->as_string (), this, Type::makeVar ());
+            addMember (decl);
+            return decl;
+        }
+        return NULL;
     }
 
     Decl* addDefDecl (AST_Ptr id) {
-	Decl* decl = makeMethodDecl (id->as_string (), this, NULL);
-	addMember (decl);
-	return decl;
+        if (canAddFunc(id)) {
+            Decl* decl = makeMethodDecl (id->as_string (), this, Type::makeVar ());
+            addMember (decl);
+            return decl;
+        }
+        return NULL;
     }
 
     int getTypeArity () const {
-	return _params->arity ();
+        return _params->arity ();
     }
 
     AST_Ptr _params;
@@ -513,7 +593,9 @@ protected:
 Decl*
 makeClassDecl (const gcstring& name, AST_Ptr params)
 {
-    return new ClassDecl (name, params);
+    Decl* decl = new ClassDecl (name, params);
+    classes->define(decl);
+    return decl;
 }
 
 class ModuleDecl : public Decl {
@@ -533,15 +615,32 @@ protected:
     }
 
     Decl* addVarDecl (AST_Ptr id) {
-	Decl* decl = makeVarDecl (id->as_string (), this, Type::makeVar ());
-	addMember (decl);
-	return decl;
+        if (canAddVar(id)) {
+            Decl* decl = makeVarDecl (id->as_string (), this, Type::makeVar ());
+            addMember (decl);
+            return decl;
+        }
+        return NULL;
     }
 
     Decl* addDefDecl (AST_Ptr id) {
-	Decl* decl = makeFuncDecl (id->as_string (), this, Type::makeVar ());
-	addMember (decl);
-	return decl;
+        if (canAddFunc(id)) {
+            Decl* decl = makeFuncDecl (id->as_string (), this, Type::makeVar ());
+            addMember (decl);
+            return decl;
+        }
+        return NULL;
+    }
+
+    Decl* addClassDecl (AST_Ptr clazz) {
+        AST_Ptr id = clazz->child(0);
+        if (canAddClass(id)) {
+            AST_Ptr params = clazz->child(1);
+            Decl* decl = makeClassDecl (id->as_string (), params);
+            addMember(decl);
+            return decl;
+        }
+        return NULL;
     }
 
 };
@@ -549,16 +648,18 @@ protected:
 Decl*
 makeModuleDecl (const gcstring& name)
 {
-    return new ModuleDecl (name);
+    fileDecl = new ModuleDecl (name);
+    return fileDecl;
 }
 
 void
 outputDecls (ostream& out)
 {
+    out << endl;
     for (size_t i = 0; i < allDecls.size (); i += 1) {
-	if (!allDecls[i]->isInternal ()) {
-	    allDecls[i]->print (out);
-	    out << endl;
-	}
+        if (!allDecls[i]->isInternal ()) {
+            allDecls[i]->print (out);
+            out << endl;
+        }
     }
 }
