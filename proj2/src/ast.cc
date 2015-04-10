@@ -77,30 +77,35 @@ AST::numDecls ()
 Decl*
 AST::getDecl (int k)
 {
+    error(loc(), "");
     throw logic_error ("node does not represent a named entity");
 }
 
 void
 AST::addDecl (Decl* decl)
 {
+    error(loc(), "");
     throw logic_error ("node does not represent a named entity");
 }
 
 void
 AST::removeDecl (int k)
-{ 
+{
+    error(loc(), ""); 
     throw logic_error ("node does not represent a named entity");
 }
 
 Type_Ptr
 AST::getType ()
 {
+    error(loc(), "");
     throw logic_error ("node does not represent something with a type");
 }
 
 bool
 AST::setType (Type_Ptr type, Unifier& subst)
 {
+    error(loc(), "");
     throw logic_error ("node does not represent something with a type");
 }
 
@@ -115,10 +120,7 @@ AST::doOuterSemantics ()
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
     dast = dast->resolveAllocators(fileDecl->getEnviron());
     // dast = dast->resolveStaticSelections(fileDecl->getEnviron());
-    // dast->resolveTypesOuter(fileDecl);
-    // Unifier* subst = new Unifier();
-    // dast->resolveTypes(fileDecl, *subst);
-    // subst->setBindings();
+    dast->resolveTypesOuter(fileDecl);
     return dast;
 }
 
@@ -146,8 +148,8 @@ AST::addTargetDecls (Decl* enclosing)
 AST_Ptr
 AST::resolveSimpleIds (const Environ* env)
 {
-    for_each_child (c, this) {
-        c->resolveSimpleIds (env);
+    for_each_child_var (c, this) {
+        c = c->resolveSimpleIds (env);
     } end_for;
     return this;
 }

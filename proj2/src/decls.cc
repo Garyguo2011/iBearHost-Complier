@@ -556,9 +556,9 @@ protected:
 
         AST_Ptr id = make_id (getName ().c_str (), NULL);
         id->addDecl (const_cast<ClassDecl*> (this));
-
         AST_Ptr result = consTree (TYPE, id);
         result->append (params, params+arity);
+        
         return result->asType ();
     }
 
@@ -648,6 +648,7 @@ protected:
             AST_Ptr params = clazz->child(1);
             Decl* decl = makeClassDecl (id->as_string (), params);
             addMember(decl);
+            classes->define(decl);
             return decl;
         }
         return NULL;
