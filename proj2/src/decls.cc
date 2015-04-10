@@ -185,7 +185,8 @@ Decl::canAddVar (AST_Ptr id)
                 id->recordError();
                 return false;
             }
-            else if ((*i)->declTypeName() == "vardecl") {
+            else if ((*i)->declTypeName() == "vardecl" ||
+                     (*i)->declTypeName() == "paramdecl") {
                 found = true;
             }
         }
