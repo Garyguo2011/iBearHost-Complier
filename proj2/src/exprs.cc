@@ -166,7 +166,7 @@ protected:
                     temp.push_back(this->child(i));
                     }
                 }
-                AST_Ptr* new_args = &temp[0];
+                // AST_Ptr* new_args = &temp[0];
                 // AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
                 // return AST::make_tree(CALL1, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
                 return AST::make_tree(CALL1, &temp[0], &temp[temp.size()]);    

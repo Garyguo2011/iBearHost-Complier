@@ -123,7 +123,9 @@ protected:
         Decl_Vector decls;
         gcstring name = as_string();
         Decl* decl = classes->find(name);
-        if (decl != NULL && numDecls() == 0){;
+        if (decl != NULL && numDecls() == 0){
+            fprintf(stderr, "this id is a type \n");
+            print(cerr, 4);
             addDecl(decl);
             return consTree(TYPE, this, consTree(TYPE_LIST));
         } 

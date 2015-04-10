@@ -148,8 +148,8 @@ AST::addTargetDecls (Decl* enclosing)
 AST_Ptr
 AST::resolveSimpleIds (const Environ* env)
 {
-    for_each_child (c, this) {
-        c->resolveSimpleIds (env);
+    for_each_child_var (c, this) {
+        c = c->resolveSimpleIds (env);
     } end_for;
     return this;
 }
