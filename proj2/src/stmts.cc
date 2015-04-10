@@ -122,14 +122,6 @@ protected:
         AST_Ptr id = child(0);
         const Environ* func_env = id->getDecl()->getEnviron();
         for_each_child_var (c, this) {
-            if (c->oper()->syntax() == TYPE) {
-                AST_Ptr id = c->child(0);
-                gcstring name = id->as_string();
-                Decl* decl = classes->find(name);
-                if (decl != NULL && id->numDecls() == 0) {
-                    id->addDecl(decl);
-                }
-            }
             c = c->resolveSimpleIds(func_env);
         } end_for;
         return this;
@@ -167,16 +159,25 @@ protected:
 
     void collectDecls (Decl* enclosing)
     {
+        int count = 0;
         for_each_child(c, this) {
-            if (c->oper()->syntax() == ID) {
-                c->addDecl(makeParamDecl(c->as_string(), enclosing, 1, Type::makeVar()));
-            } else {
-                c->collectDecls(enclosing);
+            Decl* decl;
+            if (c->oper()->syntax() == TYPED_ID) {
+                decl = makeParamDecl(c->as_string(), 
+                                        enclosing, 
+                                        count, 
+                                        c->child(1));
+                c->getId()->addDecl(decl);
+            } 
+            else {
+                decl = makeParamDecl(c->as_string(),
+                                    enclosing,
+                                    count,
+                                    Type::makeVar());
+                c->addDecl(decl);
             }
-        } end_for;
-        // fprintf(stderr, "collectDecls Formalslist\n");
-        for_each_child(c, this) {
-            c->collectTypeVarDecls(enclosing);
+            count++;
+            enclosing->addMember(decl);
         } end_for;
     }
 
@@ -219,43 +220,40 @@ protected:
 
         Decl* decl = makeClassDecl(name, typeFormals);
         if (decl != NULL) {
-            if (name != "str" || name != "int" || name != "bool" || name != "range" || name != "tuple0") {
-                collectTypeVarDecls(decl);
-            }
             if (name == "str") {
                 strDecl = decl;
             }
-            if (name == "int") {
+            else if (name == "int") {
                 intDecl = decl;
             }
-            if (name == "bool") {
+            else if (name == "bool") {
                 boolDecl = decl;
             }
-            if (name == "range") {
+            else if (name == "range") {
                 rangeDecl = decl;
             }
-            if (name == "list") {
+            else if (name == "list") {
                 listDecl = decl;
             }
-            if (name == "dict") {
+            else if (name == "dict") {
                 dictDecl = decl;
             }
-            if (name == "tuple0") {
+            else if (name == "tuple0") {
                 tuple0Decl = decl;
             }
-            if (name == "tuple1") {
+            else if (name == "tuple1") {
                 tuple1Decl = decl;
             }
-            if (name == "tuple2"){
+            else if (name == "tuple2"){
                 tuple2Decl = decl;
             }
-            if (name == "tuple3"){
+            else if (name == "tuple3"){
                 tuple3Decl = decl;
             }
-
+            this->collectTypeVarDecls(decl);
             id->addDecl(decl);
-            typeFormals->collectDecls(decl);
             block->collectDecls(decl);
+            classes->define(decl);
             enclosing->addMember(decl);
         }
     }
@@ -306,6 +304,7 @@ NODE_FACTORY(TypeFormalsList_AST, TYPE_FORMALS_LIST);
 
 /** TypedID */
 class TypedID_AST : public AST_Tree {
+    
 protected:
     NODE_CONSTRUCTORS(TypedID_AST, AST_Tree);
 
@@ -314,58 +313,15 @@ protected:
         return child(0);
     }
 
-    void collectDecls (Decl* enclosing)
-    {
-        AST_Ptr id = getId();
-        gcstring name = id->as_string();
-        const Environ* env = enclosing->getEnviron();
-        if (env->find(name) != NULL) {
-            fprintf(stderr, "This type has been defined previously. \n");
-        } else {
-            Decl* temp = makeParamDecl(name, enclosing, 2, child(1));
-            id->addDecl(temp);
-            //Should Handle Type
-
-        }
-
-        // for (unsigned int count = 0; count < this -> arity(); count++) {
-        //     AST_Ptr param = child(count);
-        //     Decl* decl;
-        //     decl = makeParamDecl(param->child(0)->as_string(),
-        //                         enclosing,
-        //                         count,
-        //                         param->child(1));
-        //     param->child(0)->addDecl(decl);
-        // }
-    }
-
     void addTargetDecls (Decl* enclosing) {
-        getId() -> addTargetDecls(enclosing);
+        AST_Ptr id = getId();
+        Decl* decl = enclosing->addVarDecl(id);
+        if (decl != NULL) {
+            decl->setType((Type_Ptr)child(1));
+            id->addDecl(decl);
+        }
     }
 
-    AST_Ptr resolveSimpleIds (const Environ* env)
-    {
-        Decl_Vector decls;
-        AST_Ptr id = child(0);
-        gcstring name = id->as_string();
-        Decl* decl = classes->find(name);
-        if (decl != NULL && this->numDecls() == 0){
-            this->addDecl(decl);
-            return consTree(TYPE, this, consTree(TYPE_LIST));
-        }
-        //DB(env);
-        env->find(name, decls);
-        if (decls.size() == 0){
-            //fprintf(stderr, "decl not found\n");
-        } else {
-            for (Decl_Vector::const_iterator i = decls.begin(); 
-                i != decls.end();
-                i++){
-                this->addDecl(*i);
-            }
-        }
-        return this;
-    }
     /* DEBUGGING */
 
     void

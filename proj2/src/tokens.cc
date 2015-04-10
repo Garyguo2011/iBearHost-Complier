@@ -100,13 +100,45 @@ TOKEN_FACTORY(Int_Token, INT_LITERAL);
 
 /** Represents an identifier. */
 class Id_Token : public Typed_Token {
+
 protected:
+    
+    void addTargetDecls(Decl* enclosing) {
+        Decl* decl = enclosing->addVarDecl(this);
+        if (decl != NULL) {
+            addDecl(decl);
+        }
+    }
 
     void _print (ostream& out, int indent, ASTSet& visited) {
 	out << "(id " << lineNumber () << " " << as_string ();
         if (getDecl () != NULL)
             out << " " << getDecl ()->getIndex ();
         out << ")";
+    }
+
+
+    AST_Ptr resolveSimpleIds (const Environ* env)
+    {
+        Decl_Vector decls;
+        gcstring name = this->as_string();
+        Decl* decl = classes->find(name);
+        if (decl != NULL && this->numDecls() == 0){
+            this->addDecl(decl);
+            return consTree(TYPE, this, consTree(TYPE_LIST));
+        }
+        //DB(env);
+        env->find(name, decls);
+        if (decls.size() == 0){
+            //fprintf(stderr, "decl not found\n");
+        } else {
+            for (Decl_Vector::const_iterator i = decls.begin(); 
+                i != decls.end();
+                i++){
+                this->addDecl(*i);
+            }
+        }
+        return this;
     }
 
     TOKEN_CONSTRUCTORS (Id_Token, Typed_Token);
