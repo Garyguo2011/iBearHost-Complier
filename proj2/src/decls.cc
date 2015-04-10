@@ -556,9 +556,9 @@ protected:
 
         AST_Ptr id = make_id (getName ().c_str (), NULL);
         id->addDecl (const_cast<ClassDecl*> (this));
-
         AST_Ptr result = consTree (TYPE, id);
         result->append (params, params+arity);
+        
         return result->asType ();
     }
 

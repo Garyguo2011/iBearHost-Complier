@@ -83,6 +83,10 @@ protected:
         return boolDecl->asType ();
     }
 
+    void resolveTypes (Decl* context, Unifier& subst) {
+        setType(computeType(), subst);
+    }
+
 };
 
 NODE_FACTORY(True_AST, TRUE);
@@ -97,6 +101,9 @@ protected:
         return boolDecl->asType ();
     }
 
+    void resolveTypes (Decl* context, Unifier& subst) {
+        setType(computeType(), subst);
+    }
 };
 
 NODE_FACTORY(False_AST, FALSE);
@@ -299,6 +306,49 @@ class Tuple_AST : public Typed_Tree {
 protected:
 
     NODE_CONSTRUCTORS(Tuple_AST, Typed_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes (context, subst);
+
+        switch (arity())
+        {
+            case 0:
+            {
+                setType(tuple0Decl->asType(), subst);
+                break;
+            }
+            case 1:
+            {
+                Type_Ptr type_list[1];
+                type_list[0] = child(0)->getType();
+                setType(tuple1Decl->asType(arity(), type_list), subst);
+                break;
+            }
+            case 2:
+            {
+                Type_Ptr type_list[2];
+                type_list[0] = child(0)->getType();
+                type_list[1] = child(1)->getType();
+                setType(tuple2Decl->asType(arity(), type_list), subst);
+                break;
+            }
+            case 3:
+            {
+                Type_Ptr type_list[3];
+                type_list[0] = child(0)->getType();
+                type_list[1] = child(1)->getType();
+                type_list[2] = child(2)->getType();
+                setType(tuple3Decl->asType(arity(), type_list), subst);
+                break;
+            }
+            default:
+            {
+                error(loc(), "Tuple has more than 3 children");
+                throw logic_error("");
+            }
+        }
+    }
+
 };
 
 NODE_FACTORY(Tuple_AST, TUPLE);
@@ -316,6 +366,24 @@ NODE_FACTORY(TargetList_AST, TARGET_LIST);
 class ListDisplay_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(ListDisplay_AST, Typed_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes (context, subst);
+        if (arity() == 0) {
+            setType(listDecl->asType (1, Type::makeVar()), subst);
+        } else {
+            Type_Ptr elements[1];
+            elements[0] = child(0)->getType();
+            Type_Ptr first_type = elements[0];
+            for (int i = 1; i < arity() ; i++) {
+                if (!unify(first_type, child(i)->getType(), subst)) {
+                    error (loc (), "Elements in list are not same types");
+                    throw logic_error("");
+                }
+            }
+            setType(listDecl->asType(1, elements), subst);
+        }
+    }
 };
 
 NODE_FACTORY(ListDisplay_AST, LIST_DISPLAY);
@@ -332,6 +400,22 @@ NODE_FACTORY(DictDisplay_AST, DICT_DISPLAY);
 class IfExpr_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(IfExpr_AST, Typed_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes (context, subst);
+
+        if (!unify(child(0)->getType(), boolDecl->asType(), subst)) {
+            error(loc(), "IF_EXPR expression is not bool");
+            throw logic_error("");
+        }
+
+        if (unify(child(1)->getType(), child(2)->getType(), subst)) {
+            setType(child(1)->getType(), subst);
+        } else {
+            error(loc(), "IF_EXPR Inconsistent Types");
+            throw logic_error("");
+        }
+    }
 };
 
 NODE_FACTORY(IfExpr_AST, IF_EXPR);
@@ -340,6 +424,17 @@ NODE_FACTORY(IfExpr_AST, IF_EXPR);
 class And_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(And_AST, Typed_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST_Tree::resolveTypes (context, subst);
+
+        if (!unify(child(0)->getType(), child(1)->getType(), subst)) {
+            error (loc (), "And Statement Expressions doesn't match");
+            throw logic_error("");
+        } else {
+            setType(child(0)->getType(), subst);    
+        }
+    }
 };
 
 NODE_FACTORY(And_AST, AND);
@@ -348,6 +443,17 @@ NODE_FACTORY(And_AST, AND);
 class Or_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(Or_AST, Typed_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST_Tree::resolveTypes (context, subst);
+
+        if (!unify(child(0)->getType(), child(1)->getType(), subst)) {
+            error (loc (), "Or Statement Expressions doesn't match");
+            throw logic_error("");
+        } else {
+            setType(child(0)->getType(), subst);    
+        }
+    }
 };
 
 NODE_FACTORY(Or_AST, OR);

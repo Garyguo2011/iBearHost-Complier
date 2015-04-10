@@ -84,6 +84,14 @@ NODE_FACTORY(Continue_AST, CONTINUE);
 class If_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(If_AST, AST_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes (context, subst);
+        if (!unify(child(0)->getType(), boolDecl->asType(), subst)) {
+            error(loc(), "If expresion is not bool");
+            throw logic_error("");
+        }
+    }
 };
 
 NODE_FACTORY(If_AST, IF);
@@ -92,6 +100,15 @@ NODE_FACTORY(If_AST, IF);
 class While_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(While_AST, AST_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes(context, subst);
+
+        if (!unify(child(0)->getType(), boolDecl->asType(), subst)) {
+            error(loc(), "While expresion is not bool");
+            throw logic_error("");
+        }
+    }    
 };
 
 NODE_FACTORY(While_AST, WHILE);
@@ -357,29 +374,6 @@ protected:
             id->addDecl(decl);
         }
     }
-
-    /* DEBUGGING */
-
-    void
-    DB (const Environ* env)
-    {
-        if (env == NULL) {
-            fprintf (stderr, "NULL\n");
-        } else {
-            const char* label;
-            label = "Immediate";
-            while (env != NULL) {
-                const Decl_Vector& members = env->get_members ();
-                fprintf (stderr, "%s:\n", label);
-                for (size_t i = 0; i < members.size (); i += 1) {
-                    fprintf (stderr, "   %s @%p\n", members[i]->getName ().c_str (),
-                             members[i]);
-                }
-                env = env->get_enclosure ();
-                label = "Enclosed by";
-            }
-        }
-    }
 };
 
 NODE_FACTORY(TypedID_AST, TYPED_ID);
@@ -394,6 +388,19 @@ protected:
         //fprintf(stderr, "collectDecls assign\n");
         child(0)->addTargetDecls(enclosing);
         child(1)->collectDecls(enclosing);
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst)
+    {
+        AST::resolveTypes (context, subst);
+
+        // consider more complex example
+        if (unify(child(0)->getType(), child(1)->getType(),subst)) {
+            setType(child(0)->getType(), subst);
+        } else {
+            error(loc(), "Assign left and right type inconsistency");
+            throw logic_error("");
+        }
     }
 };
 
