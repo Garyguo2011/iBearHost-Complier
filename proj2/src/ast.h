@@ -152,12 +152,7 @@ public:
      *  OBJ is not a class, so that the possible meanings of ID depends 
      *  on the type of OBJ).  During resolution, all def's in me are
      *  frozen---i.e., references to them do not create fresh type
-     *  variables. Returns the modified tree.   The return value
-     *  differs from THIS only in the case where I am a call whose
-     *  function has the form OBJ.ID, and this is found to denote a
-     *  (possibly overloaded) method, in which case the return value
-     *  is me rewritten as an ordinary call (that is OBJ.ID(ARG1, ...)
-     *  becomes ID(OBJ, ARG1, ...)). */
+     *  variables. */
     virtual void resolveTypesOuter(Decl* context);
 
     /** Attempt to determine the types of me and my subcomponents.

@@ -32,6 +32,16 @@ Decl* rangeDecl;
  *  introduced by freshen). */
 static gcvector<Decl*> allDecls;
 
+/** Utility for printing types in Decls. */
+static void
+outType (Type_Ptr type, ostream& out) {
+    out << " ";
+    if (type != NULL) {
+	type->binding ()->print (cout, 0);
+    } else
+	out << "?";
+}
+
 Decl::Decl (const gcstring& name, Decl* container, Environ* members)
     : _frozen (true), _name (name), _container (container),
       _members (members) {
@@ -304,11 +314,7 @@ public:
 protected:
 
     void printType (ostream& out) const {
-        out << " ";
-        if (_type != NULL) {
-            _type->binding ()->print (cout, 0);
-        } else
-            out << "?";
+	outType (_type, out);
     }
 
 private:
@@ -427,6 +433,10 @@ protected:
     void printContainer (ostream& out) const {
         _canonical->print(out, 0);
     };
+
+    void printType (ostream& out) const {
+	outType (getAst ()->asType (), out);
+    }
 
 };
 

@@ -431,6 +431,23 @@ protected:
         return child (0)->asType ();
     }
 
+    int numTypeParams () {
+        return arity ();
+    }
+
+    Type_Ptr typeParam (int k) {
+        return child (k)->asType ();
+    }
+
+    Type_Ptr boundFunctionType () {
+        if (numParams () == 0)
+            return NULL;
+        Type_Ptr result = consTree (FUNCTION_TYPE, returnType ())->asType ();
+        for (int i = 1; i < numParams (); i += 1)
+            result->append(paramType (i));
+        return result;
+    }
+
     NODE_CONSTRUCTORS (FunctionType_AST, Type);
 
 };
