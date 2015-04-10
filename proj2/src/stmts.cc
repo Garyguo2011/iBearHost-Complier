@@ -390,18 +390,18 @@ protected:
         child(1)->collectDecls(enclosing);
     }
 
-    void resolveTypes (Decl* context, Unifier& subst)
-    {
-        AST::resolveTypes (context, subst);
+    // void resolveTypes (Decl* context, Unifier& subst)
+    // {
+    //     AST::resolveTypes (context, subst);
 
-        // consider more complex example
-        if (unify(child(0)->getType(), child(1)->getType(),subst)) {
-            setType(child(0)->getType(), subst);
-        } else {
-            error(loc(), "Assign left and right type inconsistency");
-            throw logic_error("");
-        }
-    }
+    //     // consider more complex example
+    //     if (unify(child(0)->getType(), child(1)->getType(),subst)) {
+    //         setType(child(0)->getType(), subst);
+    //     } else {
+    //         error(loc(), "Assign left and right type inconsistency");
+    //         throw logic_error("");
+    //     }
+    // }
 };
 
 NODE_FACTORY(Assign_AST, ASSIGN);

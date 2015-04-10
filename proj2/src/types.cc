@@ -27,31 +27,31 @@ AST::resolveTypesOuter (Decl* context)
         // for_each_child (c, this) {
         // } end_for;
 
-    switch (this->oper()->syntax()) {
-        // case AND:
-        // case TRUE:
-        // case FALSE:
-        case LIST_DISPLAY:
-        case IF_EXPR:
-        case TUPLE:
-        {
-            this->print(cerr, 4);
-            cerr << "\n";
-            getType()->print(cerr, 4);
-            break;   
-        }
-        case WHILE:
-        case IF:
-        {
-            this->print(cerr, 4);
-            cerr << "\n";
-            // getType()->print(cerr, 4);
-            break;
-        }
-        default:
-            break;
+    // switch (this->oper()->syntax()) {
+    //     // case AND:
+    //     // case TRUE:
+    //     // case FALSE:
+    //     case LIST_DISPLAY:
+    //     case IF_EXPR:
+    //     case TUPLE:
+    //     {
+    //         this->print(cerr, 4);
+    //         cerr << "\n";
+    //         getType()->print(cerr, 4);
+    //         break;   
+    //     }
+    //     case WHILE:
+    //     case IF:
+    //     {
+    //         this->print(cerr, 4);
+    //         cerr << "\n";
+    //         // getType()->print(cerr, 4);
+    //         break;
+    //     }
+    //     default:
+    //         break;
 
-    }
+    // }
     
     // cerr << "\n";
 

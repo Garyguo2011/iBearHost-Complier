@@ -154,21 +154,28 @@ protected:
             gcstring name = this->child(0)->child(0)->as_string();
             Decl* decl = classes->find(name);
             Decl* init_decl = decl->getEnviron()->find_immediate("__init__");
-            init_tree->addDecl(init_decl);
-            AST_Ptr new_tree = consTree(NEW, this->child(0));
-            std::vector <AST_Ptr> temp;
-            temp.push_back(init_tree);
-            temp.push_back(consTree(NEW, this->child(0)));
-            if (this->arity() >= 2){
-                // AST_Ptr expr_tree = this->child(1);
-                for (int i = 1; i < this->arity(); i++){
-                temp.push_back(this->child(i));
+            if (decl != NULL){
+                init_tree->addDecl(init_decl);
+                AST_Ptr new_tree = consTree(NEW, this->child(0));
+                std::vector <AST_Ptr> temp;
+                temp.push_back(init_tree);
+                temp.push_back(consTree(NEW, this->child(0)));
+                if (this->arity() >= 2){
+                    // AST_Ptr expr_tree = this->child(1);
+                    for (int i = 1; i < this->arity(); i++){
+                    temp.push_back(this->child(i));
+                    }
                 }
+                AST_Ptr* new_args = &temp[0];
+                // AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
+                // return AST::make_tree(CALL1, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
+                return AST::make_tree(CALL1, &temp[0], &temp[temp.size()]);    
+            } else {
+                for_each_child_var (c, this) {
+                    c = c->resolveAllocators (env);
+                }   end_for;    
             }
-            AST_Ptr* new_args = &temp[0];
-            // AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
-            // return AST::make_tree(CALL1, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
-            return AST::make_tree(CALL1, &temp[0], &temp[temp.size()]);
+            
         } else {
             for_each_child_var (c, this) {
                 c = c->resolveAllocators (env);
