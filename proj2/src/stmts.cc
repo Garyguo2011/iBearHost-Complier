@@ -102,7 +102,6 @@ protected:
     NODE_CONSTRUCTORS(For_AST, AST_Tree);
 
     void collectDecls (Decl* enclosing) {
-        //fprintf(stderr, "collectDecls For\n");
         AST_Ptr target = child(0);
         for (size_t i = 1; i < arity (); i += 1) {
             child (i)->collectDecls (enclosing);
@@ -117,6 +116,8 @@ NODE_FACTORY(For_AST, FOR);
 /** def */
 class Def_AST : public AST_Tree {
 protected:
+    NODE_CONSTRUCTORS(Def_AST, AST_Tree);
+
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
         AST_Ptr id = child(0);
@@ -126,11 +127,9 @@ protected:
         } end_for;
         return this;
     }
-    NODE_CONSTRUCTORS(Def_AST, AST_Tree);
 
     void collectDecls (Decl* enclosing)
     {
-        //fprintf(stderr, "collectDecls def\n");
         AST_Ptr id = child(0);
         Decl* decl = enclosing->addDefDecl(id);
         if (decl != NULL) {
@@ -163,7 +162,7 @@ protected:
         for_each_child(c, this) {
             Decl* decl;
             if (c->oper()->syntax() == TYPED_ID) {
-                decl = makeParamDecl(c->as_string(), 
+                decl = makeParamDecl(c->getId()->as_string(), 
                                         enclosing, 
                                         count, 
                                         c->child(1));
@@ -189,6 +188,8 @@ NODE_FACTORY(Formalslist_AST, FORMALS_LIST);
 class Class_AST : public AST_Tree {
 protected:
 
+    NODE_CONSTRUCTORS(Class_AST, AST_Tree);
+
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
         AST_Ptr id = child(0);
@@ -201,60 +202,95 @@ protected:
 
     void collectTypeVarDecls (Decl* enclosing){
         AST_Ptr params = child(1);
-        for (unsigned int count = 0; count < params->arity(); count++){
-            AST_Ptr param = params->child(count);
+        for_each_child_var(param, params) {
             AST_Ptr paramId = param->child(0);
             Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
             param->addDecl(paramType);
-        }
+        } end_for;
     }
 
-    NODE_CONSTRUCTORS(Class_AST, AST_Tree);
-
     void collectDecls (Decl* enclosing) {
-        //fprintf(stderr, "collectDecls class\n");
+        
         AST_Ptr id = child(0);
-        AST_Ptr typeFormals = child(1);
-        AST_Ptr block = child(2);
+        AST_Ptr params = child(1);
         const gcstring name = id->as_string();
-
-        Decl* decl = makeClassDecl(name, typeFormals);
-        if (decl != NULL) {
-            if (name == "str") {
-                strDecl = decl;
-            }
-            else if (name == "int") {
-                intDecl = decl;
-            }
-            else if (name == "bool") {
-                boolDecl = decl;
-            }
-            else if (name == "range") {
-                rangeDecl = decl;
-            }
-            else if (name == "list") {
-                listDecl = decl;
-            }
-            else if (name == "dict") {
-                dictDecl = decl;
-            }
-            else if (name == "tuple0") {
-                tuple0Decl = decl;
-            }
-            else if (name == "tuple1") {
-                tuple1Decl = decl;
-            }
-            else if (name == "tuple2"){
-                tuple2Decl = decl;
-            }
-            else if (name == "tuple3"){
-                tuple3Decl = decl;
-            }
-            this->collectTypeVarDecls(decl);
+        if (name == "str") {
+            Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+            strDecl = decl;
             id->addDecl(decl);
-            block->collectDecls(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
+        }
+        else if (name == "int") {
+            Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
+            intDecl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        else if (name == "bool") {
+            Decl* decl = makeClassDecl(name, params);
+            boolDecl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        else if (name == "range") {
+            Decl* decl = makeClassDecl(name, params);
+            rangeDecl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        // need inline substitution
+        else if (name == "list") {
+            Decl* decl = makeClassDecl(name, params);
+            collectTypeVarDecls(decl);
+            listDecl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        else if (name == "dict") {
+            Decl* decl = makeClassDecl(name, params);
+            collectTypeVarDecls(decl);
+            dictDecl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        else if (name == "tuple0") {
+            Decl* decl = makeClassDecl(name, params);
+            tuple0Decl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        else if (name == "tuple1") {
+            Decl* decl = makeClassDecl(name, params);
+            collectTypeVarDecls(decl);
+            tuple1Decl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        else if (name == "tuple2"){
+            Decl* decl = makeClassDecl(name, params);
+            collectTypeVarDecls(decl);
+            tuple2Decl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        else if (name == "tuple3"){
+            Decl* decl = makeClassDecl(name, params);
+            collectTypeVarDecls(decl);
+            tuple3Decl = decl;
+            id->addDecl(decl);
+            enclosing->addMember(decl);
+        }
+        /* END */
+        
+        else {
+            Decl* decl = enclosing->addClassDecl(this);
+            collectTypeVarDecls(decl);
+            if (decl != NULL) {
+                id->addDecl(decl);
+                for_each_child (c, this) {
+                    c->collectDecls (decl);
+                } end_for;
+            }
         }
     }
 };
@@ -362,31 +398,3 @@ protected:
 };
 
 NODE_FACTORY(Assign_AST, ASSIGN);
-
-// class Type_AST : public AST_Tree {
-// protected:
-//     NODE_CONSTRUCTORS(Type_AST, AST_Tree);
-
-//     AST_Ptr resolveSimpleIds (const Environ* env)
-//     {
-//         fprintf(stderr, "Type\n");
-//         AST_Ptr id = child(0);
-//         gcstring name = id->as_string();
-//         Decl* decl = classes->find(name);
-//         if (decl != NULL && id->numDecls() == 0){
-//             id->addDecl(decl);
-//         }
-//         return this;
-//     }
-
-//     void resolveSimpleTypeIds (const Environ* env)
-//     {
-//         AST_Ptr id = child(0);
-//         Decl* decl = classes->find(id->as_string());
-//         if (decl != NULL){
-//             this->addDecl(decl);
-//         }
-//     }
-// };
-
-// NODE_FACTORY(Type_AST, TYPE);

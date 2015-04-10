@@ -122,7 +122,6 @@ unifies (Type_Ptr t0, Type_Ptr t1)
 
 
 /*****    TYPE    *****/
-
 Type_Ptr
 Type::getType ()
 {
@@ -133,7 +132,7 @@ Type::getType ()
 AST_Ptr
 Type::getId ()
 {
-    return NULL;
+    return child(0);
 }
 
 int
@@ -454,6 +453,28 @@ protected:
         child (0)->addDecl (decl);
     }
 
+    AST_Ptr resolveSimpleIds (const Environ* env) {
+        Decl_Vector decls;
+        AST_Ptr id = getId();
+        gcstring name = id->as_string();
+        Decl* decl = classes->find(name);
+        if (decl != NULL && id->numDecls() == 0){
+            id->addDecl(decl);
+        }
+        return this;
+    }
+
+    void resolveSimpleTypeIds (const Environ* env)
+    {
+        AST_Ptr id = this->child(0);
+        Decl* decl = classes->find(id->as_string());
+        if (decl != NULL) {
+            this->addDecl(decl);
+        }
+        for_each_child (c, this) {
+            c->resolveSimpleTypeIds (env);
+        } end_for;
+    }
 };
 
 NODE_FACTORY (ClassType_AST, TYPE);
