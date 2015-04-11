@@ -214,6 +214,9 @@ protected:
     {
         AST_Ptr id = child(0);
         Decl* decl = enclosing->addDefDecl(id);
+        if (child(2)->isType()) {
+            decl->setType((Type_Ptr)child(2));
+        }
         if (decl != NULL) {
             id->addDecl(decl);
             for_each_child(c, this) {
