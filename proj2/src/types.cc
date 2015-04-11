@@ -21,35 +21,33 @@ AST::resolveTypesOuter (Decl* context)
     freezeDecls (true);
     // FILL THIS IN
     Unifier* subst = new Unifier();
-    // for_each_child()
-    
     resolveTypes(context, *subst);
-        // for_each_child (c, this) {
-        // } end_for;
 
     // switch (this->oper()->syntax()) {
-    //     // case AND:
-    //     // case TRUE:
-    //     // case FALSE:
-    //     case LIST_DISPLAY:
-    //     case IF_EXPR:
-    //     case TUPLE:
-    //     {
-    //         this->print(cerr, 4);
-    //         cerr << "\n";
-    //         getType()->print(cerr, 4);
-    //         break;   
-    //     }
-    //     case WHILE:
-    //     case IF:
-    //     {
-    //         this->print(cerr, 4);
-    //         cerr << "\n";
-    //         // getType()->print(cerr, 4);
-    //         break;
-    //     }
-    //     default:
-    //         break;
+        // case AND:
+        // case TRUE:
+        // case FALSE:
+
+        // case LIST_DISPLAY:
+        // case IF_EXPR:
+        // case TUPLE:
+        // case CALL1:
+        // {
+        //     this->print(cerr, 4);
+        //     cerr << "\n";
+        //     getType()->print(cerr, 4);
+        //     break;
+        // }
+        // case WHILE:
+        // case IF:
+        // {
+        //     this->print(cerr, 4);
+        //     cerr << "\n";
+        //     // getType()->print(cerr, 4);
+        //     break;
+        // }
+        // default:
+        //     break;
 
     // }
     
