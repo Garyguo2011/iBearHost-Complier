@@ -124,7 +124,25 @@ protected:
             child (i)->collectDecls (enclosing);
         }
         target->addTargetDecls (enclosing);
+    }
 
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes(context, subst);
+
+        Type_Ptr t_type = child(0)->getType();
+        Type_Ptr e_type = child(1)->getType();
+
+        // E: $a, T: $b where $a is one of list($b)
+        if ((unify(e_type, listDecl->asType(1, &t_type),subst)) ||
+            (   unify(e_type, rangeDecl->asType(),subst) &&
+                unify(t_type, intDecl->asType(), subst)       ) ||
+            (   unify(e_type, strDecl->asType(), subst)  &&
+                unify(t_type, strDecl->asType(), subst)       ))
+        {
+            return;
+        } else {
+            error(loc(), "For statements variable doesn't have proper types");
+        }
     }
 };
 
@@ -409,8 +427,8 @@ protected:
     //         setType(child(0)->getType(), subst);
     //     } else {
     //         error(loc(), "Assign left and right type inconsistency");
-    //         throw logic_error("");
     //     }
+    //     child(0)->getType()->print(cerr, 4);
     // }
 };
 

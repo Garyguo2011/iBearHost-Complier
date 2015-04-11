@@ -190,6 +190,28 @@ protected:
 
 NODE_FACTORY (Call_AST, CALL);
 
+class Call1_AST : public Callable {
+protected:
+    NODE_CONSTRUCTORS (Call1_AST, Callable);
+
+    AST_Ptr getId () {
+        child(1)->child(0)->child(0);
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes(context, subst);
+        Decl* classDecl = classes->find(getId()->as_string());
+        if (classDecl != NULL) {
+            setType(classDecl->asType(), subst);
+            getType()->print(cerr, 4);
+        } else {
+            error(loc(), "Class Declation missing");
+        }
+    }
+};
+
+NODE_FACTORY (Call1_AST, CALL1);
+
 /** A binary operator. */
 class Binop_AST : public Callable {
 protected:
@@ -413,14 +435,12 @@ protected:
 
         if (!unify(child(0)->getType(), boolDecl->asType(), subst)) {
             error(loc(), "IF_EXPR expression is not bool");
-            throw logic_error("");
         }
 
         if (unify(child(1)->getType(), child(2)->getType(), subst)) {
             setType(child(1)->getType(), subst);
         } else {
             error(loc(), "IF_EXPR Inconsistent Types");
-            throw logic_error("");
         }
     }
 };
@@ -437,7 +457,6 @@ protected:
 
         if (!unify(child(0)->getType(), child(1)->getType(), subst)) {
             error (loc (), "And Statement Expressions doesn't match");
-            throw logic_error("");
         } else {
             setType(child(0)->getType(), subst);    
         }
@@ -456,7 +475,6 @@ protected:
 
         if (!unify(child(0)->getType(), child(1)->getType(), subst)) {
             error (loc (), "Or Statement Expressions doesn't match");
-            throw logic_error("");
         } else {
             setType(child(0)->getType(), subst);    
         }
