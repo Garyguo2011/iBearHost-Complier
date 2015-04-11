@@ -310,37 +310,31 @@ protected:
             Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
             strDecl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "int") {
             Decl* decl = makeClassDecl(name, consTree(TYPE_FORMALS_LIST));
             intDecl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "bool") {
             Decl* decl = makeClassDecl(name, params);
             boolDecl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "range") {
             Decl* decl = makeClassDecl(name, params);
             rangeDecl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
-        // need inline substitution
         else if (name == "list") {
             Decl* decl = makeClassDecl(name, params);
             collectTypeVarDecls(decl);
             listDecl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "dict") {
@@ -348,14 +342,12 @@ protected:
             collectTypeVarDecls(decl);
             dictDecl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "tuple0") {
             Decl* decl = makeClassDecl(name, params);
             tuple0Decl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "tuple1") {
@@ -363,7 +355,6 @@ protected:
             collectTypeVarDecls(decl);
             tuple1Decl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "tuple2"){
@@ -371,7 +362,6 @@ protected:
             collectTypeVarDecls(decl);
             tuple2Decl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         else if (name == "tuple3"){
@@ -379,7 +369,6 @@ protected:
             collectTypeVarDecls(decl);
             tuple3Decl = decl;
             id->addDecl(decl);
-            classes->define(decl);
             enclosing->addMember(decl);
         }
         /* END */

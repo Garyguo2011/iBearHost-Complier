@@ -200,9 +200,9 @@ protected:
         AST::resolveTypes(context, subst);
         Decl* classDecl = classes->find(getId()->as_string());
         if (classDecl != NULL) {
-            setType(classDecl->asType(), subst);
+            setType(classDecl->asGenericType(), subst);
         } else {
-            error(loc(), "Class Declation missing");
+            error(loc(), "Class Declaration missing");
         }
     }
 };
@@ -307,8 +307,7 @@ protected:
         AST_Ptr id1 = getId();
         if (decl != NULL) {
             Decl_Vector decls;
-            decl->getEnviron()->find(id1->as_string(), decls);
-
+            decl->getEnviron()->find_immediate(id1->as_string(), decls);
             for (Decl_Vector::const_iterator i = decls.begin ();
                      i != decls.end ();
                      i++)
