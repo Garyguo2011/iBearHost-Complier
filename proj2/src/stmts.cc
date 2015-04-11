@@ -397,10 +397,10 @@ protected:
 NODE_FACTORY(TypeFormalsList_AST, TYPE_FORMALS_LIST);
 
 /** TypedID */
-class TypedID_AST : public AST_Tree {
+class TypedID_AST : public Typed_Tree {
     
 protected:
-    NODE_CONSTRUCTORS(TypedID_AST, AST_Tree);
+    NODE_CONSTRUCTORS(TypedID_AST, Typed_Tree);
 
     AST_Ptr getId()
     {
@@ -415,14 +415,27 @@ protected:
             id->addDecl(decl);
         }
     }
+
+    Type_Ptr getType()
+    {
+        return (Type_Ptr) child(1);
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst)
+    {
+        if (arity() == 2 && child(1)->oper()->syntax() == TYPE){
+            setType(getType(), subst);
+        }
+    }
+
 };
 
 NODE_FACTORY(TypedID_AST, TYPED_ID);
 
 /** Assign */
-class Assign_AST : public AST_Tree {
+class Assign_AST : public Typed_Tree {
 protected:
-    NODE_CONSTRUCTORS(Assign_AST, AST_Tree);
+    NODE_CONSTRUCTORS(Assign_AST, Typed_Tree);
 
     void collectDecls (Decl* enclosing)
     {
@@ -431,18 +444,18 @@ protected:
         child(1)->collectDecls(enclosing);
     }
 
-    // void resolveTypes (Decl* context, Unifier& subst)
-    // {
-    //     AST::resolveTypes (context, subst);
+    void resolveTypes (Decl* context, Unifier& subst)
+    {
+        AST::resolveTypes (context, subst);
 
-    //     // consider more complex example
-    //     if (unify(child(0)->getType(), child(1)->getType(),subst)) {
-    //         setType(child(0)->getType(), subst);
-    //     } else {
-    //         error(loc(), "Assign left and right type inconsistency");
-    //         throw logic_error("");
-    //     }
-    // }
+        // consider more complex example
+        if (unify(child(0)->getType(), child(1)->getType(),subst)) {
+            setType(child(0)->getType(), subst);
+        } else {
+            error(loc(), "Assign left and right type inconsistency");
+            throw logic_error("");
+        }
+    }
 };
 
 NODE_FACTORY(Assign_AST, ASSIGN);

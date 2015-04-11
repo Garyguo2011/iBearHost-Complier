@@ -115,6 +115,7 @@ protected:
         }
     }
 
+
     void _print (ostream& out, int indent, ASTSet& visited) {
 	out << "(id " << lineNumber () << " " << as_string ();
         if (getDecl () != NULL)
@@ -167,6 +168,23 @@ protected:
     void removeDecl (int k) {
         assert (k >= 0 && k < (int) _me.size ());
         _me.erase (_me.begin () + k);
+    }
+
+    Type_Ptr getType()
+    {
+        if (_type == NULL){
+            if (getDecl() == NULL)
+                error(loc(), "id not declared in the scope");
+            else
+                _type = getDecl()->getType();
+        }
+            
+        return _type;
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst)
+    {
+
     }
 
 private:

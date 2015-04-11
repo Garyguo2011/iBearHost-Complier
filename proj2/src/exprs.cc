@@ -399,6 +399,10 @@ NODE_FACTORY(ListDisplay_AST, LIST_DISPLAY);
 class DictDisplay_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(DictDisplay_AST, Typed_Tree);
+    // void resolveTypes (Decl* context, Unifier& subst) 
+    // {
+        
+    // }
 };
 
 NODE_FACTORY(DictDisplay_AST, DICT_DISPLAY);
@@ -408,7 +412,8 @@ class IfExpr_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(IfExpr_AST, Typed_Tree);
 
-    void resolveTypes (Decl* context, Unifier& subst) {
+    void resolveTypes (Decl* context, Unifier& subst) 
+    {
         AST::resolveTypes (context, subst);
 
         if (!unify(child(0)->getType(), boolDecl->asType(), subst)) {
