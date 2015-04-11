@@ -664,7 +664,6 @@ protected:
             AST_Ptr params = clazz->child(1);
             Decl* decl = makeClassDecl (id->as_string (), params);
             addMember(decl);
-            classes->define(decl);
             return decl;
         }
         return NULL;
