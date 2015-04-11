@@ -377,7 +377,6 @@ protected:
             default:
             {
                 error(loc(), "Tuple has more than 3 children");
-                throw logic_error("");
             }
         }
     }
@@ -411,7 +410,6 @@ protected:
             for (unsigned int i = 1; i < arity() ; i++) {
                 if (!unify(first_type, child(i)->getType(), subst)) {
                     error (loc (), "Elements in list are not same types");
-                    throw logic_error("");
                 }
             }
             setType(listDecl->asType(1, elements), subst);
@@ -450,7 +448,6 @@ protected:
                     Type_Ptr rest_type = dictDecl->asType(2, rest);
                     if (!unify(first_type, rest_type, subst)) {
                         error (loc (), "Elements in dict are not same types");
-                        throw logic_error("");
                     }
                 }
                 setType(first_type, subst);
