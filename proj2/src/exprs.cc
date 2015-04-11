@@ -265,6 +265,20 @@ class Slice_AST : public Callable {
 
 NODE_FACTORY (Slice_AST, SLICE);
 
+
+class Subscript_Assign_AST : public Callable {
+    NODE_CONSTRUCTORS(Subscript_Assign_AST, Callable);
+};
+NODE_FACTORY (Subscript_Assign_AST, SUBSCRIPT_ASSIGN);
+
+
+class Slice_Assign_AST: public Callable {
+    NODE_CONSTRUCTORS(Slice_Assign_AST, Callable);
+};
+NODE_FACTORY (Slice_Assign_AST, SLICE_ASSIGN);
+
+
+
 /** Compare */
 class Compare_AST : public Binop_AST {
 protected:
