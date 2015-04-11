@@ -30,9 +30,16 @@
 # 	def f(self):
 # 		if self.x > 0:
 # 			return x
-def g():
-	print x
-x = 5
+# def g():
+# 	print x
+# x = 5
+# x :: int = 1
+# if truth(x):
+# 	print 0
+f()
+def f():
+	pass
+
 
 
 

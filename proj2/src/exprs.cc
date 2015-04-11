@@ -154,7 +154,7 @@ protected:
             gcstring name = this->child(0)->child(0)->as_string();
             Decl* decl = classes->find(name);
             Decl* init_decl = decl->getEnviron()->find_immediate("__init__");
-            if (decl != NULL){
+            if (init_decl != NULL){
                 init_tree->addDecl(init_decl);
                 AST_Ptr new_tree = consTree(NEW, this->child(0));
                 std::vector <AST_Ptr> temp;
@@ -171,9 +171,7 @@ protected:
                 // return AST::make_tree(CALL1, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
                 return AST::make_tree(CALL1, &temp[0], &temp[temp.size()]);    
             } else {
-                for_each_child_var (c, this) {
-                    c = c->resolveAllocators (env);
-                }   end_for;    
+                error(loc(), "No __init__ method found.");   
             }
             
         } else {

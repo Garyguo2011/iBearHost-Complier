@@ -1,1 +1,3 @@
-pass
+f()
+def f():
+	pass
