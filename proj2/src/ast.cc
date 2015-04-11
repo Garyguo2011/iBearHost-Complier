@@ -114,7 +114,6 @@ AST_Ptr
 AST::doOuterSemantics ()
 {
     AST_Ptr dast;
-    //fprintf(stderr, "collectDecls\n");
     this->collectDecls(fileDecl);
     dast = this->resolveSimpleIds(fileDecl->getEnviron());
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
