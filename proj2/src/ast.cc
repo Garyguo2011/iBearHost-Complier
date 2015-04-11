@@ -119,7 +119,7 @@ AST::doOuterSemantics ()
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
     dast = dast->resolveAllocators(fileDecl->getEnviron());
     dast = dast->resolveStaticSelections(fileDecl->getEnviron());
-    // dast->resolveTypesOuter(fileDecl);
+    dast->resolveTypesOuter(fileDecl);
     return dast;
 }
 

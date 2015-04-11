@@ -203,7 +203,6 @@ protected:
         Decl* classDecl = classes->find(getId()->as_string());
         if (classDecl != NULL) {
             setType(classDecl->asType(), subst);
-            getType()->print(cerr, 4);
         } else {
             error(loc(), "Class Declation missing");
         }
