@@ -429,16 +429,27 @@ protected:
             type_list[1] = Type::makeVar();
             setType(listDecl->asType (2, type_list), subst);
         } else {
-            Type_Ptr elements[1];
-            elements[0] = child(0)->getType();
-            Type_Ptr first_type = elements[0];
-            for (int i = 1; i < arity() ; i++) {
-                if (!unify(first_type, child(i)->getType(), subst)) {
-                    error (loc (), "Elements in list are not same types");
-                    throw logic_error("");
+            Type_Ptr keyType = child(0)->child(0)->getType();
+            if (keyType == boolDecl->asType() || keyType == intDecl->asType() || keyType == strDecl->asType()){
+                Type_Ptr elements[2];
+                elements[0] = child(0)->child(0)->getType();
+                elements[1] = child(0)->child(1)->getType();
+                Type_Ptr first_type = dictDecl->asType(2, elements);
+                for (int i = 1; i < arity() ; i++) {
+                    Type_Ptr rest[2];
+                    rest[0] = child(i)->child(0)->getType();
+                    rest[1] = child(0)->child(0)->getType();
+                    Type_Ptr rest_type = dictDecl->asType(2, rest);
+                    if (!unify(first_type, rest_type, subst)) {
+                        error (loc (), "Elements in dict are not same types");
+                        throw logic_error("");
+                    }
                 }
+                setType(first_type, subst);
+            } else {
+                error(loc(), "invalid key type");
             }
-            setType(listDecl->asType(1, elements), subst);
+            
         }
     }
 };
