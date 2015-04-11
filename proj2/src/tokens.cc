@@ -170,8 +170,9 @@ protected:
         if (_type == NULL){
             if (getDecl() == NULL)
                 error(loc(), "id not declared in the scope");
-            else
+            else{
                 _type = getDecl()->getType();
+            }
         }
             
         return _type;
@@ -179,7 +180,6 @@ protected:
 
     void resolveTypes (Decl* context, Unifier& subst)
     {
-
     }
 
 private:

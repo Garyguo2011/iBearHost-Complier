@@ -377,7 +377,7 @@ protected:
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes (context, subst);
         if (arity() == 0) {
-            setType(listDecl->asType (1, Type::makeVar()), subst);
+            setType(dictDecl->asType(1, Type::makeVar()), subst);
         } else {
             Type_Ptr elements[1];
             elements[0] = child(0)->getType();
@@ -399,10 +399,27 @@ NODE_FACTORY(ListDisplay_AST, LIST_DISPLAY);
 class DictDisplay_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(DictDisplay_AST, Typed_Tree);
-    // void resolveTypes (Decl* context, Unifier& subst) 
-    // {
-        
-    // }
+    void resolveTypes (Decl* context, Unifier& subst) 
+    {
+        AST::resolveTypes (context, subst);
+        if (arity() == 0) {
+            Type_Ptr type_list[2];
+            type_list[0] = Type::makeVar();
+            type_list[1] = Type::makeVar();
+            setType(listDecl->asType (2, type_list), subst);
+        } else {
+            Type_Ptr elements[1];
+            elements[0] = child(0)->getType();
+            Type_Ptr first_type = elements[0];
+            for (int i = 1; i < arity() ; i++) {
+                if (!unify(first_type, child(i)->getType(), subst)) {
+                    error (loc (), "Elements in list are not same types");
+                    throw logic_error("");
+                }
+            }
+            setType(listDecl->asType(1, elements), subst);
+        }
+    }
 };
 
 NODE_FACTORY(DictDisplay_AST, DICT_DISPLAY);
