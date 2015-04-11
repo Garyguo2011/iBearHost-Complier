@@ -127,8 +127,24 @@ unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
         if (t0->getId ()->getDecl () != t1->getId ()->getDecl ())
             return false;
     }
+
+    if (t0->oper()->syntax() != FUNCTION_TYPE && t1->oper()->syntax() != FUNCTION_TYPE) {
+        // Compound types have different numbers of children, cannot possibly unify
+        if (t0->arity() != t1->arity()) {
+            return false;
+        }
+
+        // For nested types, also unify all children
+        for (int i = 1; i < t0->arity(); i++) {
+            if (!unify1((Type_Ptr)t0->child(i), (Type_Ptr)t1->child(i), subst)) {
+                return false;
+            }
+        }
+    }
+
     if (t0->numTypeParams () != t1->numTypeParams ())
         return false;
+
     for (int i = 0; i < t0->numTypeParams (); i += 1) {
         if (!unify1 (t0->typeParam (i), t1->typeParam (i), subst))
             return false;

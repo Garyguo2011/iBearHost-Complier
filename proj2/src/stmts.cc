@@ -493,7 +493,6 @@ protected:
 
     void collectDecls (Decl* enclosing)
     {
-        //fprintf(stderr, "collectDecls assign\n");
         child(0)->addTargetDecls(enclosing);
         child(1)->collectDecls(enclosing);
     }
@@ -502,7 +501,6 @@ protected:
     {
         AST::resolveTypes (context, subst);
 
-        // consider more complex example
         if (unify(child(0)->getType(), child(1)->getType(),subst)) {
             setType(child(0)->getType(), subst);
         } else {
