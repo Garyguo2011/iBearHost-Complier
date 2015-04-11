@@ -158,8 +158,6 @@ protected:
                 }
                 c->collectDecls(decl);
             } end_for;
-        } else {
-            error(loc(), "this Def has already been defined.");
         }
     }
 };
@@ -170,6 +168,26 @@ NODE_FACTORY(Def_AST, DEF);
 class Method_AST : public Def_AST {
 protected:
     NODE_CONSTRUCTORS(Method_AST, Def_AST);
+
+    void collectDecls (Decl* enclosing)
+    {
+        if ((std::string) child(1)->child(0)->child(0)->as_string().c_str() == (std::string) "self") {
+            AST_Ptr id = child(0);
+            Decl* decl = enclosing->addDefDecl(id);
+            if (decl != NULL) {
+                id->addDecl(decl);
+                for_each_child(c, this) {
+                    if (c->arity() > 1 && c->oper()->syntax() == DEF
+                        && id->as_string() == c->child(0)->as_string()) {
+                        error(loc(), "child name can't be equal to the Def!");
+                    }
+                    c->collectDecls(decl);
+                } end_for;
+            }
+        } else {
+            error(loc(), "first parameter should be a self in a class method!");
+        }
+    }
 };
 
 NODE_FACTORY(Method_AST, METHOD);
@@ -316,6 +334,10 @@ protected:
         /* END */
         
         else {
+            const Environ* env = enclosing->getEnviron();
+            if (env->find_immediate(name) != NULL) {
+                error(loc(), "This name has been declared in this scope!");
+            }
             Decl* decl = enclosing->addClassDecl(this);
             collectTypeVarDecls(decl);
             if (decl != NULL) {
@@ -326,8 +348,6 @@ protected:
                     }
                     c->collectDecls (decl);
                 } end_for;
-            } else {
-                error(loc(), "This class has been declared.");
             }
         }
     }

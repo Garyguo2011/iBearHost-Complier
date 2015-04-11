@@ -192,7 +192,8 @@ Decl::canAddVar (AST_Ptr id)
         if ((*i)->getName() == name) {
             if ((*i)->declTypeName() == "classdecl" ||
                 (*i)->declTypeName() == "funcdecl") {
-                id->recordError();
+                //id->recordError();
+                error(id, "error can't add var for this ID");
                 return false;
             }
             else if ((*i)->declTypeName() == "vardecl" ||
@@ -219,7 +220,8 @@ Decl::canAddFunc (AST_Ptr id)
         if ((*i)->getName() == name) {
             if ((*i)->declTypeName() == "vardecl" ||
                 (*i)->declTypeName() == "classdecl") {
-                id->recordError();
+                //id->recordError();
+                error(id, "this Def has already been defined.");
                 return false;
             }
         }
@@ -235,7 +237,10 @@ Decl::canAddClass (AST_Ptr id)
 {
     if (classes->find_immediate(id->as_string()) == NULL) {
         return true;
+    } else {
+        error(id, "This class has been declared.");
     }
+
     return false;
 }
 
