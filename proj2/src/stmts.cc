@@ -239,16 +239,15 @@ protected:
      *  the Id's name.  */
     void collectDecls (Decl* enclosing)
     {
-        if ((std::string) child(1)->child(0)->child(0)->as_string().c_str() == (std::string) "self") {
+        if (child(1)->arity() == 0) {
+            error(loc(), "Method cannot have zero parameters");
+        }
+        else if ((std::string) child(1)->child(0)->child(0)->as_string().c_str() == (std::string) "self") {
             AST_Ptr id = child(0);
             Decl* decl = enclosing->addDefDecl(id);
             if (decl != NULL) {
                 id->addDecl(decl);
                 for_each_child(c, this) {
-                    if (c->arity() > 1 && c->oper()->syntax() == DEF
-                        && id->as_string() == c->child(0)->as_string()) {
-                        error(loc(), "child name can't be equal to the Def!");
-                    }
                     c->collectDecls(decl);
                 } end_for;
             }
