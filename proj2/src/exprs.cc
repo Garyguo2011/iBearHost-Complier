@@ -153,6 +153,16 @@ class Call_AST : public Callable {
 
 protected:
 
+    /** Add target declarations from first child to ENCLOSING.
+     *  Add declarations from the second child to ENCLOSING. */
+    void collectDecls (Decl* enclosing)
+    {
+        const Environ* env = enclosing->getEnviron();
+        if (env->find(child(0)->as_string()) == NULL) {
+            error(loc(), "ID for call does not found in this scope!");
+        }
+    }
+
     /** First check whether the node of AST is a TYPE(rescursively call otherwirse),
      *  then check whether there's a "__init__" method. If it is, create and return
      *  a new tree with the node of CALL1 that follows the relating rules and throw
@@ -276,6 +286,19 @@ class Slice_AST : public Callable {
 };
 
 NODE_FACTORY (Slice_AST, SLICE);
+
+
+class Subscript_Assign_AST : public Callable {
+    NODE_CONSTRUCTORS(Subscript_Assign_AST, Callable);
+};
+NODE_FACTORY (Subscript_Assign_AST, SUBSCRIPT_ASSIGN);
+
+
+class Slice_Assign_AST: public Callable {
+    NODE_CONSTRUCTORS(Slice_Assign_AST, Callable);
+};
+NODE_FACTORY (Slice_Assign_AST, SLICE_ASSIGN);
+
 
 /** Compare AST for compare from the grammar rule, inherited from Binop_AST. */
 class Compare_AST : public Binop_AST {
