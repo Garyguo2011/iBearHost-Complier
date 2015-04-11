@@ -150,6 +150,7 @@ protected:
 
 /** Call AST for function call, inherited from Callable. */
 class Call_AST : public Callable {
+
 protected:
 
     /** First check whether the node of AST is a TYPE(rescursively call otherwirse),
@@ -164,13 +165,13 @@ protected:
             Decl* init_decl = decl->getEnviron()->find_immediate("__init__");
             if (init_decl != NULL){
                 init_tree->addDecl(init_decl);
-                AST_Ptr new_tree = consTree(NEW, this->child(0));
+                // AST_Ptr new_tree = consTree(NEW, this->child(0));
                 std::vector <AST_Ptr> temp;
                 temp.push_back(init_tree);
                 temp.push_back(consTree(NEW, this->child(0)));
                 if (this->arity() >= 2){
                     // AST_Ptr expr_tree = this->child(1);
-                    for (int i = 1; i < this->arity(); i++){
+                    for (unsigned int i = 1; i < this->arity(); i++){
                     temp.push_back(this->child(i));
                     }
                 }
@@ -189,8 +190,14 @@ protected:
         }
         return this;
     }
-    NODE_CONSTRUCTORS (Call_AST, Callable);
 
+    // void resolveTypes (Decl* context, Unifier& subst)
+    // {
+    //     context get environ find immediate id name 
+
+
+    // }
+    NODE_CONSTRUCTORS (Call_AST, Callable);
 
 };
 
@@ -203,7 +210,7 @@ protected:
 
     /** Return the id of Call1 Tree according to the grammar rule.*/
     AST_Ptr getId () {
-        child(1)->child(0)->child(0);
+        return child(1)->child(0)->child(0);
     }
 
     /** If a class declaration has been found within the scope, then the type to
@@ -389,7 +396,6 @@ protected:
             default:
             {
                 error(loc(), "Tuple has more than 3 children");
-                throw logic_error("");
             }
         }
     }
@@ -417,15 +423,14 @@ protected:
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes (context, subst);
         if (arity() == 0) {
-            setType(listDecl->asType (1, Type::makeVar()), subst);
+            setType(listDecl->asType(1, Type::makeVar()), subst);
         } else {
             Type_Ptr elements[1];
             elements[0] = child(0)->getType();
             Type_Ptr first_type = elements[0];
-            for (int i = 1; i < arity() ; i++) {
+            for (unsigned int i = 1; i < arity() ; i++) {
                 if (!unify(first_type, child(i)->getType(), subst)) {
                     error (loc (), "Elements in list are not same types");
-                    throw logic_error("");
                 }
             }
             setType(listDecl->asType(1, elements), subst);
@@ -439,10 +444,40 @@ NODE_FACTORY(ListDisplay_AST, LIST_DISPLAY);
 class DictDisplay_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(DictDisplay_AST, Typed_Tree);
-    // void resolveTypes (Decl* context, Unifier& subst) 
-    // {
-        
-    // }
+    void resolveTypes (Decl* context, Unifier& subst) 
+    {
+        AST::resolveTypes (context, subst);
+        if (arity() == 0) {
+            Type_Ptr type_list[2];
+            type_list[0] = Type::makeVar();
+            type_list[1] = Type::makeVar();
+            setType(dictDecl->asType (2, type_list), subst);
+        } else {
+            Type_Ptr keyType = child(0)->child(0)->getType();
+
+            if (unify(keyType, boolDecl->asType(), subst) || 
+                unify(keyType, intDecl->asType(), subst) || 
+                unify(keyType, strDecl->asType(), subst)) {
+                Type_Ptr elements[2];
+                elements[0] = child(0)->child(0)->getType();
+                elements[1] = child(0)->child(1)->getType();
+                Type_Ptr first_type = dictDecl->asType(2, elements);
+                for (unsigned int i = 1; i < arity() ; i++) {
+                    Type_Ptr rest[2];
+                    rest[0] = child(i)->child(0)->getType();
+                    rest[1] = child(i)->child(1)->getType();
+                    Type_Ptr rest_type = dictDecl->asType(2, rest);
+                    if (!unify(first_type, rest_type, subst)) {
+                        error (loc (), "Elements in dict are not same types");
+                    }
+                }
+                setType(first_type, subst);
+            } else {
+                error(loc(), "invalid key type");
+            }
+            
+        }
+    }
 };
 
 NODE_FACTORY(DictDisplay_AST, DICT_DISPLAY);

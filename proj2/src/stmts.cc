@@ -126,7 +126,6 @@ protected:
         AST::resolveTypes (context, subst);
         if (!unify(child(0)->getType(), boolDecl->asType(), subst)) {
             error(loc(), "If expresion is not bool");
-            throw logic_error("");
         }
     }
 };
@@ -141,10 +140,8 @@ protected:
     /** Throw an erro if the first child's type(condition) is not a boolDecl. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes(context, subst);
-
         if (!unify(child(0)->getType(), boolDecl->asType(), subst)) {
             error(loc(), "While expresion is not bool");
-            throw logic_error("");
         }
     }    
 };
@@ -540,7 +537,6 @@ protected:
             setType(child(0)->getType(), subst);
         } else {
             error(loc(), "Assign left and right type inconsistency");
-            throw logic_error("");
         }
     }
 };
