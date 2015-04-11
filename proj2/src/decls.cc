@@ -193,7 +193,7 @@ Decl::canAddVar (AST_Ptr id)
             // if ((*i)->declTypeName() == "classdecl" ||
             //     (*i)->declTypeName() == "funcdecl" ||
             //     (*i)->declTypeName() == "moduledecl") {
-             if (strcmp((*i)->declTypeName(), "vardecl") == 0 ||
+             if (strcmp((*i)->declTypeName(), "funcdecl") == 0 ||
                 strcmp((*i)->declTypeName(), "classdecl") == 0 ||
                 strcmp((*i)->declTypeName(), "moduledecl") == 0){
                 //id->recordError();
