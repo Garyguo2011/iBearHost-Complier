@@ -156,13 +156,13 @@ protected:
             Decl* init_decl = decl->getEnviron()->find_immediate("__init__");
             if (init_decl != NULL){
                 init_tree->addDecl(init_decl);
-                AST_Ptr new_tree = consTree(NEW, this->child(0));
+                // AST_Ptr new_tree = consTree(NEW, this->child(0));
                 std::vector <AST_Ptr> temp;
                 temp.push_back(init_tree);
                 temp.push_back(consTree(NEW, this->child(0)));
                 if (this->arity() >= 2){
                     // AST_Ptr expr_tree = this->child(1);
-                    for (int i = 1; i < this->arity(); i++){
+                    for (unsigned int i = 1; i < this->arity(); i++){
                     temp.push_back(this->child(i));
                     }
                 }
@@ -193,7 +193,7 @@ protected:
     NODE_CONSTRUCTORS (Call1_AST, Callable);
 
     AST_Ptr getId () {
-        child(1)->child(0)->child(0);
+        return child(1)->child(0)->child(0);
     }
 
     void resolveTypes (Decl* context, Unifier& subst) {
@@ -401,7 +401,7 @@ protected:
             Type_Ptr elements[1];
             elements[0] = child(0)->getType();
             Type_Ptr first_type = elements[0];
-            for (int i = 1; i < arity() ; i++) {
+            for (unsigned int i = 1; i < arity() ; i++) {
                 if (!unify(first_type, child(i)->getType(), subst)) {
                     error (loc (), "Elements in list are not same types");
                     throw logic_error("");
@@ -436,7 +436,7 @@ protected:
                 elements[0] = child(0)->child(0)->getType();
                 elements[1] = child(0)->child(1)->getType();
                 Type_Ptr first_type = dictDecl->asType(2, elements);
-                for (int i = 1; i < arity() ; i++) {
+                for (unsigned int i = 1; i < arity() ; i++) {
                     Type_Ptr rest[2];
                     rest[0] = child(i)->child(0)->getType();
                     rest[1] = child(i)->child(1)->getType();
