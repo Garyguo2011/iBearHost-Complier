@@ -190,15 +190,20 @@ Decl::canAddVar (AST_Ptr id)
          i != exists.end ();
          i++) {
         if ((*i)->getName() == name) {
-            if ((*i)->declTypeName() == "classdecl" ||
-                (*i)->declTypeName() == "funcdecl" ||
-                (*i)->declTypeName() == "moduledecl") {
+            // if ((*i)->declTypeName() == "classdecl" ||
+            //     (*i)->declTypeName() == "funcdecl" ||
+            //     (*i)->declTypeName() == "moduledecl") {
+             if (strcmp((*i)->declTypeName(), "funcdecl") == 0 ||
+                strcmp((*i)->declTypeName(), "classdecl") == 0 ||
+                strcmp((*i)->declTypeName(), "moduledecl") == 0){
                 //id->recordError();
                 error(id, "error can't add var for this ID");
                 return false;
             }
-            else if ((*i)->declTypeName() == "vardecl" ||
-                     (*i)->declTypeName() == "paramdecl") {
+            // else if ((*i)->declTypeName() == "vardecl" ||
+            //          (*i)->declTypeName() == "paramdecl") {
+            else if (strcmp((*i)->declTypeName(), "vardecl") == 0 ||
+                     strcmp((*i)->declTypeName(), "paramdecl") == 0) {
                 found = true;
             }
         }
@@ -219,10 +224,13 @@ Decl::canAddFunc (AST_Ptr id)
          i != exists.end ();
          i++) {
         if ((*i)->getName() == name) {
-            if ((*i)->declTypeName() == "vardecl" ||
-                (*i)->declTypeName() == "classdecl" ||
-                (*i)->declTypeName() == "moduledecl") {
+            // if ((*i)->declTypeName() == "vardecl" ||
+            //     (*i)->declTypeName() == "classdecl" ||
+            //     (*i)->declTypeName() == "moduledecl") {
                 //id->recordError();
+            if (strcmp((*i)->declTypeName(), "vardecl") == 0 ||
+                strcmp((*i)->declTypeName(), "classdecl") == 0 ||
+                strcmp((*i)->declTypeName(), "moduledecl") == 0){
                 error(id, "this Def has already been defined.");
                 return false;
             }
