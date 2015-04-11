@@ -114,12 +114,11 @@ AST_Ptr
 AST::doOuterSemantics ()
 {
     AST_Ptr dast;
-    //fprintf(stderr, "collectDecls\n");
     this->collectDecls(fileDecl);
     dast = this->resolveSimpleIds(fileDecl->getEnviron());
     dast->resolveSimpleTypeIds(fileDecl->getEnviron());
     dast = dast->resolveAllocators(fileDecl->getEnviron());
-    // dast = dast->resolveStaticSelections(fileDecl->getEnviron());
+    dast = dast->resolveStaticSelections(fileDecl->getEnviron());
     dast->resolveTypesOuter(fileDecl);
     return dast;
 }
