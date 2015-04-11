@@ -79,10 +79,12 @@ protected:
 
     NODE_CONSTRUCTORS (True_AST, Typed_Tree);
 
+    /** Return the type of boolDecl. */
     Type_Ptr computeType () {
         return boolDecl->asType ();
     }
 
+    /** Set type basically. */
     void resolveTypes (Decl* context, Unifier& subst) {
         setType(computeType(), subst);
     }
@@ -97,10 +99,12 @@ protected:
 
     NODE_CONSTRUCTORS (False_AST, Typed_Tree);
 
+    /** Return the type of boolDecl. */
     Type_Ptr computeType () {
         return boolDecl->asType ();
     }
 
+    /** Set type basically. */
     void resolveTypes (Decl* context, Unifier& subst) {
         setType(computeType(), subst);
     }
@@ -144,11 +148,15 @@ protected:
 
 };
 
-/** A function call. */
+/** Call AST for function call, inherited from Callable. */
 class Call_AST : public Callable {
 
 protected:
 
+    /** First check whether the node of AST is a TYPE(rescursively call otherwirse),
+     *  then check whether there's a "__init__" method. If it is, create and return
+     *  a new tree with the node of CALL1 that follows the relating rules and throw
+     *  an error otherwise. */
     AST_Ptr resolveAllocators (const Environ* env){
         if (this->child(0)->oper()->syntax() == TYPE){
             AST_Ptr init_tree = make_id("__init__", "0");
@@ -195,14 +203,18 @@ protected:
 
 NODE_FACTORY (Call_AST, CALL);
 
+/** Call1 AST for Call1 from the grammar rule, inherited from Callable. */
 class Call1_AST : public Callable {
 protected:
     NODE_CONSTRUCTORS (Call1_AST, Callable);
 
+    /** Return the id of Call1 Tree according to the grammar rule.*/
     AST_Ptr getId () {
         return child(1)->child(0)->child(0);
     }
 
+    /** If a class declaration has been found within the scope, then the type to
+     *  the type of classDecl, otherwise throw an error. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes(context, subst);
         Decl* classDecl = classes->find(getId()->as_string());
@@ -251,21 +263,21 @@ NODE_FACTORY (Unop_AST, UNOP);
 
 // NODE_FACTORY(ID_AST, ID);
 
-/** subscriptions */
+/** Subscriptions AST for subscript from the grammar rule, inherited from Callable. */
 class Subscript_AST : public Callable {
     NODE_CONSTRUCTORS(Subscript_AST, Callable);
 };
 
 NODE_FACTORY (Subscript_AST, SUBSCRIPT);
 
-/** slices */
+/** Slices AST for slice from the grammar rule, inherited from Callable. */
 class Slice_AST : public Callable {
     NODE_CONSTRUCTORS(Slice_AST, Callable);
 };
 
 NODE_FACTORY (Slice_AST, SLICE);
 
-/** Compare */
+/** Compare AST for compare from the grammar rule, inherited from Binop_AST. */
 class Compare_AST : public Binop_AST {
 protected:
     
@@ -275,7 +287,7 @@ protected:
 
 NODE_FACTORY(Compare_AST, COMPARE);
 
-/** Left Compare */
+/** Left Compare AST for left_compare from the grammar rule, inherited from Binop_AST. */
 class LeftCompare_AST : public Binop_AST {
 protected:
 
@@ -284,9 +296,11 @@ protected:
 
 NODE_FACTORY(LeftCompare_AST, LEFT_COMPARE);
 
-/** Attributeref */
+/** Attributeref AST for attributeref from the grammar rule, inherited from Typed_Tree. */
 class Attributeref_AST : public Typed_Tree {
 protected:
+
+    /** Simply recursively call it. */
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
         int count = 0;
@@ -308,6 +322,9 @@ protected:
         getId()->addDecl(decl);
     }
 
+    /** Resolve all selections of the form CLASS.ID by replacing them
+     *  with ID, appropriately decorated, assuming that ENV defines
+     *  all visible classes.   Returns the modified tree. */
     AST_Ptr resolveStaticSelections (const Environ* env) {
         AST_Ptr id0 = this->child(0);
         Decl* decl = id0->getDecl();
@@ -325,7 +342,7 @@ protected:
                 }
             }
         } else {
-            fprintf(stderr, "Class not found.\n");
+            error(loc(), "Class not found.");
         }
         return id1;
     }
@@ -333,12 +350,14 @@ protected:
 
 NODE_FACTORY(Attributeref_AST, ATTRIBUTEREF);
 
-/** Tuple */
+/** Tuple AST Tree for tuple from the grammar rule, inherited from Typed_Tree. */
 class Tuple_AST : public Typed_Tree {
 protected:
 
     NODE_CONSTRUCTORS(Tuple_AST, Typed_Tree);
 
+    /** Resolve types seperately based on its arity. Set type accordingly
+     *  iff 0 <= arity() <= 3. Otherwise throw an error. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes (context, subst);
 
@@ -384,7 +403,7 @@ protected:
 
 NODE_FACTORY(Tuple_AST, TUPLE);
 
-/** TargetList (to be modified) */
+/** TargetList AST Tree for targetlist from the grammar rule, inherited from Typed_Tree. */
 class TargetList_AST : public Typed_Tree {
 protected:
 
@@ -393,11 +412,13 @@ protected:
 
 NODE_FACTORY(TargetList_AST, TARGET_LIST);
 
-/** List Display */
+/** List Display AST Tree for list_display from the grammar rule, inherited from Typed_Tree. */
 class ListDisplay_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(ListDisplay_AST, Typed_Tree);
 
+    /** Typechecking for every child and throw an error if elements in the list have
+     *  multiple types. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes (context, subst);
         if (arity() == 0) {
@@ -418,7 +439,7 @@ protected:
 
 NODE_FACTORY(ListDisplay_AST, LIST_DISPLAY);
 
-/** Dictionary Display */
+/** Dictionary Display AST Tree for dict_display from the grammar rule, inherited from Typed_Tree. */
 class DictDisplay_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(DictDisplay_AST, Typed_Tree);
@@ -460,11 +481,13 @@ protected:
 
 NODE_FACTORY(DictDisplay_AST, DICT_DISPLAY);
 
-/** If expression (to be organized. )*/
+/** If expression AST for if, inherited from Typed_Tree. */
 class IfExpr_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(IfExpr_AST, Typed_Tree);
 
+    /** E1 if C else E2. Throw out an error if C doesn't have a type of bool,
+     *  otherwise check whether E1 and E2 can be unified. */
     void resolveTypes (Decl* context, Unifier& subst) 
     {
         AST::resolveTypes (context, subst);
@@ -483,11 +506,13 @@ protected:
 
 NODE_FACTORY(IfExpr_AST, IF_EXPR);
 
-/** And (to be organized) */
+/** And AST Tree for and, inherited from Typed_Tree. */
 class And_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(And_AST, Typed_Tree);
 
+    /** Check whether the type of first child and the type of second child
+     *  can be unified. Throw an error if they can't. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST_Tree::resolveTypes (context, subst);
 
@@ -501,11 +526,13 @@ protected:
 
 NODE_FACTORY(And_AST, AND);
 
-/** OR (to be organized) */
+/** OR AST for or, inherited from Typed_Tree. */
 class Or_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(Or_AST, Typed_Tree);
 
+    /** Check whether the type of first child and the type of second child
+     *  can be unified. Throw an error if they can't. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST_Tree::resolveTypes (context, subst);
 
