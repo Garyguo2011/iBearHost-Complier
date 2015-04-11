@@ -104,6 +104,11 @@ class Id_Token : public Typed_Token {
 protected:
     
     void addTargetDecls(Decl* enclosing) {
+        // const Environ* env = enclosing->getEnviron();
+        // Decl* decl_in_scope = env->find(as_string());
+        // if (decl_in_scope != NULL && decl_in_scope->getType() == ) {
+        //     error(loc(), "This name has been declared in this scope");
+        // }
         Decl* decl = enclosing->addVarDecl(this);
         if (decl != NULL) {
             addDecl(decl);

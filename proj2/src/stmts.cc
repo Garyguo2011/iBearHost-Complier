@@ -60,6 +60,42 @@ NODE_FACTORY (StmtList_AST, STMT_LIST);
 class Return_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Return_AST, AST_Tree);
+
+    // void collectDecls (Decl* enclosing)
+    // {
+    //     const Environ* env = enclosing->getEnviron();
+    //     DB(env);
+    //     for_each_child_var (c, this) {
+    //         if (env->find(c->as_string()) != NULL) {
+    //             c->collectDecls (enclosing);
+    //         } else {
+    //             error(loc(), "return expr declaration not found.");
+    //         }
+    //     } end_for;
+    // }
+
+    // /* DEBUGGING */
+
+    // void
+    // DB (const Environ* env)
+    // {
+    //     if (env == NULL) {
+    //         fprintf (stderr, "NULL\n");
+    //     } else {
+    //         const char* label;
+    //         label = "Immediate";
+    //         while (env != NULL) {
+    //             const Decl_Vector& members = env->get_members ();
+    //             fprintf (stderr, "%s:\n", label);
+    //             for (size_t i = 0; i < members.size (); i += 1) {
+    //                 fprintf (stderr, "   %s @%p\n", members[i]->getName ().c_str (),
+    //                          members[i]);
+    //             }
+    //             env = env->get_enclosure ();
+    //             label = "Enclosed by";
+    //         }
+    //     }
+    // }
 };
 
 NODE_FACTORY(Return_AST, RETURN);
@@ -170,6 +206,10 @@ protected:
         if (decl != NULL) {
             id->addDecl(decl);
             for_each_child(c, this) {
+                if (c->arity() > 1 && c->oper()->syntax() == DEF
+                    && id->as_string() == c->child(0)->as_string()) {
+                    error(loc(), "child name can't be equal to the Def!");
+                }
                 c->collectDecls(decl);
             } end_for;
         }
@@ -182,6 +222,26 @@ NODE_FACTORY(Def_AST, DEF);
 class Method_AST : public Def_AST {
 protected:
     NODE_CONSTRUCTORS(Method_AST, Def_AST);
+
+    void collectDecls (Decl* enclosing)
+    {
+        if ((std::string) child(1)->child(0)->child(0)->as_string().c_str() == (std::string) "self") {
+            AST_Ptr id = child(0);
+            Decl* decl = enclosing->addDefDecl(id);
+            if (decl != NULL) {
+                id->addDecl(decl);
+                for_each_child(c, this) {
+                    if (c->arity() > 1 && c->oper()->syntax() == DEF
+                        && id->as_string() == c->child(0)->as_string()) {
+                        error(loc(), "child name can't be equal to the Def!");
+                    }
+                    c->collectDecls(decl);
+                } end_for;
+            }
+        } else {
+            error(loc(), "first parameter should be a self in a class method!");
+        }
+    }
 };
 
 NODE_FACTORY(Method_AST, METHOD);
@@ -328,11 +388,18 @@ protected:
         /* END */
         
         else {
+            const Environ* env = enclosing->getEnviron();
+            if (env->find_immediate(name) != NULL) {
+                error(loc(), "This name has been declared in this scope!");
+            }
             Decl* decl = enclosing->addClassDecl(this);
             collectTypeVarDecls(decl);
             if (decl != NULL) {
                 id->addDecl(decl);
                 for_each_child (c, this) {
+                    if (c->arity() > 1 && c->oper()->syntax() == METHOD && name == c->child(0)->as_string()) {
+                        error(loc(), "child name can't be equal to the Class!");
+                    }
                     c->collectDecls (decl);
                 } end_for;
             }
