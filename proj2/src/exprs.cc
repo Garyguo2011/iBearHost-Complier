@@ -398,7 +398,7 @@ protected:
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes (context, subst);
         if (arity() == 0) {
-            setType(dictDecl->asType(1, Type::makeVar()), subst);
+            setType(listDecl->asType(1, Type::makeVar()), subst);
         } else {
             Type_Ptr elements[1];
             elements[0] = child(0)->getType();
@@ -427,10 +427,13 @@ protected:
             Type_Ptr type_list[2];
             type_list[0] = Type::makeVar();
             type_list[1] = Type::makeVar();
-            setType(listDecl->asType (2, type_list), subst);
+            setType(dictDecl->asType (2, type_list), subst);
         } else {
             Type_Ptr keyType = child(0)->child(0)->getType();
-            if (keyType == boolDecl->asType() || keyType == intDecl->asType() || keyType == strDecl->asType()){
+
+            if (unify(keyType, boolDecl->asType(), subst) || 
+                unify(keyType, intDecl->asType(), subst) || 
+                unify(keyType, strDecl->asType(), subst)) {
                 Type_Ptr elements[2];
                 elements[0] = child(0)->child(0)->getType();
                 elements[1] = child(0)->child(1)->getType();
@@ -438,7 +441,7 @@ protected:
                 for (int i = 1; i < arity() ; i++) {
                     Type_Ptr rest[2];
                     rest[0] = child(i)->child(0)->getType();
-                    rest[1] = child(0)->child(0)->getType();
+                    rest[1] = child(i)->child(1)->getType();
                     Type_Ptr rest_type = dictDecl->asType(2, rest);
                     if (!unify(first_type, rest_type, subst)) {
                         error (loc (), "Elements in dict are not same types");
