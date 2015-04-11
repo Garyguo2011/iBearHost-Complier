@@ -217,10 +217,6 @@ protected:
         if (decl != NULL) {
             id->addDecl(decl);
             for_each_child(c, this) {
-                if (c->arity() > 1 && c->oper()->syntax() == DEF
-                    && id->as_string() == c->child(0)->as_string()) {
-                    error(loc(), "child name can't be equal to the Def!");
-                }
                 c->collectDecls(decl);
             } end_for;
         }
@@ -410,9 +406,6 @@ protected:
             if (decl != NULL) {
                 id->addDecl(decl);
                 for_each_child (c, this) {
-                    if (c->arity() > 1 && c->oper()->syntax() == METHOD && name == c->child(0)->as_string()) {
-                        error(loc(), "child name can't be equal to the Class!");
-                    }
                     c->collectDecls (decl);
                 } end_for;
             }
