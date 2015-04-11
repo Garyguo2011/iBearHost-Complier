@@ -60,6 +60,42 @@ NODE_FACTORY (StmtList_AST, STMT_LIST);
 class Return_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Return_AST, AST_Tree);
+
+    // void collectDecls (Decl* enclosing)
+    // {
+    //     const Environ* env = enclosing->getEnviron();
+    //     DB(env);
+    //     for_each_child_var (c, this) {
+    //         if (env->find(c->as_string()) != NULL) {
+    //             c->collectDecls (enclosing);
+    //         } else {
+    //             error(loc(), "return expr declaration not found.");
+    //         }
+    //     } end_for;
+    // }
+
+    // /* DEBUGGING */
+
+    // void
+    // DB (const Environ* env)
+    // {
+    //     if (env == NULL) {
+    //         fprintf (stderr, "NULL\n");
+    //     } else {
+    //         const char* label;
+    //         label = "Immediate";
+    //         while (env != NULL) {
+    //             const Decl_Vector& members = env->get_members ();
+    //             fprintf (stderr, "%s:\n", label);
+    //             for (size_t i = 0; i < members.size (); i += 1) {
+    //                 fprintf (stderr, "   %s @%p\n", members[i]->getName ().c_str (),
+    //                          members[i]);
+    //             }
+    //             env = env->get_enclosure ();
+    //             label = "Enclosed by";
+    //         }
+    //     }
+    // }
 };
 
 NODE_FACTORY(Return_AST, RETURN);

@@ -19,11 +19,21 @@
 # 	return x
 # t :: int = f(a)
 # print(t)
-class f:
-	def __init__(self):
-		print 0
-def f():
-	return 0
-a = f()
+# class f:
+# 	def __init__(self):
+# 		print 0
+# def f():
+# 	return 0
+# a = f()
+# class A:
+# 	x = 3
+# 	def f(self):
+# 		if self.x > 0:
+# 			return x
+def g():
+	print x
+x = 5
+
+
 
 
