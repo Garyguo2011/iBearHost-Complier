@@ -36,9 +36,10 @@
 # x :: int = 1
 # if truth(x):
 # 	print 0
-f()
-def f():
-	pass
+# f()
+# def f():
+# 	pass
+print x
 
 
 
