@@ -105,7 +105,7 @@ unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
         if (t0->arity() != t1->arity()) {
             return false;
         }
-
+        
         // For nested types, also unify all children
         for (unsigned int i = 1; i < t0->arity(); i++) {
             if (!unify1((Type_Ptr)t0->child(i), (Type_Ptr)t1->child(i), subst)) {

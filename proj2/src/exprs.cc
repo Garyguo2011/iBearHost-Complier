@@ -162,6 +162,9 @@ protected:
         Type_Ptr functionType;
 
         if (child(0)->oper()->syntax() == ID) {
+            // cerr <<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
+            // print(cerr, 4);
+            // cerr << "\n";
             myType = makeFuncType(arity()-1);
 
             for (int count = 1; count < arity(); count++) {
@@ -186,7 +189,7 @@ protected:
                     // cerr << "\n";
                     // fprintf(stderr, "unified: %d\n", unified);
                     if (child(0)->getDecl(count)->getType()->arity() == 0) {
-                        returnType = Type::makeVar ();
+                        returnType = (Type_Ptr)myType->child(0);
                     } else {
                         returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
                     }
@@ -216,7 +219,7 @@ protected:
                 if(unifies(id->getDecl(count)->getType(), myType)) {
                     unified++;
                     if (id->getDecl(count)->getType()->arity() == 0) {
-                        returnType = Type::makeVar ();
+                        returnType = (Type_Ptr)myType->child(0);
                     } else {
                         returnType = (Type_Ptr)id->getDecl(count)->getType()->child(0);
                     }
