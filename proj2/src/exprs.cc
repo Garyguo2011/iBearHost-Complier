@@ -122,7 +122,7 @@ class Callable : public Typed_Tree {
 protected:
 
     NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
-    
+
     /** Returns the expression representing the quantity that is
      *  called to evaluate this expression. */
     virtual AST_Ptr calledExpr () {
@@ -145,6 +145,11 @@ protected:
     }
 
     // PUT COMMON CODE DEALING WITH TYPE-CHECKING or SCOPE RULES HERE.
+
+    void resolveTypes(Decl* context, Unifier& subst) {
+        Type_Ptr myFunctionType = makeFuncType(arity()-1);
+        
+    }
 
 };
 
