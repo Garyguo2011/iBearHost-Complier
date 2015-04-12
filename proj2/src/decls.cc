@@ -225,7 +225,8 @@ Decl::canAddFunc (AST_Ptr id)
          i++) {
         if ((*i)->getName() == name) {
             if (strcmp((*i)->declTypeName(), "vardecl") == 0 ||
-                strcmp((*i)->declTypeName(), "classdecl") == 0){
+                strcmp((*i)->declTypeName(), "classdecl") == 0 ||
+                strcmp((*i)->declTypeName(), "paramdecl") == 0){
                 error(id, "this Def has already been defined.");
                 return false;
             }
