@@ -22,6 +22,7 @@ AST::resolveTypesOuter (Decl* context)
 
     Unifier* subst = new Unifier();
     resolveTypes(context, *subst);
+    resolveTypes(context, *subst);
 
     subst->setBindings();
     freezeDecls (false);

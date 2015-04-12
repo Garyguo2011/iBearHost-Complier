@@ -167,18 +167,24 @@ protected:
         }
 
         else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
-            AST_Ptr id = child(0)->child(1);
-            print(cerr, 4);
-            cerr << "\n";
-            id->print(cerr, 4);
-            cerr << "\n";
-            for (int count = 0; count < child(0)->numDecls(); count++) {
-                if(unifies(id->getDecl(count)->getType(), myType)) {
-                    unified = true;
-                    setType((Type_Ptr)id->getDecl(count)->getType()->child(0), subst);
-                    break;
-                }
-            }
+            unified = true; // pass to Attributeref_AST to handle this.
+            // AST_Ptr id = child(0)->child(1);
+            // print(cerr, 4);
+            // cerr << "\n";
+            // child(0)->print(cerr, 4);
+            // cerr << "\n";
+            // fprintf(stderr, "numDecls: %d\n", id->numDecls());
+            // for (int count = 0; count < id->numDecls(); count++) {
+            //     myType->print(cerr, 4);
+            //     cerr << "\n";
+            //     id->getDecl(count)->print(cerr);
+            //     cerr << "\n";
+            //     if(unifies(id->getDecl(count)->getType(), myType)) {
+            //         unified = true;
+            //         setType((Type_Ptr)id->getDecl(count)->getType()->child(0), subst);
+            //         break;
+            //     }
+            // }
         }
 
         else {
