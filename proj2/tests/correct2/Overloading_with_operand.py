@@ -4,5 +4,5 @@ def h(x):
 def h(x):
     return x + " Zhang"
 
-print f(0)
-print f("Jinge")
+print h(0)
+print h("Jinge")

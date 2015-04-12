@@ -473,7 +473,12 @@ protected:
     void resolveTypes (Decl* context, Unifier& subst)
     {
         if (arity() == 2 && child(1)->oper()->syntax() == TYPE){
-            setType(getType(), subst);
+            if (unifies(getId()->getType(), getType())) {
+                setType(getType(), subst);
+                unify(getId()->getType(), getType(), subst);
+            } else {
+                error (loc(), "This typeId has another type.");
+            }
         }
     }
 };
