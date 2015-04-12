@@ -134,7 +134,7 @@ bool
 unify (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
 {
     Unifier s;
-    if (unify1 (t0, t1, subst)) {
+    if (unify1 (t0, t1, s)) {
         subst.transfer (s);
         return true;
     }
