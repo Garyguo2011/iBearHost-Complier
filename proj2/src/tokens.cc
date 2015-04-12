@@ -125,23 +125,26 @@ protected:
 
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
-        Decl_Vector decls;
-        gcstring name = as_string();
-        Decl* decl = classes->find(name);
-        if (decl != NULL && numDecls() == 0){
-            addDecl(decl);
-            return consTree(TYPE, this);
-        } 
-        env->find(name, decls);
-        if (decls.size() == 0){
-            //fprintf(stderr, "decl not found with \n");
-        } 
-        else {
-            for (Decl_Vector::const_iterator i = decls.begin (); 
-                 i != decls.end (); 
-                 i++)
-            {
-                addDecl(*i);
+        if (getDecl() == NULL) {
+            Decl_Vector decls;
+            gcstring name = as_string();
+            Decl* decl = classes->find(name);
+            if (decl != NULL && numDecls() == 0){
+                addDecl(decl);
+                return consTree(TYPE, this);
+            } 
+            env->find(name, decls);
+            if (decls.size() == 0){
+                //fprintf(stderr, "decl not found with \n");
+                error (loc(), "declaration not found");
+            } 
+            else {
+                for (Decl_Vector::const_iterator i = decls.begin (); 
+                     i != decls.end (); 
+                     i++)
+                {
+                    addDecl(*i);
+                }
             }
         }
         return this;

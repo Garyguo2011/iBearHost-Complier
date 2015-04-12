@@ -153,16 +153,6 @@ class Call_AST : public Callable {
 
 protected:
 
-    /** Add target declarations from first child to ENCLOSING.
-     *  Add declarations from the second child to ENCLOSING. */
-    void collectDecls (Decl* enclosing)
-    {
-        const Environ* env = enclosing->getEnviron();
-        if (env->find(child(0)->as_string()) == NULL) {
-            error(loc(), "ID for call does not found in this scope!");
-        }
-    }
-
     /** First check whether the node of AST is a TYPE(rescursively call otherwirse),
      *  then check whether there's a "__init__" method. If it is, create and return
      *  a new tree with the node of CALL1 that follows the relating rules and throw
