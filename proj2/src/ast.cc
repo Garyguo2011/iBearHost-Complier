@@ -109,6 +109,12 @@ AST::setType (Type_Ptr type, Unifier& subst)
     throw logic_error ("node does not represent something with a type");
 }
 
+
+bool
+AST::isCallable()
+{
+    return false;
+}
 /** Default does nothing. */
 AST_Ptr
 AST::doOuterSemantics ()

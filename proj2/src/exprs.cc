@@ -119,9 +119,16 @@ NODE_FACTORY(False_AST, FALSE);
  *  binary operators, unary operators, subscriptions, and slices. */
 
 class Callable : public Typed_Tree {
+public:
+
+    bool isCallable () {
+        return true;
+    }
+
 protected:
 
     NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
+
 
     /** Returns the expression representing the quantity that is
      *  called to evaluate this expression. */
@@ -148,26 +155,46 @@ protected:
 
     void resolveTypes(Decl* context, Unifier& subst) {
         AST::resolveTypes(context, subst);
-        Type_Ptr myType = makeFuncType(arity()-1);
 
-        for (int count = 1; count < arity(); count++) {
-            unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
-        }
-
-        bool unified = false;
+        int unified = 0;
+        Type_Ptr returnType;
+        Type_Ptr myType;
 
         if (child(0)->oper()->syntax() == ID) {
+            myType = makeFuncType(arity()-1);
+
+            for (int count = 1; count < arity(); count++) {
+                unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
+            }
+            Decl_Vector new_decls;
             for (int count = 0; count < child(0)->numDecls(); count++) {
+                // cerr << "\n decl is \n";
+                // child(0)->getDecl(count)->print(cerr);
+                // cerr << "\n potential type \n";
+                // child(0)->getDecl(count)->getType()->print(cerr,4);
+                // cerr << "\n my type is \n";
+                // myType->print(cerr, 4);
+                // cerr << "\n";
                 if(unifies(child(0)->getDecl(count)->getType(), myType)) {
-                    unified = true;
-                    setType((Type_Ptr)child(0)->getDecl(count)->getType()->child(0), subst);
-                    break;
+                    unified++;
+                    returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
+                }
+                else {
+                    child(0)->removeDecl(count);
+                    count--;
                 }
             }
         }
 
         else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
-            unified = true; // pass to Attributeref_AST to handle this.
+            myType = makeFuncType(arity());
+
+            unify((Type_Ptr)myType->child(1), child(0)->child(0)->getType(), subst);
+
+            for (int count = 1; count < arity(); count++) {
+                unify((Type_Ptr)myType->child(count+1), child(count)->getType(), subst);
+            }
+            // pass to Attributeref_AST to handle this.
             // AST_Ptr id = child(0)->child(1);
             // print(cerr, 4);
             // cerr << "\n";
@@ -185,17 +212,39 @@ protected:
             //         break;
             //     }
             // }
+            AST_Ptr id = child(0)->child(1);
+            for (int count = 0; count < id->numDecls(); count++) {
+                // myType->print(cerr, 4);
+                // cerr << "\n";
+                // id->getDecl(count)->getType()->print(cerr,4);
+                // cerr << "\n";
+                if(unifies(id->getDecl(count)->getType(), myType)) {
+                    unified++;
+                    returnType = (Type_Ptr)id->getDecl(count)->getType()->child(0);
+                }
+                else {
+                    id->removeDecl(count);
+                    count--;
+                }
+            }
         }
 
         else {
             if (unifies(myType, child(0)->getType())) {
-                unified = true;
-                setType(myType, subst);
+                unified++;
+                setType((Type_Ptr)myType->child(0), subst);
             }
         }
 
-        if (!unified) {
+        if (unified==0) {
             error (loc(), "no functions match");
+        }
+        else if (unified==1) {
+            setType(returnType, subst);
+        }
+        else {
+            // cerr << "more than one function! \n";
+            setType((Type_Ptr)myType->child(0), subst);
         }
     }
 };
@@ -204,7 +253,6 @@ protected:
 class Call_AST : public Callable {
 
 protected:
-
     /** First check whether the node of AST is a TYPE(rescursively call otherwirse),
      *  then check whether there's a "__init__" method. If it is, create and return
      *  a new tree with the node of CALL1 that follows the relating rules and throw
