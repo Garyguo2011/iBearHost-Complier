@@ -83,10 +83,6 @@ unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
     if (t0->oper()->syntax() != FUNCTION_TYPE || t1->oper()->syntax() != FUNCTION_TYPE) {
         t0 = t0->binding ();
         t1 = t1->binding ();
-        // cerr << "t0 is \n";
-        // t0 ->print(cerr, 4);
-        // cerr << "t1 is \n";
-        // t1 ->print(cerr, 4);
         if (t0 == t1)
             return true;
         if (t0->isTypeVariable ()) {
@@ -160,7 +156,7 @@ Type::getType ()
 AST_Ptr
 Type::getId ()
 {
-    return child(0);
+    return NULL;
 }
 
 int
@@ -359,6 +355,11 @@ makeMethodType (int n, Decl* clas)
 
 class TypeVar_AST : public Type {
 protected:
+
+    AST_Ptr getId ()
+    {
+        return child(0);
+    }
     
     NODE_CONSTRUCTORS_INIT (TypeVar_AST, Type, _me (NULL));
 
@@ -487,6 +488,10 @@ NODE_FACTORY (FunctionType_AST, FUNCTION_TYPE);
 
 class ClassType_AST: public Type {
 protected:
+    AST_Ptr getId ()
+    {
+        return child(0);
+    }
 
     NODE_CONSTRUCTORS (ClassType_AST, Type);
 

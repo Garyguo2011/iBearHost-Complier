@@ -179,9 +179,17 @@ protected:
                 if(unifies(child(0)->getDecl(count)->getType(), myType)) {
                     unified++;
                     // cerr << "CHOSEN RETURN TYPE \n";
+                    // child(0)->getDecl(count)->getType()->child(0)->print(cerr, 4);
+                    // cerr << "\n";
+                    // cerr << "FUNCTION TYPE \n";
                     // child(0)->getDecl(count)->getType()->print(cerr, 4);
                     // cerr << "\n";
-                    returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
+                    // fprintf(stderr, "unified: %d\n", unified);
+                    if (child(0)->getDecl(count)->getType()->arity() == 0) {
+                        returnType = Type::makeVar ();
+                    } else {
+                        returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
+                    }
                     functionType = (Type_Ptr)child(0)->getDecl(count)->getType();
                 }
                 else {
@@ -202,12 +210,16 @@ protected:
             AST_Ptr id = child(0)->child(1);
             for (int count = 0; count < id->numDecls(); count++) {
                 // myType->print(cerr, 4);
-                // cerr << "\n";
+                // cerr << ", myType\n";
                 // id->getDecl(count)->getType()->print(cerr,4);
-                // cerr << "\n";
+                // cerr << ", id getDecl getType\n";
                 if(unifies(id->getDecl(count)->getType(), myType)) {
                     unified++;
-                    returnType = (Type_Ptr)id->getDecl(count)->getType()->child(0);
+                    if (id->getDecl(count)->getType()->arity() == 0) {
+                        returnType = Type::makeVar ();
+                    } else {
+                        returnType = (Type_Ptr)id->getDecl(count)->getType()->child(0);
+                    }
                     functionType = (Type_Ptr)id->getDecl(count)->getType();
                 }
                 else {
