@@ -168,6 +168,10 @@ protected:
 
         else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
             AST_Ptr id = child(0)->child(1);
+            print(cerr, 4);
+            cerr << "\n";
+            id->print(cerr, 4);
+            cerr << "\n";
             for (int count = 0; count < child(0)->numDecls(); count++) {
                 if(unifies(id->getDecl(count)->getType(), myType)) {
                     unified = true;
@@ -440,6 +444,8 @@ protected:
         }
         if (attr->numDecls() == 1) {
             setType(attr->getDecl()->getType(), subst);
+        } else {
+            error(loc(), "attr not found");
         }
     }
 };
