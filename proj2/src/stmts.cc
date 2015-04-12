@@ -500,10 +500,55 @@ protected:
     {
         AST::resolveTypes (context, subst);
 
-        if (unify(child(0)->getType(), child(1)->getType(),subst)) {
-            setType(child(0)->getType(), subst);
-        } else {
-            error(loc(), "Assign left and right type inconsistency");
+        // cerr << "\n left \n";
+
+        // child(0)->getType()->print(cerr, 4);
+
+        // cerr << "\n right \n";
+
+        // child(1)->getType()->print(cerr, 4);
+
+
+
+        if (child(1)->isCallable() && child(1)->getType()->isTypeVariable()) {
+            if (unify(child(0)->getType(), child(1)->getType(),subst)) {
+                AST_Ptr function_id = NULL;
+                if (child(1)->child(0)->oper()->syntax() == ID) {
+                    function_id = child(1)->child(0);
+                }
+                else if (child(1)->child(0)->oper()->syntax() == ATTRIBUTEREF) {
+                    function_id = child(1)->child(0)->child(1);
+                }
+
+                if (function_id != NULL) {
+                    int unifications = 0;
+                    Type_Ptr function_type;
+                    for (int count = 0; count < function_id->numDecls(); count++) {
+                        if (unifies(child(1)->getType(), 
+                            function_id->getDecl(count)->getType())) {
+                            unifications++; 
+                            function_type = function_id->getDecl(count)->getType();
+                        }    
+                    }
+                    if (unifications == 0) {
+                        error (loc(), "No function found");
+                    }
+                    else if (unifications == 1){
+                        child(1)->setType(function_type, subst);
+                    }
+                    else {
+                        error (loc(), "Multiple matching types");
+                    }
+                }
+            }
+        }
+        else {
+            if (unify(child(0)->getType(), child(1)->getType(),subst)) {
+                setType(child(0)->getType(), subst);
+            } 
+            else {
+                error(loc(), "Assign left and right type inconsistency");
+            }
         }
     }
 };

@@ -123,6 +123,10 @@ protected:
 
     NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
 
+    bool isCallable () {
+        return true;
+    }
+
     /** Returns the expression representing the quantity that is
      *  called to evaluate this expression. */
     virtual AST_Ptr calledExpr () {
@@ -154,14 +158,28 @@ protected:
             unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
         }
 
-        bool unified = false;
+        int unified = 0;
+        Type_Ptr returnType;
 
         if (child(0)->oper()->syntax() == ID) {
+            // fprintf(stderr, "i am l ive got this many decls %d \n", child(0)->numDecls());
+            Decl_Vector new_decls;
             for (int count = 0; count < child(0)->numDecls(); count++) {
+                // cerr << "\n decl is \n";
+                // child(0)->getDecl(count)->print(cerr);
+                // cerr << "\n potential type \n";
+                // child(0)->getDecl(count)->getType()->print(cerr,4);
+                // cerr << "\n my type is \n";
+                // myType->print(cerr, 4);
+                // cerr << "\n";
                 if(unifies(child(0)->getDecl(count)->getType(), myType)) {
-                    unified = true;
-                    setType((Type_Ptr)child(0)->getDecl(count)->getType()->child(0), subst);
-                    break;
+                    unified++;
+                    returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
+                    new_decls.push_back(child(0)->getDecl(count));
+                }
+                else {
+                    child(0)->removeDecl(count);
+                    count--;
                 }
             }
         }
@@ -170,22 +188,31 @@ protected:
             AST_Ptr id = child(0)->child(1);
             for (int count = 0; count < child(0)->numDecls(); count++) {
                 if(unifies(id->getDecl(count)->getType(), myType)) {
-                    unified = true;
-                    setType((Type_Ptr)id->getDecl(count)->getType()->child(0), subst);
-                    break;
+                    unified++;
+                    returnType = (Type_Ptr)id->getDecl(count)->getType()->child(0);
+                }
+                else {
+                    child(0)->removeDecl(count);
+                    count--;
                 }
             }
         }
 
         else {
             if (unifies(myType, child(0)->getType())) {
-                unified = true;
-                setType(myType, subst);
+                unified++;
+                setType((Type_Ptr)myType->child(0), subst);
             }
         }
 
-        if (!unified) {
+        if (unified==0) {
             error (loc(), "no functions match");
+        }
+        else if (unified==1) {
+            setType(returnType, subst);
+        }
+        else {
+            setType((Type_Ptr)myType->child(0), subst);
         }
     }
 };
