@@ -115,7 +115,6 @@ protected:
         }
     }
 
-
     void _print (ostream& out, int indent, ASTSet& visited) {
 	out << "(id " << lineNumber () << " " << as_string ();
         if (getDecl () != NULL)
