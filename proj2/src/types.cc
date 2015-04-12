@@ -19,39 +19,9 @@ void
 AST::resolveTypesOuter (Decl* context) 
 {
     freezeDecls (true);
-    // FILL THIS IN
+
     Unifier* subst = new Unifier();
     resolveTypes(context, *subst);
-
-    // switch (this->oper()->syntax()) {
-        // case AND:
-        // case TRUE:
-        // case FALSE:
-
-        // case LIST_DISPLAY:
-        // case IF_EXPR:
-        // case TUPLE:
-        // case CALL1:
-        // {
-        //     this->print(cerr, 4);
-        //     cerr << "\n";
-        //     getType()->print(cerr, 4);
-        //     break;
-        // }
-        // case WHILE:
-        // case IF:
-        // {
-        //     this->print(cerr, 4);
-        //     cerr << "\n";
-        //     // getType()->print(cerr, 4);
-        //     break;
-        // }
-        // default:
-        //     break;
-
-    // }
-    
-    // cerr << "\n";
 
     subst->setBindings();
     freezeDecls (false);
@@ -110,25 +80,31 @@ Unifier::~Unifier ()
 static bool
 unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
 {
-    t0 = t0->binding ();
-    t1 = t1->binding ();
-    if (t0 == t1)
-        return true;
-    if (t0->isTypeVariable ()) {
-        subst.bind (t0, t1);
-        return true;
-    }
-    subst.bind (t1, t0);
-    if (t1->isTypeVariable ())
-        return true;
-    if ((t0->getId () == NULL) != (t1->getId () == NULL))
-        return false;
-    if (t0->getId () != NULL) {
-        if (t0->getId ()->getDecl () != t1->getId ()->getDecl ())
-            return false;
-    }
-
     if (t0->oper()->syntax() != FUNCTION_TYPE && t1->oper()->syntax() != FUNCTION_TYPE) {
+        t0 = t0->binding ();
+        t1 = t1->binding ();
+        // cerr << "t0 is \n";
+        // t0 ->print(cerr, 4);
+        // cerr << "t1 is \n";
+        // t1 ->print(cerr, 4);
+        if (t0 == t1)
+            return true;
+        if (t0->isTypeVariable ()) {
+            subst.bind (t0, t1);
+            return true;
+        }
+        subst.bind (t1, t0);
+        if (t1->isTypeVariable ()) {
+            return true;
+        }
+        if ((t0->getId () == NULL) != (t1->getId () == NULL)) {
+            return false;
+        }
+        if (t0->getId () != NULL) {
+            if (t0->getId ()->getDecl () != t1->getId ()->getDecl ()) {
+                return false;
+            }
+        }
         // Compound types have different numbers of children, cannot possibly unify
         if (t0->arity() != t1->arity()) {
             return false;
@@ -142,12 +118,14 @@ unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
         }
     }
 
-    if (t0->numTypeParams () != t1->numTypeParams ())
+    if (t0->numTypeParams () != t1->numTypeParams ()) {
         return false;
+    }
 
     for (int i = 0; i < t0->numTypeParams (); i += 1) {
-        if (!unify1 (t0->typeParam (i), t1->typeParam (i), subst))
+        if (!unify1 (t0->typeParam (i), t1->typeParam (i), subst)) {
             return false;
+        }
     }
     return true;
 }
@@ -470,11 +448,11 @@ class FunctionType_AST: public Type {
 protected:
 
     int numParams () {
-        return child (1)->arity ();
+        return arity () -1;
     }
 
     Type_Ptr paramType (int k) {
-        return child (1)->child (k)->asType ();
+        return child (k+1)->asType ();
     }
 
     Type_Ptr returnType () {

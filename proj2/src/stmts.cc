@@ -61,41 +61,12 @@ class Return_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(Return_AST, AST_Tree);
 
-    // void collectDecls (Decl* enclosing)
-    // {
-    //     const Environ* env = enclosing->getEnviron();
-    //     DB(env);
-    //     for_each_child_var (c, this) {
-    //         if (env->find(c->as_string()) != NULL) {
-    //             c->collectDecls (enclosing);
-    //         } else {
-    //             error(loc(), "return expr declaration not found.");
-    //         }
-    //     } end_for;
-    // }
-
-    // /* DEBUGGING */
-
-    // void
-    // DB (const Environ* env)
-    // {
-    //     if (env == NULL) {
-    //         fprintf (stderr, "NULL\n");
-    //     } else {
-    //         const char* label;
-    //         label = "Immediate";
-    //         while (env != NULL) {
-    //             const Decl_Vector& members = env->get_members ();
-    //             fprintf (stderr, "%s:\n", label);
-    //             for (size_t i = 0; i < members.size (); i += 1) {
-    //                 fprintf (stderr, "   %s @%p\n", members[i]->getName ().c_str (),
-    //                          members[i]);
-    //             }
-    //             env = env->get_enclosure ();
-    //             label = "Enclosed by";
-    //         }
-    //     }
-    // }
+    void resolveTypes(Decl* context, Unifier& subst) {
+        child(0)->resolveTypes(context, subst);
+        if (!unify(child(0)->getType(), (Type_Ptr)context->getType()->child(0), subst)) {
+            error (loc(), "wrong return type");
+        }
+    }
 };
 
 NODE_FACTORY(Return_AST, RETURN);
@@ -224,6 +195,20 @@ protected:
             } end_for;
         }
     }
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        Type_Ptr myType = makeFuncType(child(1)->arity());
+        Type_Ptr returnType = child(0)->getDecl()->getType();
+        unify(myType->returnType(), returnType, subst);
+        for (int count = 1; count < myType->arity(); count++) {
+            unify((Type_Ptr)myType->child(count), 
+                    child(1)->child(count-1)->getType(), 
+                    subst);
+        }
+        child(0)->getDecl()->setType(myType);
+
+        AST::resolveTypes(child(0)->getDecl(), subst);
+    }
 };
 
 NODE_FACTORY(Def_AST, DEF);
@@ -243,14 +228,7 @@ protected:
             error(loc(), "Method cannot have zero parameters");
         }
         else if ((std::string) child(1)->child(0)->child(0)->as_string().c_str() == (std::string) "self") {
-            AST_Ptr id = child(0);
-            Decl* decl = enclosing->addDefDecl(id);
-            if (decl != NULL) {
-                id->addDecl(decl);
-                for_each_child(c, this) {
-                    c->collectDecls(decl);
-                } end_for;
-            }
+            Def_AST::collectDecls(enclosing);
         } else {
             error(loc(), "first parameter should be a self in a class method!");
         }
@@ -271,22 +249,28 @@ protected:
         int count = 0;
         for_each_child(c, this) {
             Decl* decl;
-            if (c->oper()->syntax() == TYPED_ID) {
+            if (enclosing->isMethod() && count == 0) {
+                decl = makeParamDecl(c->getId()->as_string(), 
+                                        enclosing, 
+                                        count, 
+                                        enclosing->getContainer()->asType());
+                c->getId()->addDecl(decl);
+            }
+            else {
                 decl = makeParamDecl(c->getId()->as_string(), 
                                         enclosing, 
                                         count, 
                                         c->child(1));
                 c->getId()->addDecl(decl);
             } 
-            else {
-                decl = makeParamDecl(c->as_string(),
-                                    enclosing,
-                                    count,
-                                    Type::makeVar());
-                c->addDecl(decl);
-            }
             count++;
             enclosing->addMember(decl);
+        } end_for;
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        for_each_child_var(c, this) {
+            unify((Type_Ptr)c->child(1), c->child(0)->getDecl()->getType(), subst);
         } end_for;
     }
 
@@ -493,7 +477,6 @@ protected:
             setType(getType(), subst);
         }
     }
-
 };
 
 NODE_FACTORY(TypedID_AST, TYPED_ID);

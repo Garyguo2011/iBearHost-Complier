@@ -122,7 +122,7 @@ class Callable : public Typed_Tree {
 protected:
 
     NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
-    
+
     /** Returns the expression representing the quantity that is
      *  called to evaluate this expression. */
     virtual AST_Ptr calledExpr () {
@@ -146,6 +146,48 @@ protected:
 
     // PUT COMMON CODE DEALING WITH TYPE-CHECKING or SCOPE RULES HERE.
 
+    void resolveTypes(Decl* context, Unifier& subst) {
+        AST::resolveTypes(context, subst);
+        Type_Ptr myType = makeFuncType(arity()-1);
+
+        for (int count = 1; count < arity(); count++) {
+            unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
+        }
+
+        bool unified = false;
+
+        if (child(0)->oper()->syntax() == ID) {
+            for (int count = 0; count < child(0)->numDecls(); count++) {
+                if(unifies(child(0)->getDecl(count)->getType(), myType)) {
+                    unified = true;
+                    setType((Type_Ptr)child(0)->getDecl(count)->getType()->child(0), subst);
+                    break;
+                }
+            }
+        }
+
+        else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
+            AST_Ptr id = child(0)->child(1);
+            for (int count = 0; count < child(0)->numDecls(); count++) {
+                if(unifies(id->getDecl(count)->getType(), myType)) {
+                    unified = true;
+                    setType((Type_Ptr)id->getDecl(count)->getType()->child(0), subst);
+                    break;
+                }
+            }
+        }
+
+        else {
+            if (unifies(myType, child(0)->getType())) {
+                unified = true;
+                setType(myType, subst);
+            }
+        }
+
+        if (!unified) {
+            error (loc(), "no functions match");
+        }
+    }
 };
 
 /** Call AST for function call, inherited from Callable. */
@@ -314,6 +356,8 @@ class Attributeref_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
 
+    void addTargetDecls (Decl* enclosing) {}
+
     /** Simply recursively call it. */
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
@@ -355,25 +399,30 @@ protected:
      *  with ID, appropriately decorated, assuming that ENV defines
      *  all visible classes.   Returns the modified tree. */
     AST_Ptr resolveStaticSelections (const Environ* env) {
-        AST_Ptr id0 = this->child(0);
-        Decl* decl = id0->getDecl();
-        AST_Ptr id1 = getId();
-        if (decl != NULL) {
-            Decl_Vector decls;
-            decl->getEnviron()->find_immediate(id1->as_string(), decls);
-            for (Decl_Vector::const_iterator i = decls.begin ();
-                     i != decls.end ();
-                     i++)
-            {
-                if ((*i)->isMethod()) {
-                    id1->addDecl((*i));
-                    return id1;
+        if (child(0)->oper()->syntax() == TYPE) {
+            AST_Ptr id0 = child(0)->child(0);
+            Decl* decl = env->find_immediate(id0->as_string());
+            AST_Ptr id1 = this->child(1);
+            if (decl != NULL) {
+                Decl_Vector decls;
+                decl->getEnviron()->find_immediate(id1->as_string(), decls);
+                for (Decl_Vector::const_iterator i = decls.begin ();
+                         i != decls.end ();
+                         i++)
+                {
+                    if ((*i)->isMethod()) {
+                        id1->addDecl((*i));
+                    }
                 }
+            } 
+            else {
+                error(loc(), "Instance method not found.");
             }
-        } else {
-            error(loc(), "Class not found.");
+            return id1;
         }
-        return id1;
+        else {
+            return this;
+        }
     }
 
     /** For E.x, first resolve type of E, then go through every decl of x 
@@ -384,9 +433,10 @@ protected:
         AST_Ptr attr = child(1);
         obj->resolveTypes(context, subst);
         for (int count = 0; count < attr->numDecls(); count++) {
-            if (!unify(obj->getType(),attr->getDecl(count)->getContainer()->asType() ,subst)) {
+            if (!unify(obj->getType(),attr->getDecl(count)->getContainer()->asGenericType() ,subst)) {
                 attr->removeDecl(count);
             }
+
         }
         if (attr->numDecls() == 1) {
             setType(attr->getDecl()->getType(), subst);
