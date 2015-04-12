@@ -206,7 +206,6 @@ protected:
                     subst);
         }
         child(0)->getDecl()->setType(myType);
-
         AST::resolveTypes(child(0)->getDecl(), subst);
     }
 };

@@ -177,6 +177,9 @@ protected:
                 // cerr << "\n";
                 if(unifies(child(0)->getDecl(count)->getType(), myType)) {
                     unified++;
+                    // cerr << "CHOSEN RETURN TYPE \n";
+                    // child(0)->getDecl(count)->getType()->print(cerr, 4);
+                    // cerr << "\n";
                     returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
                 }
                 else {
@@ -194,24 +197,6 @@ protected:
             for (int count = 1; count < arity(); count++) {
                 unify((Type_Ptr)myType->child(count+1), child(count)->getType(), subst);
             }
-            // pass to Attributeref_AST to handle this.
-            // AST_Ptr id = child(0)->child(1);
-            // print(cerr, 4);
-            // cerr << "\n";
-            // child(0)->print(cerr, 4);
-            // cerr << "\n";
-            // fprintf(stderr, "numDecls: %d\n", id->numDecls());
-            // for (int count = 0; count < id->numDecls(); count++) {
-            //     myType->print(cerr, 4);
-            //     cerr << "\n";
-            //     id->getDecl(count)->print(cerr);
-            //     cerr << "\n";
-            //     if(unifies(id->getDecl(count)->getType(), myType)) {
-            //         unified = true;
-            //         setType((Type_Ptr)id->getDecl(count)->getType()->child(0), subst);
-            //         break;
-            //     }
-            // }
             AST_Ptr id = child(0)->child(1);
             for (int count = 0; count < id->numDecls(); count++) {
                 // myType->print(cerr, 4);
@@ -498,7 +483,8 @@ protected:
         }
         if (attr->numDecls() == 1) {
             setType(attr->getDecl()->getType(), subst);
-        } else {
+        } 
+        else if (attr->numDecls() == 0) {
             error(loc(), "attr not found");
         }
     }
