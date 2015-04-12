@@ -193,7 +193,7 @@ def __setitem__(S::dict of [int, $b], k::int, val::$b):
 def __setitem__(S::dict of [bool, $b], k::bool, val::$b):
     native "__setitem__dict__"
 
-def __setitem__(S::dict of [str, $b], k::int, val::$b):
+def __setitem__(S::dict of [str, $b], k::str, val::$b):
     native "__setitem__dict__"
 
 def len(D::dict of [int, $b])::int:
