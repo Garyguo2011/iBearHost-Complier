@@ -125,7 +125,7 @@ protected:
 
     AST_Ptr resolveSimpleIds (const Environ* env)
     {
-        if (getDecl() == NULL) {
+        if (numDecls() == 0) {
             Decl_Vector decls;
             gcstring name = as_string();
             Decl* decl = classes->find(name);
@@ -135,7 +135,6 @@ protected:
             } 
             env->find(name, decls);
             if (decls.size() == 0){
-                //fprintf(stderr, "decl not found with \n");
                 error (loc(), "declaration not found");
             } 
             else {

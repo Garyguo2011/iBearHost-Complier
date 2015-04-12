@@ -172,6 +172,8 @@ public:
      *  avoid multiple error messages. */
     void recordError ();
 
+    virtual bool isCallable ();
+
 protected:
 
     AST ();

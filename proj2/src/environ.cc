@@ -48,7 +48,9 @@ Environ::find_immediate (const gcstring& name, Decl_Vector& defns) const
 	 i++) 
     {
 	if (name == (*i)->getName ())
+    {
 	    defns.push_back (*i);
+    }
     }
 }
     
