@@ -516,6 +516,9 @@ protected:
         if (decl != NULL) {
             this->addDecl(decl);
         }
+        if (classes->find(id->as_string()) == NULL) {
+            error(loc(), "Invalid type for class");
+        }
         for_each_child (c, this) {
             c->resolveSimpleTypeIds (env);
         } end_for;
