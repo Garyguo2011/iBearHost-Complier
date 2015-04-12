@@ -530,7 +530,7 @@ class ClassDecl : public Decl {
 public:
 
     ClassDecl (const gcstring& name, AST_Ptr params)
-        : Decl (name, NULL, new Environ (outer_environ)), _params (params) {
+        : Decl (name, fileDecl, new Environ (fileDecl->getEnviron())), _params (params) {
     }
 
 protected:
