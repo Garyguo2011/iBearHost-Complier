@@ -159,6 +159,7 @@ protected:
         int unified = 0;
         Type_Ptr returnType;
         Type_Ptr myType;
+        Type_Ptr functionType;
 
         if (child(0)->oper()->syntax() == ID) {
             myType = makeFuncType(arity()-1);
@@ -181,6 +182,7 @@ protected:
                     // child(0)->getDecl(count)->getType()->print(cerr, 4);
                     // cerr << "\n";
                     returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
+                    functionType = (Type_Ptr)child(0)->getDecl(count)->getType();
                 }
                 else {
                     child(0)->removeDecl(count);
@@ -206,6 +208,7 @@ protected:
                 if(unifies(id->getDecl(count)->getType(), myType)) {
                     unified++;
                     returnType = (Type_Ptr)id->getDecl(count)->getType()->child(0);
+                    functionType = (Type_Ptr)id->getDecl(count)->getType();
                 }
                 else {
                     id->removeDecl(count);
@@ -226,6 +229,7 @@ protected:
         }
         else if (unified==1) {
             setType(returnType, subst);
+            unify(myType, functionType, subst);
         }
         else {
             // cerr << "more than one function! \n";
