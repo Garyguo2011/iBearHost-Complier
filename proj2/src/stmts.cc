@@ -512,12 +512,15 @@ protected:
 
         // child(1)->getType()->print(cerr, 4);
 
+        // cerr << "\n is right side bound? \n";
+
+        // cerr << subst.isBound(child(1)->getType());
+
         // cerr << "\n";
 
-        // child(1)->print(cerr, 4);
-
-
-        if (child(1)->isCallable() && child(1)->getType()->isTypeVariable()) {
+        if (child(1)->isCallable() 
+            && subst.binding(child(1)->getType())->isTypeVariable()
+            ) {
             if (unify(child(0)->getType(), child(1)->getType(),subst)) {
                 AST_Ptr function_id = NULL;
                 if (child(1)->child(0)->oper()->syntax() == ID) {
@@ -535,11 +538,11 @@ protected:
                             (Type_Ptr)function_id->getDecl(count)->getType()->child(0))) {
                             unifications++; 
                             function_type = function_id->getDecl(count)->getType();
+                            // cerr << "this function type is \n";
+                            // function_type->print(cerr, 4);
+                            // cerr << "\n";
                         }    
                         else {
-                            // cerr << "\n failed decl \n";
-                            // function_id->getDecl(count)->print(cerr);
-                            // cerr << "\n";
                             function_id->removeDecl(count);
                             count--;
                         }
@@ -548,7 +551,7 @@ protected:
                         error (loc(), "No function found");
                     }
                     else if (unifications == 1){
-                        child(1)->setType(function_type, subst);
+                        child(1)->setType((Type_Ptr)function_type->child(0), subst);
                     }
                     else {
                         error (loc(), "Multiple matching types");

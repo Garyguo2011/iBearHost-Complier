@@ -80,7 +80,7 @@ Unifier::~Unifier ()
 static bool
 unify1 (Type_Ptr t0, Type_Ptr t1, Unifier& subst)
 {
-    if (t0->oper()->syntax() != FUNCTION_TYPE && t1->oper()->syntax() != FUNCTION_TYPE) {
+    if (t0->oper()->syntax() != FUNCTION_TYPE || t1->oper()->syntax() != FUNCTION_TYPE) {
         t0 = t0->binding ();
         t1 = t1->binding ();
         // cerr << "t0 is \n";

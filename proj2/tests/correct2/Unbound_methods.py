@@ -5,7 +5,7 @@ class C:
     def g (self):
         return 6
 
-vg::(C)->int = A.g
+vg::(C)->int = C.g
 
 anC::C = C()
 
