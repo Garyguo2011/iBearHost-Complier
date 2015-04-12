@@ -172,7 +172,7 @@ public:
      *  avoid multiple error messages. */
     void recordError ();
 
-    bool isCallable ();
+    virtual bool isCallable ();
 
 protected:
 

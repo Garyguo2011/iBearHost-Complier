@@ -119,13 +119,16 @@ NODE_FACTORY(False_AST, FALSE);
  *  binary operators, unary operators, subscriptions, and slices. */
 
 class Callable : public Typed_Tree {
-protected:
-
-    NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
+public:
 
     bool isCallable () {
         return true;
     }
+
+protected:
+
+    NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
+
 
     /** Returns the expression representing the quantity that is
      *  called to evaluate this expression. */
@@ -175,7 +178,6 @@ protected:
                 if(unifies(child(0)->getDecl(count)->getType(), myType)) {
                     unified++;
                     returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
-                    new_decls.push_back(child(0)->getDecl(count));
                 }
                 else {
                     child(0)->removeDecl(count);
@@ -186,10 +188,6 @@ protected:
 
         else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
             AST_Ptr id = child(0)->child(1);
-            print(cerr, 4);
-            cerr << "\n";
-            id->print(cerr, 4);
-            cerr << "\n";
             for (int count = 0; count < child(0)->numDecls(); count++) {
                 if(unifies(id->getDecl(count)->getType(), myType)) {
                     unified++;
@@ -216,6 +214,7 @@ protected:
             setType(returnType, subst);
         }
         else {
+            // cerr << "more than one function! \n";
             setType((Type_Ptr)myType->child(0), subst);
         }
     }
@@ -225,7 +224,6 @@ protected:
 class Call_AST : public Callable {
 
 protected:
-
     /** First check whether the node of AST is a TYPE(rescursively call otherwirse),
      *  then check whether there's a "__init__" method. If it is, create and return
      *  a new tree with the node of CALL1 that follows the relating rules and throw

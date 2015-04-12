@@ -508,6 +508,9 @@ protected:
 
         // child(1)->getType()->print(cerr, 4);
 
+        // cerr << "\n";
+
+        // child(1)->print(cerr, 4);
 
 
         if (child(1)->isCallable() && child(1)->getType()->isTypeVariable()) {
@@ -525,10 +528,17 @@ protected:
                     Type_Ptr function_type;
                     for (int count = 0; count < function_id->numDecls(); count++) {
                         if (unifies(child(1)->getType(), 
-                            function_id->getDecl(count)->getType())) {
+                            (Type_Ptr)function_id->getDecl(count)->getType()->child(0))) {
                             unifications++; 
                             function_type = function_id->getDecl(count)->getType();
                         }    
+                        else {
+                            // cerr << "\n failed decl \n";
+                            // function_id->getDecl(count)->print(cerr);
+                            // cerr << "\n";
+                            function_id->removeDecl(count);
+                            count--;
+                        }
                     }
                     if (unifications == 0) {
                         error (loc(), "No function found");
