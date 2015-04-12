@@ -393,6 +393,18 @@ NODE_FACTORY(Compare_AST, COMPARE);
 class LeftCompare_AST : public Binop_AST {
 protected:
 
+    void resolveTypes (Decl* context, Unifier& subst)
+    {
+        for_each_child(c, this) {
+            c->resolveTypes(context, subst);
+        } end_for;
+        if (unify(child(1)->getType(), child(2)->getType(), subst)) {
+            setType(child(1)->getType(), subst);
+        } else {
+            error(loc(), "Types for two children of left_compare doesn't match.");
+        }
+    }
+
     NODE_CONSTRUCTORS(LeftCompare_AST, Binop_AST);
 };
 

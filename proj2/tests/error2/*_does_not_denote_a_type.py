@@ -1,1 +1,2 @@
-a :: integer = 1
+y :: str = "12"
+a :: y = 1
