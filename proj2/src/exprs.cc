@@ -386,10 +386,21 @@ protected:
         return id1;
     }
 
+    /** For E.x, first resolve type of E, then go through every decl of x 
+     *  and check whether E is a class and the decl of x is an attribute of E
+     */
     void resolveTypes(Decl* context, Unifier& subst) {
         AST_Ptr obj = child(0);
         AST_Ptr attr = child(1);
-
+        obj->resolveTypes(context, subst);
+        for (int count = 0; count < attr->numDecls(); count++) {
+            if (!unify(obj->getType(),attr->getDecl(count)->getContainer()->asType() ,subst)) {
+                attr->removeDecl(count);
+            }
+        }
+        if (attr->numDecls() == 1) {
+            setType(attr->getDecl()->getType(), subst);
+        }
     }
 };
 
