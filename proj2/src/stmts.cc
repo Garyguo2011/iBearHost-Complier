@@ -201,7 +201,9 @@ protected:
         Type_Ptr returnType = child(0)->getDecl()->getType();
         unify(myType->returnType(), returnType, subst);
         for (int count = 1; count < myType->arity(); count++) {
-            unify((Type_Ptr)myType->child(count), child(1)->child(count-1)->getType(), subst);
+            unify((Type_Ptr)myType->child(count), 
+                    child(1)->child(count-1)->getType(), 
+                    subst);
         }
         child(0)->getDecl()->setType(myType);
 
@@ -226,14 +228,7 @@ protected:
             error(loc(), "Method cannot have zero parameters");
         }
         else if ((std::string) child(1)->child(0)->child(0)->as_string().c_str() == (std::string) "self") {
-            AST_Ptr id = child(0);
-            Decl* decl = enclosing->addDefDecl(id);
-            if (decl != NULL) {
-                id->addDecl(decl);
-                for_each_child(c, this) {
-                    c->collectDecls(decl);
-                } end_for;
-            }
+            Def_AST::collectDecls(enclosing);
         } else {
             error(loc(), "first parameter should be a self in a class method!");
         }
@@ -254,22 +249,28 @@ protected:
         int count = 0;
         for_each_child(c, this) {
             Decl* decl;
-            if (c->oper()->syntax() == TYPED_ID) {
+            if (enclosing->isMethod() && count == 0) {
+                decl = makeParamDecl(c->getId()->as_string(), 
+                                        enclosing, 
+                                        count, 
+                                        enclosing->getContainer()->asType());
+                c->getId()->addDecl(decl);
+            }
+            else {
                 decl = makeParamDecl(c->getId()->as_string(), 
                                         enclosing, 
                                         count, 
                                         c->child(1));
                 c->getId()->addDecl(decl);
             } 
-            else {
-                decl = makeParamDecl(c->as_string(),
-                                    enclosing,
-                                    count,
-                                    Type::makeVar());
-                c->addDecl(decl);
-            }
             count++;
             enclosing->addMember(decl);
+        } end_for;
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst) {
+        for_each_child_var(c, this) {
+            unify((Type_Ptr)c->child(1), c->child(0)->getDecl()->getType(), subst);
         } end_for;
     }
 
@@ -498,11 +499,6 @@ protected:
     void resolveTypes (Decl* context, Unifier& subst)
     {
         AST::resolveTypes (context, subst);
-
-        if ( child(1)->oper()->syntax() == CALL ||
-             child(1)->oper()->syntax() == CALL1 ) {
-
-        }
 
         if (unify(child(0)->getType(), child(1)->getType(),subst)) {
             setType(child(0)->getType(), subst);

@@ -1,6 +1,5 @@
-class A:
-	def __init__(self):
-		pass
-	y = 5
-x = A()
-x.y = 5
+def f(x::int):
+	return x
+def f(x::str):
+	return x
+f("hello")
