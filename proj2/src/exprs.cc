@@ -312,6 +312,7 @@ NODE_FACTORY(LeftCompare_AST, LEFT_COMPARE);
 /** Attributeref AST for attributeref from the grammar rule, inherited from Typed_Tree. */
 class Attributeref_AST : public Typed_Tree {
 protected:
+    NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
 
     /** Simply recursively call it. */
     AST_Ptr resolveSimpleIds (const Environ* env)
@@ -323,9 +324,24 @@ protected:
             }
             count++;
         } end_for;
+        if (!child(0)->isType()) {
+            AST_Ptr attr = child(1);
+            Decl_Vector all_classes = classes->get_members();
+            for (Decl_Vector::const_iterator i = all_classes.begin (); 
+             i != all_classes.end (); 
+             i++) {
+                Decl_Vector class_members = (*i)->getEnviron()->get_members();
+                for (Decl_Vector::const_iterator member = class_members.begin (); 
+                 member != class_members.end (); 
+                 member++) {
+                    if ((*member)->getName() == attr->as_string()) {
+                        attr->addDecl(*member);
+                    }
+                }
+            }
+        }
         return this;
     }
-    NODE_CONSTRUCTORS(Attributeref_AST, Typed_Tree);
 
     AST_Ptr getId() {
         return child(1);
@@ -358,6 +374,23 @@ protected:
             error(loc(), "Class not found.");
         }
         return id1;
+    }
+
+    /** For E.x, first resolve type of E, then go through every decl of x 
+     *  and check whether E is a class and the decl of x is an attribute of E
+     */
+    void resolveTypes(Decl* context, Unifier& subst) {
+        AST_Ptr obj = child(0);
+        AST_Ptr attr = child(1);
+        obj->resolveTypes(context, subst);
+        for (int count = 0; count < attr->numDecls(); count++) {
+            if (!unify(obj->getType(),attr->getDecl(count)->getContainer()->asType() ,subst)) {
+                attr->removeDecl(count);
+            }
+        }
+        if (attr->numDecls() == 1) {
+            setType(attr->getDecl()->getType(), subst);
+        }
     }
 };
 
