@@ -156,10 +156,9 @@ protected:
 
         bool unified = false;
 
-
         if (child(0)->oper()->syntax() == ID) {
             for (int count = 0; count < child(0)->numDecls(); count++) {
-                if(unify(child(0)->getDecl(count)->getType(), myType, subst)) {
+                if(unifies(child(0)->getDecl(count)->getType(), myType)) {
                     unified = true;
                     setType((Type_Ptr)child(0)->getDecl(count)->getType()->child(0), subst);
                     break;
@@ -170,7 +169,7 @@ protected:
         else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
             AST_Ptr id = child(0)->child(1);
             for (int count = 0; count < child(0)->numDecls(); count++) {
-                if(unify(id->getDecl(count)->getType(), myType, subst)) {
+                if(unifies(id->getDecl(count)->getType(), myType)) {
                     unified = true;
                     setType((Type_Ptr)id->getDecl(count)->getType()->child(0), subst);
                     break;
@@ -179,7 +178,7 @@ protected:
         }
 
         else {
-            if (unify(myType, child(0)->getType(), subst)) {
+            if (unifies(myType, child(0)->getType())) {
                 unified = true;
                 setType(myType, subst);
             }
