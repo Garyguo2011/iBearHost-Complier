@@ -549,6 +549,42 @@ NODE_FACTORY(Tuple_AST, TUPLE);
 class TargetList_AST : public Typed_Tree {
 protected:
 
+    /** Wrap types in a tuple type. */
+    void resolveTypes (Decl* context, Unifier& subst) {
+        
+        for_each_child_var(c, this) {
+            c->resolveTypes(context, subst);
+        } end_for;
+
+        switch (arity())
+        {
+            case 1:
+            {
+                Type_Ptr type_list[1];
+                type_list[0] = child(0)->getType();
+                setType(tuple1Decl->asType(arity(), type_list), subst);
+                break;
+            }
+            case 2:
+            {
+                Type_Ptr type_list[2];
+                type_list[0] = child(0)->getType();
+                type_list[1] = child(1)->getType();
+                setType(tuple2Decl->asType(arity(), type_list), subst);
+                break;
+            }
+            case 3:
+            {
+                Type_Ptr type_list[3];
+                type_list[0] = child(0)->getType();
+                type_list[1] = child(1)->getType();
+                type_list[2] = child(2)->getType();
+                setType(tuple3Decl->asType(arity(), type_list), subst);
+                break;
+            }
+        }
+    }
+
     NODE_CONSTRUCTORS(TargetList_AST, Typed_Tree);
 };
 
