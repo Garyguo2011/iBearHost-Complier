@@ -158,7 +158,7 @@ protected:
 
         int unified = 0;
         Type_Ptr returnType;
-        Type_Ptr myType = NULL;
+        Type_Ptr myType;
         Type_Ptr functionType;
 
         if (child(0)->oper()->syntax() == ID) {
@@ -167,9 +167,9 @@ protected:
             for (unsigned int count = 1; count < arity(); count++) {
                 unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
             }
-            Decl_Vector new_decls;
             // fprintf(stderr, "numdecls is %d\n", child(0)->numDecls());
             for (int count = 0; count < child(0)->numDecls(); count++) {
+                Type_Ptr potential_type = child(0)->getDecl(count)->getType();
                 // cerr << "\n decl is \n";
                 // child(0)->getDecl(count)->print(cerr);
                 // cerr << "\n potential type \n";
@@ -179,7 +179,7 @@ protected:
                 // cerr << "\n";
                 // ((Type_Ptr) myType->child(1))->binding()->print(cerr, 4);
                 // cerr << "\n";
-                if(unifies(child(0)->getDecl(count)->getType(), myType)) {
+                if(unifies(potential_type, myType)) {
                     unified++;
                     // cerr << "CHOSEN RETURN TYPE \n";
                     // child(0)->getDecl(count)->getType()->child(0)->print(cerr, 4);
@@ -188,12 +188,12 @@ protected:
                     // child(0)->getDecl(count)->getType()->print(cerr, 4);
                     // cerr << "\n";
                     // fprintf(stderr, "unified: %d\n", unified);
-                    if (child(0)->getDecl(count)->getType()->arity() == 0) {
+                    if (potential_type->arity() == 0) {
                         returnType = (Type_Ptr)myType->child(0);
                     } else {
-                        returnType = (Type_Ptr)child(0)->getDecl(count)->getType()->child(0);
+                        returnType = (Type_Ptr)potential_type->child(0);
                     }
-                    functionType = (Type_Ptr)child(0)->getDecl(count)->getType();
+                    functionType = potential_type;
                 }
                 else {
                     child(0)->removeDecl(count);
@@ -212,18 +212,19 @@ protected:
             }
             AST_Ptr id = child(0)->child(1);
             for (int count = 0; count < id->numDecls(); count++) {
+                Type_Ptr potential_type = id->getDecl(count)->getType();
                 // myType->print(cerr, 4);
                 // cerr << ", myType\n";
                 // id->getDecl(count)->getType()->print(cerr,4);
                 // cerr << ", id getDecl getType\n";
-                if(unifies(id->getDecl(count)->getType(), myType)) {
+                if(unifies(potential_type, myType)) {
                     unified++;
-                    if (id->getDecl(count)->getType()->arity() == 0) {
+                    if (potential_type->arity() == 0) {
                         returnType = (Type_Ptr)myType->child(0);
                     } else {
-                        returnType = (Type_Ptr)id->getDecl(count)->getType()->child(0);
+                        returnType = (Type_Ptr)potential_type->child(0);
                     }
-                    functionType = (Type_Ptr)id->getDecl(count)->getType();
+                    functionType = potential_type;
                 }
                 else {
                     id->removeDecl(count);
@@ -233,6 +234,12 @@ protected:
         }
 
         else {
+            myType = makeFuncType(arity()-1);
+
+            for (unsigned int count = 1; count < arity(); count++) {
+                unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
+            }
+            
             if (unifies(myType, child(0)->getType())) {
                 unified++;
                 setType((Type_Ptr)myType->child(0), subst);
@@ -243,8 +250,8 @@ protected:
             error (loc(), "no functions match");
         }
         else if (unified==1) {
-            setType(returnType, subst);
             unify(myType, functionType, subst);
+            setType((Type_Ptr)myType->child(0), subst);
             // cerr << "RETURN TYPE \n";
             // returnType->print(cerr, 4);
             // cerr << "\n";
