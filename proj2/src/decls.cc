@@ -583,9 +583,9 @@ protected:
 
     Type_Ptr asGenericType () {
         gcvector<Type_Ptr> params;
-        for (int i = 0; i < getTypeArity (); i += 1) {
-            params.push_back (Type::makeVar ());
-        }
+        for_each_child(c,_params) {
+            params.push_back((Type_Ptr)c);
+        } end_for;
         return asType (getTypeArity (), &params[0]);
     }
 

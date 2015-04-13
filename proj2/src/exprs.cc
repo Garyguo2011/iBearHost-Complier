@@ -321,10 +321,9 @@ protected:
      *  the type of classDecl, otherwise throw an error. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes(context, subst);
+        setType((Type_Ptr)child(1)->child(0), subst);
         Decl* classDecl = classes->find(getId()->as_string());
-        if (classDecl != NULL) {
-            setType(classDecl->asGenericType(), subst);
-        } else {
+        if (classDecl == NULL) {
             error(loc(), "Class Declaration missing");
         }
     }
@@ -506,14 +505,36 @@ protected:
         AST_Ptr obj = child(0);
         AST_Ptr attr = child(1);
         obj->resolveTypes(context, subst);
+        Type_Ptr idClassType;
         for (int count = 0; count < attr->numDecls(); count++) {
-            if (!unify(obj->getType(),attr->getDecl(count)->getContainer()->asGenericType() ,subst)) {
+            Type_Ptr potentialIdClassType = attr->getDecl(count)->getContainer()->asGenericType();
+            if (!unifies(obj->getType(),potentialIdClassType)) {
                 attr->removeDecl(count);
+                count--;
+            }
+            else {
+                idClassType = potentialIdClassType;
             }
 
         }
         if (attr->numDecls() == 1) {
-            setType(attr->getDecl()->getType(), subst);
+            Unifier* temp = new Unifier();
+            // cerr << "before unification we have types \n";
+            // cerr << "obj type is \n";
+            // obj->getType()->print(cerr,4);
+            // cerr << "\n class type is \n";
+            // idClassType->print(cerr, 4);
+            unify(obj->getType(), idClassType, *temp);
+            // cerr << "\n gonna unify attribute ref \n";
+            // cerr << "obj type is \n";
+            // obj->getType()->print(cerr,4);
+            // cerr << "\n class type is \n";
+            // idClassType->print(cerr, 4);
+            // cerr << "\n my type is going to be \n";
+            // attr->getDecl()->getType()->binding()->print(cerr, 4);
+            // cerr << "\n";
+            setType(attr->getDecl()->getType()->binding(), subst);
+            delete temp;
         } 
         else if (attr->numDecls() == 0) {
             error(loc(), "attr not found");

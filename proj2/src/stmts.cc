@@ -252,7 +252,7 @@ protected:
                 decl = makeParamDecl(c->getId()->as_string(), 
                                         enclosing, 
                                         count, 
-                                        enclosing->getContainer()->asType());
+                                        enclosing->getContainer()->asGenericType());
                 c->getId()->addDecl(decl);
             }
             else {
@@ -283,6 +283,10 @@ protected:
 
     NODE_CONSTRUCTORS(Class_AST, AST_Tree);
 
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes(context, subst);
+    }
+
     /** Recursively can resolveSimpleIds within the scope of first child'decl environment,
      *  for every child variable. */
     AST_Ptr resolveSimpleIds (const Environ* env)
@@ -295,14 +299,23 @@ protected:
         return this;
     }
 
+    void resolveSimpleTypeIds (const Environ* env)
+    {
+        AST_Ptr id = child(0);
+        const Environ* class_env = id->getDecl()->getEnviron();
+        for_each_child (c, this){
+            c->resolveSimpleTypeIds (class_env);
+        } end_for;
+    }
+
     /** Add declarations that result from occurrences of type variables
      *  in type attributions to each child variable of the second child. */
     void collectTypeVarDecls (Decl* enclosing){
         AST_Ptr params = child(1);
         for_each_child_var(param, params) {
-            AST_Ptr paramId = param->child(0);
-            Decl* paramType = makeTypeVarDecl(paramId->as_string(), param);
+            Decl* paramType = makeTypeVarDecl(param->as_string(), param);
             param->addDecl(paramType);
+            enclosing->addMember(paramType);
         } end_for;
     }
 
@@ -452,6 +465,43 @@ protected:
         return child(0);
     }
 
+    void resolveSimpleTypeIds (const Environ* env) {
+        Type_Ptr myType = (Type_Ptr)child(1);
+        if (myType->isTypeVariable()) {
+            Decl* typeVarDecl = env->find(myType->as_string());
+            if (typeVarDecl != NULL) {
+                myType->addDecl(typeVarDecl);
+            }
+        }
+        else {
+            AST::resolveSimpleTypeIds(env);
+        }
+    }
+
+    /* DEBUGGING */
+
+    void
+    DB (const Environ* env)
+    {
+        if (env == NULL) {
+            fprintf (stderr, "NULL\n");
+        } else {
+            const char* label;
+            label = "Immediate";
+            while (env != NULL) {
+                const Decl_Vector& members = env->get_members ();
+                fprintf (stderr, "%s:\n", label);
+                for (size_t i = 0; i < members.size (); i += 1) {
+                    fprintf (stderr, "   %s @%p\n", members[i]->getName ().c_str (),
+                             members[i]);
+                }
+                env = env->get_enclosure ();
+                label = "Enclosed by";
+            }
+        }
+    }
+
+
     /** If the Id could be add as Variable Declaration, then set my type to this delcation
      *  and add it to the ID. */
     void addTargetDecls (Decl* enclosing) {
@@ -477,7 +527,7 @@ protected:
                 setType(getType(), subst);
                 unify(getId()->getType(), getType(), subst);
             } else {
-                error (loc(), "This typeId has another type.");
+                error (loc(), "This typedId has another type.");
             }
         }
     }

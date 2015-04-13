@@ -11,3 +11,6 @@ anC.j = "Jinge Zhang"
 otherC = C of [int]()
 
 otherC.j = 6
+
+print anC.j
+print otherC.j
