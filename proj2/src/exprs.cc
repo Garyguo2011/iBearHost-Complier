@@ -175,7 +175,7 @@ protected:
                 // cerr << "\n potential type \n";
                 // child(0)->getDecl(count)->getType()->print(cerr,4);
                 // cerr << "\n my type is \n";
-                // ((Type_Ptr)myType->child(1))->binding()->child(1)->print(cerr, 4);
+                // myType->print(cerr, 4);
                 // cerr << "\n";
                 // ((Type_Ptr) myType->child(1))->binding()->print(cerr, 4);
                 // cerr << "\n";
@@ -383,13 +383,13 @@ class Subscript_AST : public Callable {
 protected:
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes(context, subst);
-        // print(cerr, 4);
-        // cerr << ", self\n";
-        // ((Type_Ptr)child(1)->getType())->binding()->child(1)->print(cerr, 4);
-        // cerr << ", lala\n\n";
+
         Type_Ptr type = child(1)->getType();
-        Type_Ptr type_to_set = (Type_Ptr) type->binding()->child(type->binding()->arity()-1);
-        setType(type_to_set, subst);
+        int size = (int) type->binding()->arity();
+        if (size > 1) {
+            Type_Ptr type_to_set = (Type_Ptr) type->binding()->child(size-1);
+            setType(type_to_set, subst);
+        }
         
     }
     NODE_CONSTRUCTORS(Subscript_AST, Callable);
