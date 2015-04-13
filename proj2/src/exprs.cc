@@ -158,7 +158,7 @@ protected:
 
         int unified = 0;
         Type_Ptr returnType;
-        Type_Ptr myType;
+        Type_Ptr myType = NULL;
         Type_Ptr functionType;
 
         if (child(0)->oper()->syntax() == ID) {
@@ -207,7 +207,7 @@ protected:
 
             unify((Type_Ptr)myType->child(1), child(0)->child(0)->getType(), subst);
 
-            for (int count = 1; count < arity(); count++) {
+            for (unsigned int count = 1; count < arity(); count++) {
                 unify((Type_Ptr)myType->child(count+1), child(count)->getType(), subst);
             }
             AST_Ptr id = child(0)->child(1);

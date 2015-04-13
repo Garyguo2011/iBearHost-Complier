@@ -209,7 +209,7 @@ protected:
         Type_Ptr myType = makeFuncType(child(1)->arity());
         Type_Ptr returnType = functionDecl->getType();
         unify(myType->returnType(), returnType, subst);
-        for (int count = 1; count < myType->arity(); count++) {
+        for (unsigned int count = 1; count < myType->arity(); count++) {
             unify((Type_Ptr)myType->child(count), 
                     child(1)->child(count-1)->getType(), 
                     subst);
