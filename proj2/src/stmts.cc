@@ -204,6 +204,7 @@ protected:
     } 
 
     void resolveTypes (Decl* context, Unifier& subst) {
+        freezeDecl(true);
         Decl* functionDecl = child(0)->getDecl();
         child(1)->resolveTypes(functionDecl, subst);
         Type_Ptr myType = makeFuncType(child(1)->arity());
@@ -216,6 +217,7 @@ protected:
         }
         functionDecl->setType(myType);
         child(arity()-1)->resolveTypes(functionDecl, subst);
+        freezeDecl(false);
     }
 };
 
