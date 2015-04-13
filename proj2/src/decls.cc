@@ -488,6 +488,7 @@ protected:
         if (canAddFunc(id)) {
             Decl* decl = makeFuncDecl (id->as_string (), this, Type::makeVar ());
             addMember (decl);
+            decl->setFrozen(false);
             return decl;
         }
         return NULL;
@@ -602,6 +603,7 @@ protected:
         if (canAddFunc(id)) {
             Decl* decl = makeMethodDecl (id->as_string (), this, Type::makeVar ());
             addMember (decl);
+            decl->setFrozen(false);
             return decl;
         }
         return NULL;
@@ -651,6 +653,7 @@ protected:
         if (canAddFunc(id)) {
             Decl* decl = makeFuncDecl (id->as_string (), this, Type::makeVar ());
             addMember (decl);
+            decl->setFrozen(false);
             return decl;
         }
         return NULL;
