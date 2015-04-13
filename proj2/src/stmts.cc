@@ -63,7 +63,9 @@ protected:
 
     void resolveTypes(Decl* context, Unifier& subst) {
         child(0)->resolveTypes(context, subst);
-        if (!unify(child(0)->getType(), (Type_Ptr)context->getType(), subst)) {
+        if (!unify(child(0)->getType(), 
+            (Type_Ptr)context->getType()->child(0), 
+            subst)) {
             error (loc(), "wrong return type");
         }
     }
@@ -196,17 +198,24 @@ protected:
         }
     }
 
+    void freezeDecl (bool frozen)
+    {
+        child(0)->getDecl()->setFrozen(frozen);
+    } 
+
     void resolveTypes (Decl* context, Unifier& subst) {
-        AST::resolveTypes(child(0)->getDecl(), subst);
+        Decl* functionDecl = child(0)->getDecl();
+        child(1)->resolveTypes(functionDecl, subst);
         Type_Ptr myType = makeFuncType(child(1)->arity());
-        Type_Ptr returnType = child(0)->getDecl()->getType();
+        Type_Ptr returnType = functionDecl->getType();
         unify(myType->returnType(), returnType, subst);
         for (int count = 1; count < myType->arity(); count++) {
             unify((Type_Ptr)myType->child(count), 
                     child(1)->child(count-1)->getType(), 
                     subst);
         }
-        child(0)->getDecl()->setType(myType);
+        functionDecl->setType(myType);
+        child(arity()-1)->resolveTypes(functionDecl, subst);
     }
 };
 

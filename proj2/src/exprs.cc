@@ -162,15 +162,13 @@ protected:
         Type_Ptr functionType;
 
         if (child(0)->oper()->syntax() == ID) {
-            // cerr <<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
-            // print(cerr, 4);
-            // cerr << "\n";
             myType = makeFuncType(arity()-1);
 
-            for (int count = 1; count < arity(); count++) {
+            for (unsigned int count = 1; count < arity(); count++) {
                 unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
             }
             Decl_Vector new_decls;
+            // fprintf(stderr, "numdecls is %d\n", child(0)->numDecls());
             for (int count = 0; count < child(0)->numDecls(); count++) {
                 // cerr << "\n decl is \n";
                 // child(0)->getDecl(count)->print(cerr);
