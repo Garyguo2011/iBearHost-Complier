@@ -182,7 +182,13 @@ ast_node_type:
     ;
 
 id:   ID
-    | ast_node_type
+    | other_id
+           { $$ = AST::make_token (ID, $other_id.value()->text_size (),
+                                   $other_id.value()->as_chars ()); }
+    ;
+
+other_id:
+      ast_node_type
     | "id" 
     | "int_literal"
     | "string_literal"
