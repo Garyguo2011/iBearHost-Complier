@@ -230,7 +230,8 @@ Type::hasFreeVariables (ASTSet& visited)
     if (visited.count (this) == 0) {
         visited.insert (this);
         for_each_child (c, this) {
-            if (c->asType ()->hasFreeVariables (visited))
+            if (c->asType () != NULL 
+                && c->asType ()->hasFreeVariables (visited))
                 return true;
         } end_for;
     }
