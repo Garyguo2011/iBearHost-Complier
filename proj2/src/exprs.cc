@@ -175,7 +175,9 @@ protected:
                 // cerr << "\n potential type \n";
                 // child(0)->getDecl(count)->getType()->print(cerr,4);
                 // cerr << "\n my type is \n";
-                // myType->print(cerr, 4);
+                // ((Type_Ptr)myType->child(1))->binding()->child(1)->print(cerr, 4);
+                // cerr << "\n";
+                // ((Type_Ptr) myType->child(1))->binding()->print(cerr, 4);
                 // cerr << "\n";
                 if(unifies(child(0)->getDecl(count)->getType(), myType)) {
                     unified++;
@@ -243,6 +245,18 @@ protected:
         else if (unified==1) {
             setType(returnType, subst);
             unify(myType, functionType, subst);
+            // cerr << "RETURN TYPE \n";
+            // returnType->print(cerr, 4);
+            // cerr << "\n";
+            // cerr << "FUNCTION TYPE \n";
+            // functionType->print(cerr, 4);
+            // cerr << "\n";
+            // cerr << "MY TYPE \n";
+            // myType->print(cerr, 4);
+            // cerr << "\n";
+            // cerr << "SELF TYPE \n";
+            // getType()->binding()->print(cerr, 4);
+            // cerr << "\n";
         }
         else {
             // cerr << "more than one function! \n";
@@ -366,6 +380,18 @@ NODE_FACTORY (Unop_AST, UNOP);
 
 /** Subscriptions AST for subscript from the grammar rule, inherited from Callable. */
 class Subscript_AST : public Callable {
+protected:
+    void resolveTypes (Decl* context, Unifier& subst) {
+        AST::resolveTypes(context, subst);
+        // print(cerr, 4);
+        // cerr << ", self\n";
+        // ((Type_Ptr)child(1)->getType())->binding()->child(1)->print(cerr, 4);
+        // cerr << ", lala\n\n";
+        Type_Ptr type = child(1)->getType();
+        Type_Ptr type_to_set = (Type_Ptr) type->binding()->child(type->binding()->arity()-1);
+        setType(type_to_set, subst);
+        
+    }
     NODE_CONSTRUCTORS(Subscript_AST, Callable);
 };
 
