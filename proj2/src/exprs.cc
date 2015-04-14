@@ -151,8 +151,7 @@ protected:
         replace (k + 1, expr);
     }
 
-    // PUT COMMON CODE DEALING WITH TYPE-CHECKING or SCOPE RULES HERE.
-
+    /** Resolve Type on callable. Divided into two seperate cases: ID and ATTRIBUTEREF. */
     void resolveTypes(Decl* context, Unifier& subst) {
         AST::resolveTypes(context, subst);
 
@@ -167,27 +166,10 @@ protected:
             for (unsigned int count = 1; count < arity(); count++) {
                 unify((Type_Ptr)myType->child(count), child(count)->getType(), subst);
             }
-            // fprintf(stderr, "numdecls is %d\n", child(0)->numDecls());
             for (int count = 0; count < child(0)->numDecls(); count++) {
                 Type_Ptr potential_type = child(0)->getDecl(count)->getType();
-                // cerr << "\n decl is \n";
-                // child(0)->getDecl(count)->print(cerr);
-                // cerr << "\n potential type \n";
-                // child(0)->getDecl(count)->getType()->print(cerr,4);
-                // cerr << "\n my type is \n";
-                // myType->print(cerr, 4);
-                // cerr << "\n";
-                // ((Type_Ptr) myType->child(1))->binding()->print(cerr, 4);
-                // cerr << "\n";
                 if(unifies(potential_type, myType)) {
                     unified++;
-                    // cerr << "CHOSEN RETURN TYPE \n";
-                    // child(0)->getDecl(count)->getType()->child(0)->print(cerr, 4);
-                    // cerr << "\n";
-                    // cerr << "FUNCTION TYPE \n";
-                    // child(0)->getDecl(count)->getType()->print(cerr, 4);
-                    // cerr << "\n";
-                    // fprintf(stderr, "unified: %d\n", unified);
                     if (potential_type->arity() == 0) {
                         returnType = (Type_Ptr)myType->child(0);
                     } else {
@@ -213,10 +195,6 @@ protected:
             AST_Ptr id = child(0)->child(1);
             for (int count = 0; count < id->numDecls(); count++) {
                 Type_Ptr potential_type = id->getDecl(count)->getType();
-                // myType->print(cerr, 4);
-                // cerr << ", myType\n";
-                // id->getDecl(count)->getType()->print(cerr,4);
-                // cerr << ", id getDecl getType\n";
                 if(unifies(potential_type, myType)) {
                     unified++;
                     if (potential_type->arity() == 0) {
@@ -252,21 +230,8 @@ protected:
         else if (unified==1) {
             unify(myType, functionType, subst);
             setType((Type_Ptr)myType->child(0), subst);
-            // cerr << "RETURN TYPE \n";
-            // returnType->print(cerr, 4);
-            // cerr << "\n";
-            // cerr << "FUNCTION TYPE \n";
-            // functionType->print(cerr, 4);
-            // cerr << "\n";
-            // cerr << "MY TYPE \n";
-            // myType->print(cerr, 4);
-            // cerr << "\n";
-            // cerr << "SELF TYPE \n";
-            // getType()->binding()->print(cerr, 4);
-            // cerr << "\n";
         }
         else {
-            // cerr << "more than one function! \n";
             setType((Type_Ptr)myType->child(0), subst);
         }
     }
@@ -288,19 +253,14 @@ protected:
             Decl* init_decl = decl->getEnviron()->find_immediate("__init__");
             if (init_decl != NULL){
                 init_tree->addDecl(init_decl);
-                // AST_Ptr new_tree = consTree(NEW, this->child(0));
                 std::vector <AST_Ptr> temp;
                 temp.push_back(init_tree);
                 temp.push_back(consTree(NEW, this->child(0)));
                 if (this->arity() >= 2){
-                    // AST_Ptr expr_tree = this->child(1);
                     for (unsigned int i = 1; i < this->arity(); i++){
                     temp.push_back(this->child(i));
                     }
                 }
-                // AST_Ptr* new_args = &temp[0];
-                // AST_Ptr new_expr_tree = AST::make_tree(EXPR_LIST, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
-                // return AST::make_tree(CALL1, new_args, new_args + sizeof (new_args) / sizeof(new_args[0]));
                 return AST::make_tree(CALL1, &temp[0], &temp[temp.size()]);    
             } else {
                 error(loc(), "No __init__ method found.");   
@@ -314,12 +274,6 @@ protected:
         return this;
     }
 
-    // void resolveTypes (Decl* context, Unifier& subst)
-    // {
-    //     context get environ find immediate id name 
-
-
-    // }
     NODE_CONSTRUCTORS (Call_AST, Callable);
 
 };
@@ -368,26 +322,10 @@ protected:
 
 NODE_FACTORY (Unop_AST, UNOP);
 
-// FIXME: There are others as well.
-
-// /** ID */
-// class ID_AST : public AST_Tree {
-// protected:
-//     NODE_CONSTRUCTORS(ID_AST, AST_Tree);
-
-//     AST_Ptr getId()
-//     {
-//         return child(0);
-//     }
-
-
-// };
-
-// NODE_FACTORY(ID_AST, ID);
-
 /** Subscriptions AST for subscript from the grammar rule, inherited from Callable. */
 class Subscript_AST : public Callable {
 protected:
+    /** Resolve types for subscript, set type according if the subscription for list or dict. */
     void resolveTypes (Decl* context, Unifier& subst) {
         AST::resolveTypes(context, subst);
 
@@ -550,20 +488,7 @@ protected:
         }
         if (attr->numDecls() == 1) {
             Unifier* temp = new Unifier();
-            // cerr << "before unification we have types \n";
-            // cerr << "obj type is \n";
-            // obj->getType()->print(cerr,4);
-            // cerr << "\n class type is \n";
-            // idClassType->print(cerr, 4);
             unify(obj->getType(), idClassType, *temp);
-            // cerr << "\n gonna unify attribute ref \n";
-            // cerr << "obj type is \n";
-            // obj->getType()->print(cerr,4);
-            // cerr << "\n class type is \n";
-            // idClassType->print(cerr, 4);
-            // cerr << "\n my type is going to be \n";
-            // attr->getDecl()->getType()->binding()->print(cerr, 4);
-            // cerr << "\n";
             setType(attr->getDecl()->getType()->binding(), subst);
             delete temp;
         } 
@@ -704,6 +629,8 @@ NODE_FACTORY(ListDisplay_AST, LIST_DISPLAY);
 class DictDisplay_AST : public Typed_Tree {
 protected:
     NODE_CONSTRUCTORS(DictDisplay_AST, Typed_Tree);
+
+    /** Resolve types for DICT_DISPLAY. */
     void resolveTypes (Decl* context, Unifier& subst) 
     {
         AST::resolveTypes (context, subst);

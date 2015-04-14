@@ -198,11 +198,13 @@ protected:
         }
     }
 
+    /** Set frozen to the first child's decl. */
     void freezeDecl (bool frozen)
     {
         child(0)->getDecl()->setFrozen(frozen);
     } 
 
+    /** Resolve types on def. */
     void resolveTypes (Decl* context, Unifier& subst) {
         freezeDecl(true);
         Decl* functionDecl = child(0)->getDecl();
@@ -310,6 +312,7 @@ protected:
         return this;
     }
 
+    /** Resolve simple type id within the class envrion. */
     void resolveSimpleTypeIds (const Environ* env)
     {
         AST_Ptr id = child(0);
@@ -445,22 +448,6 @@ class TypeFormalsList_AST : public AST_Tree {
 protected:
     NODE_CONSTRUCTORS(TypeFormalsList_AST, AST_Tree);
 
-    // void collectDecls(Decl* enclosing)
-    // {
-    //     //fprintf(stderr, "collectDecls TypeFormalsList\n");
-    //     for (unsigned int count = 0; count < this -> arity(); count++) {
-    //         AST_Ptr c = child(count);
-    //         const Environ* env = enclosing->getEnviron();
-    //         const gcstring name = c->as_string();
-    //         if (env->find(name) != NULL) {
-    //             fprintf(stderr, "This type has been defined previously. \n");
-    //         } else {
-    //             Decl* temp = makeTypeVarDecl(name, c);
-    //             c->addDecl(temp);
-    //         }
-    //     }
-    // }
-
 };
 
 NODE_FACTORY(TypeFormalsList_AST, TYPE_FORMALS_LIST);
@@ -488,30 +475,6 @@ protected:
             AST::resolveSimpleTypeIds(env);
         }
     }
-
-    /* DEBUGGING */
-
-    void
-    DB (const Environ* env)
-    {
-        if (env == NULL) {
-            fprintf (stderr, "NULL\n");
-        } else {
-            const char* label;
-            label = "Immediate";
-            while (env != NULL) {
-                const Decl_Vector& members = env->get_members ();
-                fprintf (stderr, "%s:\n", label);
-                for (size_t i = 0; i < members.size (); i += 1) {
-                    fprintf (stderr, "   %s @%p\n", members[i]->getName ().c_str (),
-                             members[i]);
-                }
-                env = env->get_enclosure ();
-                label = "Enclosed by";
-            }
-        }
-    }
-
 
     /** If the Id could be add as Variable Declaration, then set my type to this delcation
      *  and add it to the ID. */
@@ -565,20 +528,6 @@ protected:
     {
         AST::resolveTypes (context, subst);
 
-        // cerr << "\n left \n";
-
-        // child(0)->getType()->print(cerr, 4);
-
-        // cerr << "\n right \n";
-
-        // child(1)->getType()->print(cerr, 4);
-
-        // cerr << "\n is right side bound? \n";
-
-        // cerr << subst.isBound(child(1)->getType());
-
-        // cerr << "\n";
-
         if (child(1)->isCallable() 
             && subst.binding(child(1)->getType())->isTypeVariable()
             ) {
@@ -599,9 +548,6 @@ protected:
                             (Type_Ptr)function_id->getDecl(count)->getType()->child(0))) {
                             unifications++; 
                             function_type = function_id->getDecl(count)->getType();
-                            // cerr << "this function type is \n";
-                            // function_type->print(cerr, 4);
-                            // cerr << "\n";
                         }    
                         else {
                             function_id->removeDecl(count);
