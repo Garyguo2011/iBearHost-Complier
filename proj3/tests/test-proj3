@@ -53,7 +53,7 @@ def Compile(prog, executable):
 
 def Execute(prog, inp):
     global Stdout, Stderr, RC
-    RC, Stdout, Stderr = Run("%s", prog, stdin=inp)
+    RC, Stdout, Stderr = Run("./%s", prog, stdin=inp)
     return RC == 0
 
 def HasError(errout):
