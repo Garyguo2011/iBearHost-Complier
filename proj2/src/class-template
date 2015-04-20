@@ -1,0 +1,26 @@
+(defun insert-class-template (name  parent token) 
+  (interactive "sClass name prefix: \nsParent class: \nsToken name: ")
+  (save-restriction
+    (let ((start (point)))
+      (insert *class-template*)
+      (narrow-to-region start (point))
+      (message (format "%d %d" start (point)))
+      (replace-string "$1" name nil (point-min) (point-max))
+      (replace-string "$2" parent nil (point-min) (point-max))
+      (replace-string "$3" token nil (point-min) (point-max)))))
+
+(defconst *class-template* "\
+/***** $3 *****/\n\
+\n\
+/**       */\n\
+class $1_AST : public $2 {\n\
+protected:\n\
+\n\
+    NODE_CONSTRUCTORS ($1_AST, $2);\n\
+\n\
+\n\
+};\n\
+\n\
+NODE_FACTORY ($1_AST, $3);\n\
+\n\n")
+
