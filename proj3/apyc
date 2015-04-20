@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+# -*-Python-*-
+
+import re, sys
+from subprocess import call, DEVNULL, check_call, CalledProcessError
+from os.path import basename, dirname, join, splitext, exists, isdir, realpath
+from getopt import getopt, GetoptError
+from tempfile import mkdtemp
+from sys import stderr
+from os import mkdir, chmod
+from shutil import rmtree
+
+HERE = realpath(dirname(sys.argv[0]))
+
+class TempDir:
+    """As for tempfile.TemporaryDirectory, but makes allows a specific
+    directory name and allows retention of the directory."""
+    def __init__(self, name=None, mode=0o700, keep=False):
+        self.keep = keep
+        self.name = name
+        if self.name is None:
+            self.name = mkdtemp()
+            chmod(self.name, mode)
+        elif not isdir(self.name):
+            try:
+                mkdir(name, mode=mode)
+            except OSError as excp:
+                print("Cannot create temporary directory {}: {}"
+                      .format(tmpDir, excp), file=stderr)
+                sys.exit(1)
+        
+    def __repr__(self):
+        return "<{} {!r}>".format(self.__class__.__name__, self.name)
+
+    def __enter__(self):
+        return self.name
+
+    def __exit__(self, exc, value, tb):
+        if not keep:
+            rmtree(self.name, ignore_errors=True)
+    
+
+def Usage():
+    print("""\
+Usage: apyc [ --phase=PHASE ] [ -o OUTFILE ] [ -k ] [ -c ] [ -l LIB ] \\
+            FILE.py
+    Compile FILE.py through phase PHASE (1, 2, or 3; default 3),
+    putting the output in OUTFILE (default FILE.ast for PHASE=1, FILE.dast
+    for PHASE=2, FILE for PHASE=3). If -k is present, retain temporary
+    intermediate .dast and .cc files if PHASE=3.  If -c present, do not
+    compile .cc file, but leave it as OUTFILE. If LIB defined, use it as the
+    source for the runtime library""")
+    sys.exit(1)
+
+def phase2(inFile, outFile, phase, keep):
+    """Run phase PHASE (1 or 2) on INFILE, producing OUTFILE.
+    Passes -k if KEEP."""
+    command = "{prog} --phase={phase} {opt}-o {output} {input}" \
+               .format(prog=join(HERE, "apyc2"),
+                       opt="-k " if keep else "",
+                       phase=phase, input=inFile, output=outFile)
+    if verbose:
+        print(command, file=stderr)
+    check_call(command, shell=True, stdin=DEVNULL, stdout=DEVNULL)
+
+def phase3(pythonSource, tempDir, outFile):
+    """Run phase 3 on SOURCEDAST, which is the translation of PYTHONSOURCE,
+    putting intermediate files in TEMPDIR, and the output executable in
+    OUTFILE."""
+    dast = join(tempDir, "prog.dast")
+    phase2(pythonSource, dast, 2, False)
+    command = "{prog} -o {outFile} {source} {dast}" \
+               .format(prog=join(HERE, "apyc3"),
+                       source=pythonSource, dast=dast, outFile=outFile)
+    if verbose:
+        print(command, file=stderr)
+    check_call(command, shell=True, stdin=DEVNULL, stdout=DEVNULL)
+
+def phase4(ccFile, libFile, executableFile):
+    includeDir = dirname(libFile)
+    command = "g++ -g -o {executable} -I{includeDir} {ccFile} {libFile}" \
+              .format(executable=executableFile, includeDir=includeDir,
+                      ccFile=ccFile, libFile=libFile)
+    if verbose:
+        print(command, file=stderr)
+    check_call(command, shell=True, stdin=DEVNULL, stdout=DEVNULL)
+
+keep = False
+outFile = None
+ccFile = None
+link = True
+phase = 3
+verbose = False
+lib = join(HERE, "lib", "runtime.cc")
+try:
+    opts, args = getopt(sys.argv[1:], 'o:l:ckv', ['phase='])
+    if len(args) != 1:
+        Usage()
+    else:
+        source = args[0]
+    for opt, val in opts:
+        if opt == '-d' and v != 'p':
+            Usage()
+        elif opt == '-d':
+            debugParser = True
+        elif opt == '-o':
+            outFile = val
+        elif opt == '-k':
+            keep = True
+        elif opt == '-v':
+            verbose = True
+        elif opt == '--phase':
+            if val != '1' and val != '2':
+                Usage()
+            else:
+                phase = int(val)
+        elif opt == '-c':
+            link = False
+        elif opt == '-l':
+            lib = val
+        else:
+            print("Unknown option: '{}'".format(opt), file=stderr)
+            sys.exit(1)
+    if phase is None:
+        Usage()
+    base, _ = splitext(source)
+    if link:
+        if outFile is None:
+            if phase == 1:
+                outFile = base + ".ast"
+            elif phase == 2:
+                outFile = base + ".dast"
+            elif phase == 3:
+                outFile = basename(base)
+    else:
+        phase = 3
+        ccFile = outFile or basename(base) + ".cc"
+
+except GetoptError:
+    Usage()
+
+try:
+    if not 1 <= phase <= 3:
+        Usage()
+    if phase < 3:
+        phase2(source, outFile, phase, keep)
+    else:
+        if keep:
+            dir = basename(base) + ".d"
+            print("Retaining files in directory {}".format(dirname))
+        else:
+            dir = None
+        with TempDir(dir, 0o700, keep) as tmpDir:
+            ccFile = ccFile or join(tmpDir, "prog.cc")
+            phase3(source, tmpDir, ccFile)
+            if link:
+                phase4(ccFile, lib, outFile)
+except CalledProcessError:
+    sys.exit(1)

@@ -1,0 +1,44 @@
+/* -*- mode: C++; c-file-style: "stroustrup"; indent-tabs-mode: nil; -*- */
+
+/* modules.cc: Describes programs or libraries.  Contains top-level routines. */
+
+/* Authors:  YOUR NAMES HERE */
+
+#include <iostream>
+#include "apyc.h"
+#include "dast.h"
+#include "dast-parser.hh"
+
+using namespace std;
+
+static GCINIT _gcdummy;
+
+Decl* mainModule;
+
+/*****   MODULE    *****/
+
+/** A module, representing a complete source file. */
+class Module_AST : public AST_Tree {
+protected:
+
+    const char* lineNumber () {
+	return "0";
+    }
+
+    // FIXME: Dummy implementation.
+    void codeGen () {
+        cout << "#include \"runtime.h\"" << endl 
+             << "void" << endl
+             << "__main__()" << endl
+             << "{" << endl
+             << "    __print__ (__cons_str__ (\"Hello, world!\"));" << endl
+             << "    __newline__ ();" << endl
+             << "}" << endl;
+    }
+
+    NODE_CONSTRUCTORS (Module_AST, AST_Tree);
+
+};
+
+NODE_FACTORY (Module_AST, MODULE);
+

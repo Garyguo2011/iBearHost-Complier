@@ -1,0 +1,23 @@
+#!/bin/bash
+
+declare -i i
+declare -a gdbopts
+i=0
+while [[ $# -gt 0 ]] && [[ $1 =~ ^-.* ]]; do
+    gdbopts[$i]=$1
+    i+=1
+    shift
+done
+
+file=$1
+base=$(basename $file .py)
+dir=$base.d
+
+if ! [ -d $dir -a -f $dir/prog.dast ]; then
+    ./apyc -k --phase=2 -o $dir/prog.dast $file > /dev/null 2>&1
+fi
+sleep 2  # To address race condition in Emacs M-x gdb.
+ulimit -v 100000
+ulimit -d 100000
+exec gdb "${gdbopts[@]}" --args apyc3 -o $base.cc $file $dir/prog.dast 
+
