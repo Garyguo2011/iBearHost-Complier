@@ -1,0 +1,995 @@
+/* -*- mode: fundamental; c-file-style: "stroustrup"; indent-tabs-mode: nil -*- */
+
+/* apyc: Parser */
+
+/* Authors: P. N. Hilfinger */
+
+%define semantic_tree_type "AST"
+
+%token INT
+%token STRING
+%token ID
+
+%{
+   #include <string>
+   #include "apyc.h"
+   #include "ast.h"
+
+   /** Make sure garbage collection is initialized. */
+   static GCINIT _gcdummy;
+   using namespace std;
+
+   static AST_Ptr theTree;
+
+    /** Assuming that TEXT is the whitespace at the beginning of a line, returns
+     *  or queues the indicated INDENT and DEDENT tokens. */
+    static int do_indent(const char* text);
+
+    /** Nesting level of current source position in '[', '(', and '{'
+     *  brackets. */
+    static int bracket_depth;
+    /** Current nesting depth within "if", "while", and "for" statements. */
+    static int control_depth;
+    /** Current nesting depth within "def" and "class" statements. */
+    static int defn_depth;
+    /** Current loop depth within "while" and "for" statements. */
+    static int loop_depth;
+    /** Current nesting depth within "def" statements (functions). */
+    static int func_depth;
+
+    /** Output an error message if a "def" statement is not permitted
+     *  at the current source position. */
+    static void check_def_placement ();
+    /** Output an error message if a "class" statement is not permitted
+     *  at the current source position. */
+    static void check_class_placement ();
+    /** Output an error message TEXT is not in the required range for
+     *  integer numerals.  It is assumed to have the form of a valid
+     *  numeral otherwise. */
+    static void check_numeral (const char* text);
+    /** Output an error message if not nested in the main body of a loop (
+     *  (not including its "else" clause). */
+    static void check_in_loop ();
+    /** Output an error message if not nested inside a function definition. */
+    static void check_in_func ();
+
+    /** Create a new ID token whose text is TEXT, and whose location
+     *  is LOC. */
+     static AST_Ptr make_id (const char* text, Location_Type loc);
+
+    /** Create an id token for the function (e.g., __add__)
+     *  corresponding to the binary operator OP (e.g., +). */
+    static AST_Ptr make_binop_id (AST_Ptr op);
+    static AST_Ptr make_binop_id (const List_Ptr& op);
+
+    /** Create an id token for the function (e.g., __neg__)
+     *  corresponding to the unary operator OP (e.g., -). */
+    static AST_Ptr make_unop_id (AST_Ptr op);
+
+    /** Create a UNOP node corresponding to 'op y', where op, and y
+     *  are the elements of OPERANDS. */
+    static AST_Ptr make_unop (const List_Ptr& operands);
+
+    /** Increment COUNT. */
+    static inline void
+    incr (int& count)
+    {
+        count += 1;
+    }
+
+    /** Decrement COUNT, but no further than 0. */
+    static inline void
+    decr (int& count)
+    { 
+        count -= 1;
+        if (count < 0)
+            count = 0;
+    }
+%}
+
+%debug
+%define error_function error
+
+%left "or"
+%left "and"
+%left "not"
+%left "<" ">" "==" ">=" "<=" "!=" "is" "in"
+%left "+" "-"
+%left "%" "*" "/" 
+%left UNOP
+%right "**"
+
+%token DIVDIV "//"
+%token POW "**"
+
+/* The following tokens represent keywords and node types, sometimes both.
+ * In order to keep information about node types together, I've used a little 
+ * trick.  In a rule such as
+ *     if_stmt: "if"^ expression ":"! ...
+ * where the relevant keyword also happens to coincide with the external
+ * name of the AST operator corresponding to this statement, we define
+ *     %token IF "if"
+ * In a rule such as
+ *     dict_display: "{"! key_datum_list? "}"! 
+ *              { $$ = $^(DICT_DISPLAY, $*); }
+ * where the there is no such correspondence, we define instead
+ *     %token DICT_DISPLAY "@dict_display"
+ * Since "@dict_display" is not a valid token (it would be an error for this
+ * to appear in any Python program) and does not appear in the grammar, this
+ * declaration has no effect on the lexical language recognized.  However, it
+ * still provides an easy way to find the external name of an operator.
+ * Suppose that yyexternal_token_name(SYNTAX) is NAME for an operator 
+ * whose syntactic category is SYNTAX.  If NAME starts with k "@" characters,
+ * then by default the external AST operator name for SYNTAX is NAME+k;
+ * otherwise, it is simply NAME.  Hence, the lexical token strings can do double
+ * duty.   This convention allows us to have several different operators with 
+ * the same printed name, and also prevents operators whose names are not
+ * keywords from interfering with the use of those names as legitimate
+ * identifiers. */
+
+%token AND "and"
+%token ASSIGN "@assign"
+%token ATTRIBUTEREF "@attributeref"
+%token BINOP "@binop"
+%token BLOCK "@block"
+%token BREAK "break"
+%token CALL "@call"
+%token CLASS  "class"
+%token COMPARE "@compare"
+%token LEFT_COMPARE "@left_compare"
+%token CONTINUE "continue"
+%token DEDENT
+%token DEF "def"
+%token DICT_DISPLAY "@dict_display"
+%token FALSE "False"
+%token FOR "for"
+%token FORMALS_LIST "@formals_list"
+%token FUNCTION_TYPE "@function_type"
+%token IF "if"
+%token IF_EXPR "@if_expr"
+%token INDENT 
+%token INT_LITERAL "@int_literal"
+%token LIST_DISPLAY "@list_display"
+%token METHOD "@def"
+%token MODULE "@module"
+%token NATIVE "native"
+%token NEXT_VALUE "@next_value"
+%token NONE "None"
+%token NOT "not"
+%token OR "or"
+%token PAIR "@pair"
+%token PRINT "print"
+%token PRINTLN "@println"
+%token SLICE "@slice"
+%token SLICE_TARGET "@@slice_assign"
+%token STMT_LIST "@stmt_list"
+%token STRING_LITERAL
+%token SUBSCRIPT "@subscript"
+%token SUBSCRIPT_TARGET "@@subscript_assign"
+%token TARGET_LIST "@target_list"
+%token TRUE "True"
+%token TYPE_FORMALS_LIST "@type_formals_list"
+%token TUPLE "@tuple"
+%token TYPE "@type"
+%token TYPE_LIST "@type_list"
+%token TYPE_VAR "@type_var"
+%token TYPED_ID "@typed_id"
+%token UNOP "@unop"
+%token WHILE "while"
+
+/* GLR parsing is useful for cases where the parser must make a reduction before
+ * it has sufficient information to know which reduction to make.  For example,
+ * consider a statement that begins
+ *      a[i], b[j], c
+ * (it's not useful, but is valid Python as it stands).  As a tuple, this 
+ * consists of a list of expressions.  a[i] is a subscription, and corresponds
+ * to a (subscript ...) AST.  But if we have
+ *      a[i], b[j], c = L
+ * then the a[i] should create a subscript_assign.  If you try to handle this
+ * by having two rules for subscription, one for the first case and one 
+ * for the second, the parser has to decide which to choose just after seeing
+ * seeing a[i], but long before seeing "=", which is how one tells which
+ * translation is appropriate.  A GLR parser will hold off on this decision
+ * until is reaches the =. */
+
+%glr-parser
+
+/* If you use the GLR features, Bison will report conflicts.  Without GLR,
+ * a conflict generally means an error.  With GLR, it could mean an error,
+ * or it could indicate conflicts that the GLR algorithm will correctly resolve.
+ * There's really no way to know without testing.  When you get conflicts
+ * THAT YOU EXPECT you can record here these expectations by reporting how
+ * many reduce/reduce (%expect-rr) and shift-reduce (%expect) you expect. 
+ * Before increasing these counts, make sure you understand what causes your
+ * conflicts and that GLR will resolve them.  Don't expect too many (our solution
+ * has 20 overall) and try to remove conflicts rather than tolerating them.
+ * A conflict will occur when there is a situation where Bison cannot decide
+ * on the basis of the input so far whether to perform a reduction.  The 
+ * conflict is OK if it will become clear later on in the input what should
+ * have been done. */
+%expect-rr 18
+%expect 1
+
+%%
+
+                    /* Lexical Rules */
+
+_OCTAL: '0' .. '7'
+    ;
+
+/* Exclusions from our subset */
+*:  ("as" | "try" | "yield" | "exec" | "del" | "future" | "with" | "assert" 
+     | "except" | "finally" | "global" | "raise" 
+     | "import" | "from" | "lambda")
+                { error (yysource_location (), 
+                         "The '%s' symbol is not part of our subset",
+                         $TEXT); }
+    ;
+
+_ID: (_LETTER | "_")  (_LETTER | _DIGIT | "_")* 
+    ;
+
+ID: _ID
+    ;
+
+TYPE_VAR: '$' _ID
+    ;
+
+_OTHERCHAR: _ANY - '\n' - '\r' - '"' - '\'' - '\\';
+
+_ESCAPE: '\\' _ANY | "\\\r\n";
+
+_NOT_NL_APOSTR: _OTHERCHAR | '"' | _ESCAPE
+    ;
+
+_NOT_NL_QUOTE: _OTHERCHAR | '\'' | _ESCAPE
+    ;
+
+_SHORTSTRING: "'" _NOT_NL_APOSTR* "'" | '"' _NOT_NL_QUOTE* '"'
+    ;
+
+*:    ("'" _NOT_NL_APOSTR* | '"' _NOT_NL_QUOTE*) 
+                { error (yysource_location (), "unterminated string"); }
+    ;
+
+_NOT_APOSTR: _OTHERCHAR | _ESCAPE | '"' | "\n" | "\r"
+    ;
+_NOT_QUOTE: _OTHERCHAR | _ESCAPE | '\'' | "\n" | "\r"
+    ;
+
+_LONGSTRING: 
+      "'''" (_NOT_APOSTR* (( "'" | "''") _NOT_APOSTR)?)* "'''"
+    | "\"\"\"" (_NOT_QUOTE* (( "\"" | "\"\"" ) _NOT_QUOTE)?)* "\"\"\"" 
+    ;
+
+*:   
+      ("'''" (_NOT_APOSTR* (( "'" | "''") _NOT_APOSTR)?)*
+    | "\"\"\"" (_NOT_QUOTE* (( "\"" | "\"\"" ) _NOT_QUOTE)?)*)
+                { error (yysource_location (), "unterminated long string"); }
+    ;
+
+
+STRING: _SHORTSTRING   
+                { $$ = AST::make_token (STRING, $TEXT_SIZE-2, $TEXT+1); }
+    ;
+STRING: _LONGSTRING
+                { $$ = AST::make_token (STRING, $TEXT_SIZE-6, $TEXT+3); }
+    ;
+
+RAWSTRING: ("r" | "R") _SHORTSTRING
+                { $$ = AST::make_token (RAWSTRING, $TEXT_SIZE-3, $TEXT+2); }
+    ;
+
+RAWSTRING: ("r" | "R") _LONGSTRING
+                { $$ = AST::make_token (RAWSTRING, $TEXT_SIZE-7, $TEXT+4); }
+    ;
+
+_POSDIGIT: '1' .. '9' 
+    ;
+  
+_DECIMALINTEGER: _POSDIGIT _DIGIT* | "0"
+    ;
+  
+_OCTINTEGER: "0" _OCTAL+ 
+    ;
+  
+_HEXDIGIT: _DIGIT | 'a' .. 'f' | 'A' .. 'F' 
+    ;
+_HEXINTEGER: "0" ("x" | "X") _HEXDIGIT+ 
+    ;
+  
+_INTEGER: _DECIMALINTEGER | _OCTINTEGER | _HEXINTEGER 
+    ;
+
+INT_LITERAL: _INTEGER { check_numeral ($TEXT); } 
+    ;
+
+*: "0x" | "0X" | "0" _DIGIT+ 
+                { error (yysource_location (), "invalid numeral"); }
+    ;
+
+_WS: ' ' | '\t' 
+    ;
+
+_NL: "\r"? "\n" | "\r"
+    ;
+
+_COMMENT: "#" (_ANY - '\n' - '\r')* ; 
+
+ 
+"(":            { incr (bracket_depth); } 
+    ;
+"[":            { incr (bracket_depth); } 
+    ;
+"{":            { incr (bracket_depth); } 
+    ;
+")":            { decr (bracket_depth); } 
+    ;
+"]":            { decr (bracket_depth); } 
+    ;
+"}":            { decr (bracket_depth); } 
+    ;
+
+*:    _BOL _WS* _COMMENT? _NL %prefer
+    ;
+
+*:    _BOL _WS* %prefer 
+                { YYSET_TOKEN (do_indent($TEXT));  } 
+    ;  
+
+*:    _EOF 
+                { int tok = do_indent (""); 
+                  YYSET_TOKEN (tok < 0 ? 0: tok);
+                } 
+    ;
+
+*:    _WS* _COMMENT?
+    ;
+
+NEWLINE: _NL 
+                { if (bracket_depth > 0) {
+                      yy_set_bol (0);
+                      YYIGNORE;
+                  }
+                }
+    ;
+
+*:    "\\" _NL _WS*
+                { yy_set_bol (0); }
+    ;
+
+*:    '\000' .. '\176' 
+                { error (yysource_location (), "invalid character"); }
+    ;         
+
+                        /* Main Grammar */
+
+program: 
+      (NEWLINE! | statement | error)* 
+                { $$ = $^ (MODULE, $*);
+                  $$.set_loc (NULL);
+                  theTree = $$.value ();
+                } 
+    ;
+
+identifier: ID
+    ;
+
+atom: identifier | literal | enclosure 
+    ;
+  
+enclosure: parenth_form | list_display | dict_display 
+    ;
+
+literal: 
+      stringliteral 
+    | INT_LITERAL
+    | "True"^ 
+    | "False"^
+    | "None"^ 
+    ;
+
+string_piece:
+      STRING
+    | RAWSTRING
+    ;
+
+stringliteral:
+      string_piece
+    | stringliteral string_piece
+                { $stringliteral.value()->as_token()
+                     ->append_text($string_piece.value()->as_token()
+                                   ->string_text()); 
+                  $$ = $stringliteral; }
+    ;
+
+parenth_form: "("! expression ")"! 
+    | "("! (expression ( ","! | (","! expression)+ ","!? ))? ")"! 
+                { $$ = $^(TUPLE, $*); }
+    ;
+
+list_display: "["! ( expression (","! expression)* ","!? )? "]"! 
+                { $$ = $^(LIST_DISPLAY, $*); }
+    ;
+  
+dict_display: "{"! key_datum_list? "}"!
+                { $$ = $^(DICT_DISPLAY, $*); }
+    ;
+  
+key_datum_list: key_datum (","! key_datum)* ","!? 
+    ;
+  
+key_datum: expression ":"! expression 
+                { $$ = $^(PAIR, $*); }
+    ;
+
+primary: atom 
+    | attributeref 
+    | subscript
+    | slice 
+    | call
+    ;
+
+attributeref: 
+      primary "."! identifier 
+                { $$ = $^(ATTRIBUTEREF, $*); }
+    | parameterized_type "."! identifier
+                { $$ = $^(ATTRIBUTEREF, $*); }
+    ;
+
+subscript: p=primary "["! expression_or_list "]"! 
+      	        { $$ = $^ (SUBSCRIPT, make_id ("__getitem__", $p.loc ()), $*); }
+    ;
+
+slice: p=primary "["! low_bound ":"! high_bound "]"! 
+                { $$ = $^ (SLICE, make_id ("__getslice__", $p.loc ()), $*); }
+    ;
+
+subscript_target: p=primary "["! expression_or_list "]"! 
+                { $$ = $^ (SUBSCRIPT_TARGET, 
+                           make_id ("__setitem__", $p.loc ()), 
+                           $*, $^(NEXT_VALUE));
+                }
+    ;
+
+slice_target : p=primary "["! low_bound ":"! high_bound "]"! 
+                { $$ = $^ (SLICE_TARGET, make_id ("__setslice__", $p.loc ()), 
+                           $*, $^(NEXT_VALUE)); }
+    ;
+
+low_bound: 
+      expression
+    | /* empty */
+                { $$ = AST::make_token (INT_LITERAL, "0"); }
+    ;
+
+high_bound:
+      expression
+    | /* empty */
+                { $$ = AST::make_token (INT_LITERAL, "0x3fffffff"); }
+    ;
+
+call: primary "("! argument_list ")"! 
+                { $$ = $^(CALL, $*); }
+    | parameterized_type "("! argument_list ")"! 
+                { $$ = $^(CALL, $*); }
+    ;
+  
+argument_list: (expression (","! expression)* ","!?)?
+                /* Trailing comma requires GLR*/
+    ;
+  
+expression: 
+      conditional_expression
+    ;
+
+  
+conditional_expression: 
+      thenpart=expr1 "if"! cond=expr1 "else"! elsepart=expression 
+                { $$ = $^(IF_EXPR, $cond.value(), $thenpart.value (), 
+                          $elsepart.value ()); }
+    | expr1
+    ;
+
+  
+expr1: 
+      expr2 
+    | expr1 ("or"^ | "and"^) expr1 %expand
+    | "not" expr1
+                { $$ = make_unop ($*); }
+    ;
+
+expression_list_no_comma:
+      expression (","! expression)*   /* Requires GLR for trailiing "," */
+    ;
+
+expression_list0_no_comma:
+      (expression (","! expression)*)?
+    ;
+
+expression_or_list:
+       expression
+    | (expression ","!)+ expression?
+                { $$ = $^(TUPLE, $*); }
+    ;
+
+comp_operator: 
+      ("<" | ">" | "==" | "<=" | ">=" | "!=" | "is" | "is" "not" | "in" | "not" "in")
+                { $$ = make_binop_id ($*); }
+/*
+       | op="is" "not" 
+                { $$ = make_id ("__isnot__", $op.loc ()); }
+       | op="not" "in"
+                { $$ = make_id ("__notin__", $op.loc()); }  */
+    ;
+
+expr2: 
+      left_compare op=comp_operator! expr3
+                { $$ = $^ (COMPARE, $op, $*); }
+    | expr3 op=comp_operator! expr3  
+                { $$ = $^ (COMPARE, $op, $*); }
+    | expr3
+    ;
+
+left_compare:
+      expr3 op=comp_operator! expr3
+                { $$ = $^(LEFT_COMPARE, $op, $*); }
+    | left_compare op=comp_operator! expr3
+                { $$ = $^(LEFT_COMPARE, $op, $*); }
+    ;
+
+expr3: 
+      primary
+    | "-" expr3 %prec UNOP
+                { $$ = make_unop ($*); }
+    | "+" expr3 %prec UNOP
+                { $$ = make_unop ($*); }
+    | expr3 
+     (op="+"! | op="-"! | op="*"! | op="/"! | op="%"! | op="**"!)
+      expr3 %expand
+                { $$ = $^ (BINOP, make_binop_id ($op.value ()), $*); }
+    ;
+             
+simple_stmt:
+      expression_stmt
+    | assignment_stmt
+    | pass_stmt
+    | print_stmt
+    | return_stmt
+    | break_stmt
+    | continue_stmt
+    ;
+
+expression_stmt: expression_or_list    
+    ;
+
+assignment_stmt: 
+      target_list "="! expression_or_list
+                { $$ = $^ (ASSIGN, $*); }
+    | target_list "="! assignment_stmt
+                { $$ = $^ (ASSIGN, $*); }
+    ;
+
+target_list: 
+      target 
+    | "("! target ")"!
+    | target_list1
+    | "("! target_list1 ")"!
+    | "["! target_list1 "]"!
+    | "["! target "]"!
+                { $$ = $^ (TARGET_LIST, $*); }
+    ;
+
+target_list1:
+    | target (","! target)+ ","!?
+                { $$ = $^(TARGET_LIST, $*); }
+    | target ","!
+                { $$ = $^(TARGET_LIST, $target.value ()); }
+    ;
+  
+target:  
+      identifier            /* Requires GLR for resolution vs atom */
+    | identifier type_annotation
+                { $$ = $^(TYPED_ID, $*); }
+    | attributeref          /* Requires GLR for resolution vs. primary */
+    | subscript_target      /* Requires GLR for resolution vs. primary */
+    | slice_target          /* Requires GLR for resolution vs. primary */
+    ;
+
+pass_stmt: op="pass"!   
+                { $$ = $^(STMT_LIST); $$.set_loc ($op.loc ()); }
+    ;
+
+print_stmt: 
+      op="print"! expression_list0_no_comma
+                { $$ = $^(PRINTLN, $*); $$.set_loc ($op.loc ()); }
+    | op="print"^ expression_list_no_comma ","!
+    ;
+
+return_stmt: "return"^ expression_or_list
+                { check_in_func (); }
+    | op="return"  
+                { check_in_func (); 
+                  $$ = $^ ($op.value (), $^(NONE)); 
+                  $$.set_loc ($op.loc ());
+                }
+    ;
+
+break_stmt: "break"^ { check_in_loop (); }
+    ;
+
+continue_stmt: "continue"^ { check_in_loop (); }
+    ;
+
+compound_stmt: 
+      if_stmt
+    | while_stmt
+    | for_stmt
+    | funcdef
+    | classdef
+    ;
+
+stmts: 
+      stmt_list NEWLINE!
+    | NEWLINE! INDENT! statement+ DEDENT!
+    | error! NEWLINE!
+    | NEWLINE! INDENT! error! DEDENT!
+    ;
+  
+suite:
+      stmts     { $$ = $^(STMT_LIST, $*); }
+    ;
+
+statement: stmt_list NEWLINE! | compound_stmt
+    ;
+  
+stmt_list: 
+      simple_stmt (";"! simple_stmt)* ";"!? 
+    ;
+
+if_stmt: 
+      "if"^ expression ":"!
+                { incr (control_depth); } 
+         suite
+      elifs
+                { decr (control_depth); }
+    ;
+
+elifs:
+      "elif"! expression ":"! suite elifs 
+                { $$ = $^ (IF, $*); }
+    | else_clause
+    ;
+
+else_clause:
+       /* empty */
+    | "else"! ":"! suite
+    ;
+
+while_stmt: 
+      "while"^ expression ":"! 
+                { incr (control_depth); incr (loop_depth); } 
+           suite
+                { decr (loop_depth); }
+      else_clause
+                { decr (control_depth); }
+    ;
+
+for_stmt: 
+      "for"^ target_list "in"! expression_or_list ":"! 
+                { incr (control_depth); incr (loop_depth); } 
+           suite
+                { decr (loop_depth); }
+      else_clause
+                { decr (control_depth); }
+    ;
+
+funcdef: 
+      "def"! funcname "("! parameter_list ")"! type_annotation? ":"! 
+                { check_def_placement (); 
+                  incr (defn_depth); incr (func_depth); }
+           funcbody
+                { decr (defn_depth); decr (func_depth); 
+		  if (func_depth != 0 || defn_depth != 1)
+		      $$ = $^ (DEF, $*); 
+		  else
+		      $$ = $^ (METHOD, $*); }
+    ;
+
+funcbody:
+      stmts     { $$ = $^(BLOCK, $*); }
+    | native    { $$ = $^(BLOCK, $*); }
+    | NEWLINE! INDENT! native DEDENT!
+                { $$ = $^(BLOCK, $*); }
+    ;
+
+native:
+      "native"^ stringliteral NEWLINE! 
+    ;
+
+parameter_list: 
+      /* empty */
+                { $$ = $^(FORMALS_LIST); }
+    | (parameter ","!)* parameter ","!? 
+                { $$ = $^(FORMALS_LIST, $*); }
+    ;
+  
+
+parameter: identifier 
+    | identifier type_annotation  { $$ = $^(TYPED_ID, $*); }
+    ;
+  
+funcname:  identifier ;
+
+classdef: "class"^ name=identifier type_formals ":"! 
+                { check_class_placement (); incr (defn_depth); } 
+               classbody
+                { decr (defn_depth); }
+    ;
+  
+type_formals: 
+      ("of"! "["! TYPE_VAR (","! TYPE_VAR)* "]"!)?
+                { $$ = $^(TYPE_FORMALS_LIST, $*); }
+    ;
+
+classbody:
+      stmts     { $$ = $^(BLOCK, $*); }
+    ;
+
+type_annotation: "::"! type
+    ;
+
+type: 
+      parameterized_type
+    | identifier 
+                { $$ = $^(TYPE, $identifier, $^(TYPE_LIST)); 
+                  $$.value()->child(1)->set_loc ($identifier.loc ()); }
+    | TYPE_VAR
+    | "("! type_list ")"! "->"! type
+                { $$ = $^(FUNCTION_TYPE, 
+                          $type.value (), $type_list.value ()); }
+    ;
+
+parameterized_type:
+      identifier type_params { $$ = $^(TYPE, $*); }
+    ;
+
+type_params:
+      ( "of"! "["! types "]"! | "of"! type)
+                { $$ = $^(TYPE_LIST, $*); }
+    ; 
+
+type_list:
+      types?    { $$ = $^(TYPE_LIST, $*); }
+    ;
+
+types: 
+      type
+    | types ','! type
+    ;
+
+%%
+
+#include <stack>
+#include <map>
+
+static stack<int> indentation_stack;
+bool debugParser;
+
+/** Map of binary operators (e.g., +) to function names (e.g.,
+ *  __add__). */
+static map<gcstring, const char*> binop_map;
+/** Map of unary operators (e.g., +) to function names (e.g.,
+ *  __pos__). */
+static map<gcstring, const char*> unop_map;
+
+const char* const BINOP_INIT[] = {
+    "+", "__add__",
+    "-", "__sub__",
+    "*", "__mul__", 
+    "/", "__floordiv__",
+    "%", "__mod__",
+    "**", "__pow__",
+    ">", "__gt__",
+    "<", "__lt__",
+    ">=", "__ge__",
+    "<=", "__le__",
+    "==", "__eq__",
+    "!=", "__ne__",
+    "in", "__in__",
+    "is", "__is__", 
+    "notin", "__notin__",
+    "isnot", "__isnot__",
+    0, 0,
+};    
+
+const char* const UNOP_INIT[] = {
+    "-", "__neg__",
+    "+", "__pos__",
+    "not", "__not__",
+    0, 0,
+};
+
+static void
+check_def_placement ()
+{
+    if (control_depth > 0)
+        error (yysource_location (), "illegally nested def statement");
+}
+
+static void
+check_class_placement ()
+{
+    if (control_depth > 0 || defn_depth > 0)
+        error (yysource_location (), "illegally nested class definition");
+}
+
+static void
+check_in_loop ()
+{
+    if (loop_depth == 0)
+        error (yysource_location (), "statement must be in a loop");
+}
+
+static void
+check_in_func ()
+{
+    if (func_depth == 0)
+        error (yysource_location (), "statement must be in a function body");
+}
+
+static void
+check_numeral (const char* text)
+{
+    if (text[0] == '0' && (text[1] == 'x' || text[1] == 'X')) {
+        text += 2;
+        while (*text == '0')
+            text += 1;
+        if (strlen (text) > 8 || 
+            (strlen (text) == 8 && strcmp (text, "40000000") > 0))
+            error (yysource_location (), "hex numeral too large");
+    } else if (text[0] == '0') {
+        while (*text == '0')
+            text += 1;
+        if (strlen (text) > 11 || 
+            (strlen (text) == 11 && strcmp (text, "10000000000") > 0))
+            error (yysource_location (), "octal numeral too large");
+    } else if (strlen (text) > 10 || 
+            (strlen (text) == 10 && strcmp (text, "1073741824") > 0))
+            error (yysource_location (), "decimal numeral too large");
+}
+
+/** The equivalent number of spaces to TEXT, a sequence of whitespace 
+ *  characters. */
+static int
+indent_length (const char* text)
+{
+    int n;
+    n = 0;
+    for (const char* p = text; *p != '\0'; p += 1) {
+        if (*p == '\t')
+            n = (n + 8) & ~7;
+        else
+            n += 1;
+    }
+    return n;
+}
+
+static int
+do_indent (const char* text)
+{
+    int amount = indent_length (text);
+
+    if (indentation_stack.empty())
+        indentation_stack.push (0);
+    
+    if (amount > indentation_stack.top ()) {
+        indentation_stack.push (amount);
+        return INDENT;
+    }
+
+    if (amount < indentation_stack.top ()) {
+        indentation_stack.pop ();
+        while (amount < indentation_stack.top ()) {
+            yyqueue_token (DEDENT, 0, 0, "", 8);
+            indentation_stack.pop ();
+        }
+        if (amount != indentation_stack.top ()) {
+            error (text, "improper indentation");
+        }
+        return DEDENT;
+    }
+
+    return -1;
+}
+
+/** Create a new ID token whose text is TEXT, and whose location is LOC. */
+static AST_Ptr
+make_id (const char* text, Location_Type loc)
+{
+    if (text == NULL) {
+        fatal (loc,
+               "internal error: make_id encountered null operand");
+    }
+    AST_Ptr result = AST::make_token (ID, text);
+    result->set_loc (loc);
+    return result;
+}
+
+static AST_Ptr
+make_binop_id (const gcstring& text, Location_Type loc)
+{
+    return make_id (binop_map[text], loc);
+}
+
+static AST_Ptr
+make_binop_id (AST_Ptr op)
+{
+    return make_binop_id (op->as_string (), op->loc ());
+}
+
+static AST_Ptr
+make_binop_id (const List_Ptr& op)
+{
+    if (op->size () == 1) {
+        return make_binop_id (op->at (0));
+    } else if (op->size () == 2) {
+        return 
+            make_binop_id (op->at (0)->as_string () + op->at (1)->as_string (),
+                           op->at (0)->loc ());
+    } else {
+        fatal (yysource_location (),
+               "internal error; make_binop_id encountered unknown operator");
+    }
+}
+
+static AST_Ptr
+make_unop_id (AST_Ptr op)
+{
+    return make_id (unop_map[op->as_string ()], op->loc ());
+}
+
+/** Create a UNOP node corresponding to 'op y', where op, and y
+ *  are the elements of OPERANDS. */
+static AST_Ptr
+make_unop (const List_Ptr& operands)
+{
+    return YYMAKE_TREE (UNOP, make_unop_id (operands->at (0)),
+                        operands->at (1));
+}
+
+int
+AST::lineNumber ()
+{
+    return yylocation_line (loc ());
+}
+
+/** Initialize constant tables. */
+static void
+init ()
+{
+    if (!binop_map.empty ()) {
+        return;
+    }
+
+    for (int i = 0; BINOP_INIT[i] != NULL; i += 2) {
+        binop_map[BINOP_INIT[i]] = BINOP_INIT[i+1];
+    }
+    for (int i = 0; UNOP_INIT[i] != NULL; i += 2) {
+        unop_map[UNOP_INIT[i]] = UNOP_INIT[i+1];
+    }
+}
+
+void
+parse (FILE* f, const gcstring& name)
+{
+    init ();
+    if (debugParser)
+	yydebug = 1;
+    yypush_lexer (f, name);
+    theTree = NULL;
+    yyparse ();
+    if (theTree != NULL) {
+        theTree->print (cout, 0);
+    }
+}
