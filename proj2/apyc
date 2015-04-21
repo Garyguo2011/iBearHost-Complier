@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+# -*-Python-*-
+
+import re, sys
+from subprocess import call, DEVNULL, check_call, CalledProcessError
+from os.path import basename, dirname, join, splitext, exists, isdir, realpath
+from getopt import getopt, GetoptError
+from tempfile import TemporaryDirectory, mkdtemp
+from sys import stderr
+from os import mkdir
+
+HERE = dirname(realpath(sys.argv[0]))
+
+def Usage():
+    print("""\
+Usage: apyc --phase=PHASE [ -dp ] [ -o OUTFILE ] [ -k ] FILE.py
+    Compile FILE.py through phase PHASE (1 or 2), putting the output in 
+    OUTFILE (default FILE.ast for PHASE=1 and FILE.dast for PHASE=2).
+    If -k is present, retain temporary intermediate .ast files if PHASE=2.
+    If -dp is present, debug the phase 1 parser.""")
+    sys.exit(1)
+
+def phase1(inFile, outFile, debug=False):
+    """Run phase 1 on INFILE, producing OUTFILE.  Returns True iff successful.
+    If DEBUG, produces debugging output from parser on standard error."""
+    command = "{prog} --phase=1 {opt}-o {output} {input}" \
+               .format(prog=join(HERE, "apyc1"), opt = "-dp" if debug else "",
+                       input=inFile, output=outFile)
+    if verbose:
+        print(command, file=stderr)
+    check_call(command, shell=True, stdin=DEVNULL, stdout=DEVNULL)
+
+def phase2(preludeSource, pythonSource, tempDir, outFile, debug):
+    """Run phase 2 on PRELUDESOURCE (the standard prelude) and 
+    PYTHONSOURCE, putting intermediate AST files in TEMPDIR, and the output
+    decorated AST in OUTFILE."""
+    preludeAst = join(tempDir, "pre.ast")
+    programAst = join(tempDir, "prog.ast")
+    phase1(preludeSource, preludeAst)
+    phase1(pythonSource, programAst, debug)
+    command = "{prog} -o {output} {source1} {ast1} {source2} {ast2}" \
+               .format(prog=join(HERE, "apyc2"),
+                       source1=preludeSource, ast1=preludeAst,
+                       source2=pythonSource, ast2=programAst,
+                       output=outFile)
+    if verbose:
+        print(command, file=stderr)
+    check_call(command, shell=True, stdin=DEVNULL, stdout=DEVNULL)
+
+debugParser = False
+keep = False
+outFile = None
+phase = None
+verbose = False
+try:
+    opts, args = getopt(sys.argv[1:], 'd:o:kv', ['phase='])
+    if len(args) != 1:
+        Usage()
+    else:
+        source = args[0]
+    for opt, val in opts:
+        if opt == '-d' and v != 'p':
+            Usage()
+        elif opt == '-d':
+            debugParser = True
+        elif opt == '-o':
+            outFile = val
+        elif opt == '-k':
+            keep = True
+        elif opt == '-v':
+            verbose = True
+        elif opt == '--phase':
+            if val != '1' and val != '2':
+                Usage()
+            else:
+                phase = val
+        else:
+            print("Unknown option: '{}'".format(opt), file=stderr)
+    if phase is None:
+        Usage()
+    base, _ = splitext(source)
+    if outFile is None:
+        if phase == '1':
+            outFile = base + ".ast"
+        else:
+            outFile = base + ".dast"
+except GetoptError:
+    Usage()
+
+try:
+    if phase == '1':
+        phase1(source, outFile, debugParser)
+    else:
+        preludeSource = join(HERE, "lib", "prelude.py")
+        if keep:
+            tmpDir = basename(base) + ".d"
+            if not isdir(tmpDir):
+                try:
+                    mkdir(tmpDir, mode=0o700)
+                except OSError as excp:
+                    print("Cannot create temporary directory {}: {}"
+                          .format(tmpDir, excp), file=stderr)
+                    sys.exit(1)
+            print("Retaining files in directory {}".format(tmpDir))
+            phase2(preludeSource, source, tmpDir, outFile, debugParser)
+        else:
+            with TemporaryDirectory() as tmpDir:
+                phase2(preludeSource, source, tmpDir, outFile, debugParser)
+except CalledProcessError:
+    sys.exit(1)
+
+
+              
