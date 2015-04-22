@@ -306,6 +306,11 @@ Decl::declTypeName () const
     return "?";
 }
 
+void
+Decl::replaceBindings ()
+{
+}    
+
 /** The superclass of declarations that describe an entity with a type. */
 class TypedDecl : public Decl {
 protected:
@@ -329,6 +334,11 @@ public:
     }
 
 protected:
+
+    void replaceBindings () {
+        if (_type != NULL)
+            _type = _type->replaceBindings ()->asType ();
+    }
 
     void printType (ostream& out) const {
 	outType (_type, out);
@@ -442,8 +452,8 @@ protected:
 	return getAst () != NULL && getAst ()->arity () == 0;
     }
 
-    void printContainer (ostream&) const {
-    }
+    void printContainer (ostream&) const { 
+   }
 
     const char* declTypeName () const {
         return "typevardecl";
@@ -716,12 +726,21 @@ setBuiltinDecl (Decl* decl)
     }
 }
 
-// FIXME: Cut down on unnecessary internal typevar decls.
 void
-outputDecls (ostream& out)
+replaceDeclBindings ()
+{
+    for (size_t i = 0; i < allDecls.size (); i += 1)
+        allDecls[i]->replaceBindings ();
+}
+
+void
+outputDecls (ostream& out, const DeclSet& used)
 {
     for (size_t i = 0; i < allDecls.size (); i += 1) {
-        allDecls[i]->print (out);
-        out << endl;
+        Decl* d = allDecls[i];
+        if (used.count (d) > 0) {
+            allDecls[i]->print (out);
+            out << endl;
+        }
     }
 }

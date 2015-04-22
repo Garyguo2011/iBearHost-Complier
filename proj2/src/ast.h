@@ -23,6 +23,7 @@ class Decl;
 class Environ;
 class Unifier;
 class Resolver;
+typedef std::unordered_set<Decl*> DeclSet;
 
 /* The Horn framework uses reference-counting to reclaim space.  The
  * type Pointer<T> is a reference-counted pointer to type T.  It acts
@@ -176,13 +177,19 @@ public:
     virtual void resolveTypes (Decl* context, Unifier& subst,
                                Resolver& resolver);
 
+    /** Specialization of resolveTypes for the case where I can
+     *  contain a next_value node.  NEXTVALUETYPE gives the type to
+     *  attribute to such nodes. */
+    virtual void resolveTypes (Decl* context, Unifier& subst,
+                               Resolver& resolver, Type_Ptr nextValueType);
+
     /** Attempt to determine my type, assuming that I appear to the
      *  right of a "." where the selection is from an object (as
      *  opposed to a class). */
     virtual void resolveSelectedType (Unifier& subst, Resolver& resolver);
 
-    /** Report unresolved overloaded names in me as errors. */
-    virtual void checkResolved ();
+    /** Check language rules not processed elsewhere. */
+    virtual void otherChecks ();
 
     /** True if an error has been reported on me. */
     bool errorReported ();
@@ -191,6 +198,14 @@ public:
      *  avoid multiple error messages. */
     void recordError ();
 
+    /** Replace all type-variable bindings reachable from me with
+     *  their referents, except for those needed to break cycles. 
+     *  Returns the modified tree. */
+    virtual AST_Ptr replaceBindings ();
+
+    /** Add all Decls used in me to USED. */
+    virtual void findUsedDecls (DeclSet& used);
+
 protected:
 
     /** Print me as an AST on OUT.  Use INDENT as the indentation for 
@@ -198,9 +213,9 @@ protected:
      *  This method is intended to be called by other print methods
      *  during a traversal (using the print method below), whereas
      *  the public print method begins a traversal.  Assumes that
-     *  VISITED indicates ancestor nodes that have already been
+     *  VISITING indicates ancestor nodes that have already been
      *  printed, restoring it to its previous value when done. */
-    virtual void _print (std::ostream& out, int indent, ASTSet& visited);
+    virtual void _print (std::ostream& out, int indent, ASTSet& visiting);
 
     /** External name of this type of node, for printing purposes.
      *  This is NOT intended as a way of determine the type of a
@@ -208,17 +223,27 @@ protected:
     virtual const char* externalName ();
 
     /** Used in _print for components that follow the children of a
-     *  node, if any.  OUT, INDENT, and VISITED as for other printing
+     *  node, if any.  OUT, INDENT, and VISITING as for other printing
      *  routines.  */
-     virtual void printOther (std::ostream& out, int indent, ASTSet& visited);
+     virtual void printOther (std::ostream& out, int indent, ASTSet& visiting);
 
     /** Print TREE on OUT at given INDENT level, recording nodes
-     *  visited in VISITED (to avoid infinite traversals of
+     *  visited in VISITING (to avoid infinite traversals of
      *  circular type structures.  This is the intended way that
      *  overridings of _print should recursively print their children.
      */
     static void print (AST_Ptr tree, std::ostream& out, int indent,
-                       ASTSet& visited);
+                       ASTSet& visiting);
+
+    /** Used by replaceBindings().  Replace all type-variable bindings
+     *  reachable from me with their referents, except for those
+     *  needed to break cycles.  Assumes that the traversal started by
+     *  replaceBindings() is currently visiting nodes in VISITING.
+     *  Returns the modified tree. */
+    virtual AST_Ptr replaceBindings (ASTSet& visiting);
+
+    /** Same as p->replaceBindings (VISITING). */
+    static AST_Ptr replaceBindings (AST_Ptr p, ASTSet& visiting);
 
 private:
     /** Set to true to indicate that an error has been flagged on this
@@ -271,6 +296,8 @@ class Type : public AST_Tree {
 
     friend class TypeVar_AST;
     friend class Unifier;
+    friend Type_Ptr freshen (Type_Ptr type);
+    friend void freshen (gcvector<Type_Ptr>& types);
 
 public:
 
@@ -328,10 +355,6 @@ public:
      *  type variables. */
     virtual Type_Ptr binding ();
 
-    /** Set binding () to be the same as that of TYPE.  Affects only
-     *  type variables. */
-    virtual void setTypeBinding (Type_Ptr type);
-
     /** A new, unbound type variable. */
     static Type_Ptr makeVar ();
 
@@ -345,6 +368,11 @@ public:
 
 protected:
 
+    /** Return a freshened version of this, assuming that FRESHMAP
+     *  contains freshenings of previously processed nodes, adding
+     *  freshened versions of new nodes to FRESHMAP. */
+    virtual Type_Ptr freshen (TypeMap& freshMap);
+
     /** Bind me to TYPE, assuming I am unbound. */
     void bind (Type_Ptr type);
 
@@ -353,7 +381,7 @@ protected:
 
     /** Used internally by hasFreeVariables to do most of the work,
      *  avoiding circular traversals. */
-    virtual bool hasFreeVariables (ASTSet& visited);
+    virtual bool hasFreeVariables (ASTSet& visiting);
 
 private:
 
@@ -368,6 +396,10 @@ extern bool makeFuncType (int n, Type_Ptr type, Unifier& subst);
 
 /** Return a most-general function type having N formals. */
 extern Type_Ptr makeFuncType (int n);
+
+/** Return an N-argument function type whose formal types are varargs
+ *  parameters, returning RETURNTYPE. */
+extern Type_Ptr makeFuncType (Type_Ptr returnType, int n, ...);
 
 /** Return a most-general method type for a method of class CLAS
  *  having N>=1 formals. */
@@ -489,7 +521,11 @@ protected:
     /** Computes my type, which is then cached by getType(). */
     virtual Type_Ptr computeType ();
 
-    void printOther (std::ostream& out, int indent, ASTSet& visited);
+    void printOther (std::ostream& out, int indent, ASTSet& visiting);
+
+    AST_Ptr replaceBindings (ASTSet& visiting);
+
+    void findUsedDecls (DeclSet& used);
 
     Type_Ptr _type;
 

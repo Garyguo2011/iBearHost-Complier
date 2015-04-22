@@ -327,36 +327,26 @@ NODE_FACTORY (Assign_AST, ASSIGN);
 
 /***** FOR *****/
 
+/** Name of the dummy overloaded function that controls what
+ *  for-statement may iterate over. */
+static const char* FOR_FUNCTION = "for-loop source sequence";
+
 /**  for target in exprs: body [ else: body ]     */
 class For_AST : public AST_Tree {
 protected:
 
-    NODE_CONSTRUCTORS (For_AST, AST_Tree);
+    NODE_CONSTRUCTORS_INIT (For_AST, AST_Tree, sequence (NULL));
 
     void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver) {
-        int errs0 = numErrors ();
         AST_Tree::resolveTypes (context, subst, resolver);
-        if (errs0 != numErrors ())
-            return;
-        Type_Ptr seqType = child (1)->getType ()->binding ();
+        sequence->resolveTypes (context, subst, resolver);
+        Type_Ptr seqType = sequence->getType ()->binding ()->paramType (0);
+        Type_Ptr eltType = sequence->getType ()->binding ()->returnType ();
 
-        if (seqType->isTypeVariable ()) {
-            return;
+        if (!unify (eltType, child (0)->getType (), subst)
+            || !unify (seqType, child (1)->getType (), subst)) {
+            error (this, "invalid sequence type for 'for' statement");
         }
-
-        Type_Ptr eltType;
-        if (unifies (seqType, strDecl->asType ()))
-            eltType = strDecl->asType ();
-        else if (unifies (seqType, rangeDecl->asType ()))
-            eltType = intDecl->asType ();
-        else {
-            eltType = Type::makeVar ();
-            if (!unify (seqType, listDecl->asType (1, eltType), subst))
-                error (this, "value cannot be iterated over");
-        }
-        if (!unify (eltType, child (0)->getType (), subst)) {
-            error (this, "for loop target does not match element type");
-        } 
     }
         
     void collectDecls (Decl* enclosing) {
@@ -364,9 +354,47 @@ protected:
         for (size_t i = 1; i < arity (); i += 1)
             child (i)->collectDecls (enclosing);
         target->addTargetDecls (enclosing);
+        initForDecls ();
     }
 
+    void getOverloadings (Resolver& resolver) {
+        AST_Tree::getOverloadings (resolver);
+        assert (sequence != NULL);
+        resolver.addId (sequence);
+    }
+
+private:
+
+    /** Initialize the special ID that defines the valid kinds of
+     *  sequence in a for statement. */
+    void initForDecls () {
+        if (sequence != NULL)
+            return;
+        if (forFunctions[0] == NULL) {
+            Type_Ptr 
+                strSeq = makeFuncType (strDecl->asType (), 
+                                       1, strDecl->asType ()),
+                eltType = Type::makeVar (),
+                listSeq = makeFuncType (eltType, 1,
+                                        listDecl->asType (1, eltType, NULL)),
+                rangeSeq = makeFuncType (intDecl->asType (), 1,
+                                         rangeDecl->asType ());
+            forFunctions[0] = makeFuncDecl (FOR_FUNCTION, mainModule, strSeq);
+            forFunctions[1] = makeFuncDecl (FOR_FUNCTION, mainModule, listSeq);
+            forFunctions[2] = makeFuncDecl (FOR_FUNCTION, mainModule, rangeSeq);
+        }
+        sequence = make_id (FOR_FUNCTION, child (1)->loc ());
+        for (size_t i = 0; i < sizeof(forFunctions) / sizeof(Decl*); i += 1)
+            sequence->addDecl (forFunctions[i]);
+    }
+
+    /** Artificial identifier used to define the legal sequences for 
+     *  for statements. */
+    AST_Ptr sequence;
+    static Decl* forFunctions[3];
 };
+
+Decl* For_AST::forFunctions[3];
 
 NODE_FACTORY (For_AST, FOR);
 

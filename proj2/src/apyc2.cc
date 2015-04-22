@@ -128,9 +128,15 @@ phase2 (const gcstring& preludeSrc, const gcstring& preludeASTFile,
 
     tree = tree->doOuterSemantics ();
 
+    tree = tree->replaceBindings ();
+    replaceDeclBindings ();
+    DeclSet usedDecls;
+    tree->findUsedDecls (usedDecls);
+    usedDecls.insert (mainModule);
+
     if (numErrors () == 0) {
         printTree (tree, outASTFile);
-        outputDecls (cout);
+        outputDecls (cout, usedDecls);
     }
 }
  

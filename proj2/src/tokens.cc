@@ -53,6 +53,18 @@ protected:
         return Type::makeVar ();
     }
 
+    AST_Ptr replaceBindings (ASTSet& visiting) {
+        if (_type != NULL)
+            _type = AST::replaceBindings (_type, visiting)->asType();
+        return this;
+    }
+
+    void findUsedDecls (DeclSet& used) {
+        AST_Token::findUsedDecls (used);
+        if (_type != NULL)
+            _type->findUsedDecls (used);
+    }
+
     Type_Ptr _type;
 
     TOKEN_BASE_CONSTRUCTORS_INIT (Typed_Token, AST_Token, _type (NULL));
@@ -63,7 +75,7 @@ protected:
 class Int_Token : public Typed_Token {
 protected:
 
-    void printOther (ostream& out, int indent, ASTSet& visited) {
+    void printOther (ostream& out, int indent, ASTSet& visiting) {
 	out << " " << value;
     }
 
@@ -94,7 +106,7 @@ TOKEN_FACTORY(Int_Token, INT_LITERAL);
 class Id_Token : public Typed_Token {
 protected:
 
-    void printOther (ostream& out, int indent, ASTSet& visited) {
+    void printOther (ostream& out, int indent, ASTSet& visiting) {
         out << " " << as_string ();
         if (getDecl () != NULL) 
             out << " " << getDecl ()->getIndex ();
@@ -197,6 +209,11 @@ protected:
         }
     }
 
+    void findUsedDecls (DeclSet& used) {
+        if (numDecls () > 0) {
+            used.insert (getDecl ());
+        }
+    }    
 
 private:
 
@@ -232,7 +249,7 @@ private:
         return this;
     }
 
-    void printOther (ostream& out, int indent, ASTSet& visited) {
+    void printOther (ostream& out, int indent, ASTSet& visiting) {
         out << " " << " \"";
         for (size_t i = 0; i < literal_text.size (); i += 1) {
             char c = literal_text[i];

@@ -44,15 +44,32 @@ Typed_Tree::computeType ()
     return Type::makeVar ();
 }
 
+AST_Ptr
+Typed_Tree::replaceBindings (ASTSet& visiting)
+{
+    AST_Tree::replaceBindings (visiting);
+    if (_type != NULL)
+        _type = AST::replaceBindings (_type, visiting)->asType ()->asType ();
+    return this;
+}   
+
 void
-Typed_Tree::printOther (ostream& out, int indent, ASTSet& visited)
+Typed_Tree::findUsedDecls (DeclSet& used)
+{
+    AST_Tree::findUsedDecls (used);
+    if (_type != NULL)
+        _type->findUsedDecls (used);
+}
+
+void
+Typed_Tree::printOther (ostream& out, int indent, ASTSet& visiting)
 {
     if (getType () != NULL) {
         if (arity () == 0)
             out << " ";
         else
             out << endl << setw (indent + 4) << "";
-        print (getType (), out, indent + 4, visited);
+        print (getType (), out, indent + 4, visiting);
     }
 }
 
@@ -61,7 +78,7 @@ Typed_Tree::printOther (ostream& out, int indent, ASTSet& visited)
 class None_AST : public Typed_Tree {
 protected:
 
-    void printOther (ostream& out, int indent, ASTSet& visited) {
+    void printOther (ostream& out, int indent, ASTSet& visiting) {
     }
 
     NODE_CONSTRUCTORS (None_AST, Typed_Tree);
@@ -75,7 +92,7 @@ protected:
 
     NODE_CONSTRUCTORS (True_AST, Typed_Tree);
 
-    void printOther (ostream& out, int indent, ASTSet& visited) {
+    void printOther (ostream& out, int indent, ASTSet& visiting) {
     }
 
     Type_Ptr computeType () {
@@ -92,7 +109,7 @@ protected:
 
     NODE_CONSTRUCTORS (False_AST, Typed_Tree);
 
-    void printOther (ostream& out, int indent, ASTSet& visited) {
+    void printOther (ostream& out, int indent, ASTSet& visiting) {
     }
 
     Type_Ptr computeType () {
@@ -324,6 +341,12 @@ protected:
     void addTargetDecls (Decl* enclosing) {
     }
 
+    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver,
+                       Type_Ptr nextValueType) {
+        PASSDOWN(this, resolveTypes(context, subst, resolver, nextValueType),
+                 0);
+    }
+
 };
 
 NODE_FACTORY (Subscript_Assign_AST, SUBSCRIPT_ASSIGN);
@@ -352,10 +375,31 @@ protected:
     void addTargetDecls (Decl* enclosing) {
     }
 
+    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver,
+                       Type_Ptr nextValueType) {
+        PASSDOWN(this, resolveTypes(context, subst, resolver, nextValueType),
+                 0);
+    }
+
 };
 
 NODE_FACTORY (Slicing_Assign_AST, SLICE_ASSIGN);
     
+
+class Next_Value_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS (Next_Value_AST, Typed_Tree);
+
+    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver,
+                       Type_Ptr nextValueType) {
+        if (!setType (nextValueType, subst)) 
+            error (this, "type conflict in assignment");
+    }
+
+};
+
+NODE_FACTORY (Next_Value_AST, NEXT_VALUE);
 
 /***** ATTRIBUTEREF *****/
 
@@ -475,16 +519,34 @@ NODE_FACTORY (Tuple_AST, TUPLE);
 /***** TARGET_LIST *****/
 
 /** (TARGET, ...) on left-hand side of assignment, for. */
-class TargetList_AST : public Tuple_AST {
+class TargetList_AST : public Typed_Tree {
 protected:
 
-    NODE_CONSTRUCTORS (TargetList_AST, Tuple_AST);
+    NODE_CONSTRUCTORS (TargetList_AST, Typed_Tree);
 
     void addTargetDecls (Decl* enclosing) {
         for_each_child (c, this) {
             c->addTargetDecls (enclosing);
         } end_for;
     }
+
+    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver) {
+        if (arity () > 3)
+            error (this, "target list has too many elements (max 3)");
+        Type_Ptr componentTypes[3];
+        for (size_t i = 0; i < arity (); i += 1)
+            componentTypes[i] = Type::makeVar ();
+        Type_Ptr tupleType =
+            tupleDecl[arity ()]->asType (arity (), componentTypes);
+        if (!setType (tupleType, subst))
+            error (this, "type mismatch on assignment");
+        for (size_t i = 0; i < arity (); i += 1) {
+            child (i)->resolveTypes (context, subst, resolver,
+                                     componentTypes[i]);
+            if (!unify(child (i)->getType (), componentTypes[i], subst)) 
+                error (child (i), "type mismatch on assignment");
+        }
+    }        
 
 };
 
@@ -556,6 +618,15 @@ protected:
             error (this, "type mismatch on dict display");
     }
 
+    void otherChecks () {
+        Typed_Tree::otherChecks ();
+        Type_Ptr keyType = getType ()->binding ()->typeParam (0);
+        if (keyType->isTypeVariable () 
+            || (!unifies (keyType, strDecl->asType ())
+                && !unifies (keyType, boolDecl->asType ())
+                && !unifies (keyType, intDecl->asType ())))
+            error (this, "dictionary key type must be str, int, or bool");
+    }
 };
 
 NODE_FACTORY (DictDisplay_AST, DICT_DISPLAY);
