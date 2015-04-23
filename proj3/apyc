@@ -110,7 +110,7 @@ try:
         elif opt == '-v':
             verbose = True
         elif opt == '--phase':
-            if val != '1' and val != '2':
+            if val not in ('1', '2', '3'):
                 Usage()
             else:
                 phase = int(val)
@@ -147,7 +147,7 @@ try:
     else:
         if keep:
             dir = basename(base) + ".d"
-            print("Retaining files in directory {}".format(dirname))
+            print("Retaining files in directory {}".format(dir))
         else:
             dir = None
         with TempDir(dir, 0o700, keep) as tmpDir:
