@@ -12,6 +12,7 @@
 
 class Decl;
 class Environ;
+typedef std::unordered_set<Decl*> DeclSet;
 
 /** A dummy class whose sole purpose is to provide a constructor that
  *  initializes the garbage collector (required for Darwin).  Put a
@@ -205,6 +206,11 @@ public:
      *  Otherwise, does nothing. */
     virtual void setFrozen (bool frozen);
 
+    /** Replace all type-variable bindings reachable from me with
+     *  their referents, except for those needed to break cycles. 
+     *  Returns the modified tree. */
+    virtual void replaceBindings ();
+
     virtual ~Decl ();
 
 protected:
@@ -276,8 +282,11 @@ extern Decl* makeUnknownDecl (const gcstring& name, bool isType);
  *  appropriate global variable to point to it. */
 extern void setBuiltinDecl (Decl* decl);
 
-/** Output all Decl nodes to standard output. */
-extern void outputDecls (std::ostream& out);
+/** Replace the getAst () values of all types in Decls. */
+extern void replaceDeclBindings ();
+
+/** Output all Decl nodes in USED to standard output. */
+extern void outputDecls (std::ostream& out, const DeclSet& usedTypeVars);
 
 /** Decls for built-in types. */
 extern Decl* intDecl;

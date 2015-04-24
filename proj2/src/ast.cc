@@ -35,28 +35,28 @@ AST::retypedNode (int syntax)
 void
 AST::print (ostream& out, int indent)
 {
-    ASTSet visited;
-    print(this, out, indent, visited);
+    ASTSet visiting;
+    print(this, out, indent, visiting);
 }
 
 void
-AST::print (AST_Ptr tree, std::ostream& out, int indent, ASTSet& visited)
+AST::print (AST_Ptr tree, std::ostream& out, int indent, ASTSet& visiting)
 {
-    tree->_print (out, indent, visited);
+    tree->_print (out, indent, visiting);
 }
 
 void
-AST::_print (ostream& out, int indent, ASTSet& visited)
+AST::_print (ostream& out, int indent, ASTSet& visiting)
 {
-    visited.insert (this);
+    visiting.insert (this);
     out << "(" << externalName () << " " << lineNumber ();
     for_each_child (c, this) {
         out << endl << setw (indent + 4) << "";
-        print (c, out, indent + 4, visited);
+        print (c, out, indent + 4, visiting);
     } end_for;
-    printOther (out, indent, visited);
+    printOther (out, indent, visiting);
     out << ")";
-    visited.erase (this);
+    visiting.erase (this);
 }
 
 const char*
@@ -83,7 +83,7 @@ AST::externalName ()
 }
 
 void
-AST::printOther (ostream& out, int indent, ASTSet& visited)
+AST::printOther (ostream& out, int indent, ASTSet& visiting)
 {
 }
 
@@ -160,7 +160,7 @@ AST::doOuterSemantics ()
     tree = tree->resolveAllocators (outerEnviron);
     tree = tree->resolveStaticSelections (outerEnviron);
     tree->resolveTypesOuter (mainModule);
-    tree->checkResolved ();
+    tree->otherChecks ();
     return tree;
 }
 
@@ -243,10 +243,17 @@ AST::resolveTypes (Decl* context, Unifier& subst, Resolver& resolver)
 }
 
 void
-AST::checkResolved ()
+AST::resolveTypes (Decl* context, Unifier& subst, Resolver& resolver,
+                   Type_Ptr nextValueType)
+{
+    resolveTypes (context, subst, resolver);
+}
+
+void
+AST::otherChecks ()
 {
     for_each_child (c, this) {
-        c->checkResolved ();
+        c->otherChecks ();
     } end_for;
 }
 
@@ -260,6 +267,41 @@ void
 AST::recordError ()
 {
     _erroneous = true;
+}
+
+AST_Ptr
+AST::replaceBindings ()
+{
+    ASTSet visiting;
+    return replaceBindings(visiting);
+}
+
+AST_Ptr
+AST::replaceBindings (ASTSet& visiting)
+{
+    if (visiting.count (this) == 0) {
+        visiting.insert (this);
+        for_each_child_var (c, this) {
+            c = c->replaceBindings (visiting);
+        } end_for;
+        visiting.erase (this);
+    }
+    return this;
+}
+
+AST_Ptr
+AST::replaceBindings (AST_Ptr p, ASTSet& visiting)
+{
+    return p->replaceBindings (visiting);
+}
+
+
+void
+AST::findUsedDecls (DeclSet& used)
+{
+    for_each_child (c, this) {
+        c->findUsedDecls (used);
+    } end_for;
 }
 
 /* Definitions of methods in base class AST_Tree. */

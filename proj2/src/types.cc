@@ -343,54 +343,21 @@ Type::isTypeVariable ()
 bool
 Type::hasFreeVariables (Type_Ptr type)
 {
-    ASTSet visited;
-    return type->hasFreeVariables (visited);
+    ASTSet visiting;
+    return type->hasFreeVariables (visiting);
 }
 
 bool
-Type::hasFreeVariables (ASTSet& visited)
+Type::hasFreeVariables (ASTSet& visiting)
 {
-    if (visited.count (this) == 0) {
-        visited.insert (this);
+    if (visiting.count (this) == 0) {
+        visiting.insert (this);
         for_each_child (c, this) {
-            if (c->asType () != NULL && c->asType ()->hasFreeVariables (visited))
+            if (c->asType () != NULL && c->asType ()->hasFreeVariables (visiting))
                 return true;
         } end_for;
     }
     return false;
-}
-
-void
-Type::setTypeBinding (Type_Ptr type)
-{
-}
-
-static Type_Ptr
-freshen (Type_Ptr type, TypeMap& freshMap)
-{
-    Type_Ptr result;
-    if (freshMap.count (type) != 0)
-        return freshMap[type];
-
-    Type_Ptr type1 = type->binding ();
-    if (type1 != type)
-        result = freshen (type1, freshMap);
-    else if (type1->isTypeVariable ())
-        result = Type::makeVar ();
-    else {
-        result = consTree (type1->oper ()->syntax ())->asType ();
-        freshMap[type] = result;
-        for_each_child (c, type1) {
-            AST_Ptr c1;
-            if (c->asType () != NULL)
-                c1 = freshen (c->asType (), freshMap);
-            else 
-                c1 = c;
-            result->append (c1);
-        } end_for;
-    }
-    freshMap[type] = result;
-    return result;
 }
 
 Type_Ptr
@@ -398,11 +365,10 @@ freshen (Type_Ptr type)
 {
     if (type->hasFreeVariables (type)) {
         TypeMap freshMap;
-        return freshen (type, freshMap);
+        return type->freshen (freshMap);
     } else
-        return type->binding ();
+        return type;
 }
-
 void
 freshen (gcvector<Type_Ptr>& types)
 {
@@ -411,11 +377,33 @@ freshen (gcvector<Type_Ptr>& types)
     for (size_t i = 0; i < types.size (); i += 1) {
         if (Type::hasFreeVariables (types[i])) {
             for (size_t j = 0; j < types.size (); j += 1)
-                types[j] = freshen (types[j], freshMap);
+                types[j] = types[j]->freshen (freshMap);
             break;
         }
     }
 }
+
+/* See also TypeVar_AST::freshen */
+Type_Ptr
+Type::freshen (TypeMap& freshMap)
+{
+    Type_Ptr result;
+    if (freshMap.count (this) != 0)
+        return freshMap[this];
+
+    result = consTree (oper ()->syntax ())->asType ();
+    freshMap[this] = result;
+    for_each_child (c, this) {
+        AST_Ptr c1;
+        if (c->asType () == NULL)
+            c1 = c;
+        else
+            c1 = c->asType ()->freshen (freshMap);
+        result->append (c1);
+    } end_for;
+    return result;
+}
+
 
 Type_Ptr
 makeFuncType (int n)
@@ -435,6 +423,20 @@ makeFuncType (int n, Type_Ptr type, Unifier& subst)
         return (type->returnType () != NULL && type->numParams () == n);
     unify (type, makeFuncType (n), subst);
     return true;
+}
+
+Type_Ptr
+makeFuncType (Type_Ptr returnType, int n, ...)
+{
+    Type_Ptr func = consTree (FUNCTION_TYPE)->asType ();
+    va_list ap;
+    va_start (ap, n);
+    func->append (returnType);
+    for (int i = 0; i < n; i += 1) {
+        func->append (va_arg (ap, AST_Ptr));
+    }
+    va_end (ap);
+    return func;
 }
 
 Type_Ptr
@@ -460,12 +462,12 @@ protected:
         return true;
     }
 
-    bool hasFreeVariables (ASTSet& visited) {
+    bool hasFreeVariables (ASTSet& visiting) {
         Type_Ptr b = binding ();
         if (b->isTypeVariable ())
             return true;
         else
-            return b->hasFreeVariables (visited);
+            return b->hasFreeVariables (visiting);
     }
 
     Type_Ptr binding () {
@@ -477,15 +479,9 @@ protected:
         return b->_binding->binding ();
     }
 
-    void setTypeBinding (Type_Ptr type) {
-        Decl* me = getDecl ();
-        assert (me != NULL);
-        me->setAst (type);
-    }
-
-    void _print (ostream& out, int indent, ASTSet& visited) {
+    void _print (ostream& out, int indent, ASTSet& visiting) {
         Type_Ptr me = binding ();
-        if (me == this || visited.count (me) > 0) {
+        if (me == this || visiting.count (me) > 0) {
             if (arity () == 1) {
                 out << "(type_var " << lineNumber () << " " 
                     << child(0)->as_string ();
@@ -495,7 +491,7 @@ protected:
                 out << " " << getDecl ()->getIndex ();
             out << ")";
         } else
-            print (me, out, indent, visited);
+            print (me, out, indent, visiting);
     }
 
     gcstring as_string () const {
@@ -544,6 +540,54 @@ protected:
             }
         }
         return this;
+    }
+
+    AST_Ptr replaceBindings (ASTSet& visiting) {
+        Type_Ptr p;
+        p = this;
+        Decl* me = getDecl ();
+        if (me == NULL) 
+            return this;
+        p = me->getAst ()->asType ();
+        Type_Ptr b = p->binding ();
+        if (b->isTypeVariable ())
+            return b;
+        else if (visiting.count (b) > 0) {
+            p->unbind ();
+            p->bind (b);
+            return p;
+        } else {
+            return b->replaceBindings (visiting);
+        }
+    }
+
+    void findUsedDecls (DeclSet& used) {
+        Type::findUsedDecls (used);
+        if (numDecls () > 0) {
+            used.insert (getDecl ());
+        }
+    }    
+
+    Type_Ptr freshen (TypeMap& freshMap) {
+        if (freshMap.count (this) > 0) 
+            return freshMap[this];
+        Type_Ptr p = binding ();
+        Type_Ptr result;
+        if (p->isTypeVariable ()) {
+            if (freshMap.count (p) > 0) {
+                result = freshMap[p];
+                freshMap[this] = result;
+            } else {
+                result = Type::makeVar ();
+                freshMap[result] = freshMap[this] = freshMap[p] = result;
+            }
+        } else {
+            result = Type::makeVar ();
+            freshMap[this] = result;
+            p = p->freshen(freshMap);
+            result->bind (p);
+        }
+        return result;
     }
 
 private:
