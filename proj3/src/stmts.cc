@@ -20,6 +20,15 @@ class Print_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (Print_AST, AST_Tree);
+    void codeGen ()
+    {
+        cout << "__print__(";
+        for_each_child_var(c, this) {
+            c->codeGen();
+        } end_for;
+        cout << ");" << endl;
+        //PASSDOWN (this, codeGen(), 0);
+    }
 
 };
 

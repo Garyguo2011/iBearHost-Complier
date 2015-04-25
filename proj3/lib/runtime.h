@@ -80,8 +80,11 @@ private:
 
 class PyInt : public PyObject {
 public:
+    PyInt (const int val);
     PyInt* asInt ();
     const char* typeName ();
+private:
+    int _val;
 };
 
 class PyBool : public PyObject {
@@ -223,6 +226,12 @@ static inline PyStr*
 __cons_str__ (const char* val)
 {
     return new PyStr (val);
+}
+
+static inline PyInt*
+__cons_int__ (const int* val)
+{
+    return new PyInt (val);
 }
 
 #endif

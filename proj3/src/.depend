@@ -1,0 +1,65 @@
+apyc3.o: apyc3.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h
+dast.o: dast.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h dast-parser.hh
+decls.o: decls.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h dast-parser.hh
+exprs.o: exprs.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h dast-parser.hh
+modules.o: modules.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h dast-parser.hh
+stmts.o: stmts.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h dast-parser.hh
+tokens.o: tokens.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h dast-parser.hh
+types.o: types.cc apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h dast-parser.hh
+dast-parser.o: dast-parser.cc \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-parse-lex.cc \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h apyc.h dast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h dast-lexer.cc

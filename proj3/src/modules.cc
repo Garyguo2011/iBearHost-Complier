@@ -27,13 +27,18 @@ protected:
 
     // FIXME: Dummy implementation.
     void codeGen () {
-        cout << "#include \"runtime.h\"" << endl 
-             << "void" << endl
+        cout << "#include \"runtime.h\"" << endl;
+        fprintf(stderr, "outside main: \n");
+        //PASSDOWN (this, codeGen (), 0);
+        cout << "void" << endl
              << "__main__()" << endl
-             << "{" << endl
-             << "    __print__ (__cons_str__ (\"Hello, world!\"));" << endl
-             << "    __newline__ ();" << endl
-             << "}" << endl;
+             << "{" << endl;
+        fprintf(stderr, "inside main:\n");
+        for_each_child_var(c, this) {
+            c->codeGen();
+        } end_for;
+        cout << endl;
+        cout << "}" << endl;
     }
 
     NODE_CONSTRUCTORS (Module_AST, AST_Tree);

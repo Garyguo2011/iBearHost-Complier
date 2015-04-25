@@ -134,6 +134,10 @@ PyStr::append (PyValue other)
 
 /* Ints */
 
+PyInt::PyInt (const int val) : _val (val)
+{
+}
+
 PyInt*
 PyInt::asInt ()
 {

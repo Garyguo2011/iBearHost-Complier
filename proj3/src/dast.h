@@ -15,6 +15,8 @@
 #include <iostream>
 #include "horn-common.h"
 
+#include "../lib/runtime.h"
+
 class AST;
 class AST_Token;
 class AST_Tree;

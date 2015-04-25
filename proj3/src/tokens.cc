@@ -11,6 +11,7 @@
 #include "dast.h"
 #include "dast-parser.hh"
 
+
 using namespace std;
 
 static GCINIT _gcdummy;
@@ -78,6 +79,14 @@ protected:
     }
 
     long value;
+
+    void codeGen ()
+    {
+        const int temp = this->intValue();
+        cout << "__cons_int__ ("
+             << &temp
+             << ")";
+    }
 
 };
 
@@ -174,6 +183,14 @@ private:
     static const String_Token raw_factory;
 
     gcstring literal_text;
+
+    void codeGen ()
+    {
+        print(cerr, 4);
+        cerr << "\n";
+        cout << "__cons_str__ (\""
+             << string_text() + "\")" << endl;
+    }
 };
 
 TOKEN_FACTORY(String_Token, STRING_LITERAL);
