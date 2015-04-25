@@ -1,0 +1,32 @@
+(module 0
+    (class 10
+        (id 10 str 2)
+        (type_formals_list 0)
+        (stmt_list 11))
+    (class 13
+        (id 13 int 3)
+        (type_formals_list 0)
+        (stmt_list 14))
+    (class 16
+        (id 16 bool 4)
+        (type_formals_list 0)
+        (stmt_list 17))
+    (def 1
+        (id 1 f 6)
+        (formals_list 0)
+        (type 0
+            (id 0 bool 4))
+        (println 2
+            (string_literal 2  "lala"))
+        (return 0
+            (True 0)))
+    (call 4
+        (id 4 f 6)
+        (type 0
+            (id 0 bool 4))))(moduledecl 1 __main__  (index_list 2 3 4 6))
+(classdecl 2 str  (index_list) (index_list))
+(classdecl 3 int  (index_list) (index_list))
+(classdecl 4 bool  (index_list) (index_list))
+(funcdecl 6 f 1  (function_type 0
+    (type 0
+        (id 0 bool 4))) (index_list))

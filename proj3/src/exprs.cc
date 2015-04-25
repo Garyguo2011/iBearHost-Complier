@@ -73,12 +73,11 @@ protected:
 
     }
 
-    // void codeGen () {
-    //     print(cerr, 4);
-    //     cerr << "\n";
-    //     cout << "__cons_bool__("
-    //          << this << ")";
-    // }
+    void codeGen () {
+        print(cerr, 4);
+        cerr << "\n";
+        cout << "true";
+    }
 
 };
 
@@ -94,6 +93,12 @@ protected:
         if (boolType == NULL)
             boolType = boolDecl->asType ();
         return boolType;
+    }
+
+    void codeGen () {
+        print(cerr, 4);
+        cerr << "\n";
+        cout << "false";
     }
 
 };
@@ -141,6 +146,14 @@ class Call_AST : public Callable {
 protected:
 
     NODE_CONSTRUCTORS (Call_AST, Callable);
+
+    void codeGen() {
+        cout << child(0)->as_string() << "(";
+        for (unsigned int i = 1; i < arity(); i++) {
+            child(i)->codeGen();
+        }
+        cout << ");" << endl;
+    }
 
 };
 

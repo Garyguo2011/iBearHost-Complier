@@ -90,7 +90,7 @@ private:
 
 class PyBool : public PyObject {
 public:
-    PyBool (const bool val);
+    PyBool (const int val);
     void print(ostream& os);
     PyBool* asBool ();
     const char* typeName ();
@@ -240,7 +240,7 @@ __cons_int__ (const int val)
 }
 
 static inline PyBool*
-__cons_bool__ (const bool val)
+__cons_bool__ (const int val)
 {
     return new PyBool(val);
 }

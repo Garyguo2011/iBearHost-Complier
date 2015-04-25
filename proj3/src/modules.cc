@@ -29,13 +29,19 @@ protected:
     void codeGen () {
         cout << "#include \"runtime.h\"" << endl;
         fprintf(stderr, "outside main: \n");
-        //PASSDOWN (this, codeGen (), 0);
+        for_each_child(c, this) {
+            if (c->oper()->syntax() == DEF || c->oper()->syntax() == CLASS) {
+                c->codeGen();
+            }
+        } end_for;
         cout << "void" << endl
              << "__main__()" << endl
              << "{" << endl;
         fprintf(stderr, "inside main:\n");
         for_each_child_var(c, this) {
-            c->codeGen();
+            if (c->oper()->syntax() != DEF && c->oper()->syntax() != CLASS) {
+                c->codeGen();
+            }
         } end_for;
         cout << endl;
         cout << "}" << endl;

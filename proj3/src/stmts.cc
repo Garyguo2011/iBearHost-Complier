@@ -81,6 +81,27 @@ protected:
         return child (0);
     }
 
+    void codeGen() {
+        const char* temp = child(2)->child(0)->as_string().c_str();
+        if (((std::string) temp).compare("int") != 0 && ((std::string) temp).compare("bool") != 0) {
+            if (((std::string) temp).compare("str") == 0) {
+                temp = "char*";
+            } else {
+                temp = "void";
+            }
+        }
+        //fprintf(stderr, "haha:%s\n", temp);
+        cout << temp;
+        cout << " " << getId()->as_string();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ")" << endl <<  "{" << endl;
+        for (unsigned int i = 2; i < arity(); i++) {
+            child(i)->codeGen();
+        }
+        cout << "}" << endl;
+    }
+
 };
 
 NODE_FACTORY (Def_AST, DEF);
@@ -210,6 +231,12 @@ protected:
 
     NODE_CONSTRUCTORS (Return_AST, AST_Tree);
 
+    void codeGen() {
+        cout << "return ";
+        PASSDOWN(this, codeGen(), 0);
+        cout << ";" << endl;
+    }
+
 };
 
 NODE_FACTORY (Return_AST, RETURN);
@@ -230,6 +257,11 @@ protected:
         cout << ") {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
+        if (arity() > 2) {
+            cout << "else {" << endl;
+            child(2)->codeGen();
+            cout << "}" << endl;
+        }
     }
 
 };
@@ -244,6 +276,20 @@ class While_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (While_AST, AST_Tree);
+
+    void codeGen ()
+    {
+        cout << "while (";
+        child(0)->codeGen();
+        cout << ") {" << endl;
+        child(1)->codeGen();
+        cout << "}" << endl;
+        if (arity() > 2) {
+            cout << "else {" << endl;
+            child(2)->codeGen();
+            cout << "}" << endl;
+        }
+    }
 
 };
 

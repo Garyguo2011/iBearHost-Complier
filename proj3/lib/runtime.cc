@@ -158,20 +158,24 @@ PyInt::typeName ()
 
 /* Bools */
 
-static PyBool TrueObj;
-static PyBool FalseObj;
+static PyBool* TrueObj = new PyBool(1);
+static PyBool* FalseObj = new PyBool(0);
 
-const PyValue PyTrue = &TrueObj;
-const PyValue PyFalse = &FalseObj;
+const PyValue PyTrue = TrueObj;
+const PyValue PyFalse = FalseObj;
 
-PyBool::PyBool (const bool val) : _val (val)
+PyBool::PyBool (const int val) : _val (val)
 {
 }
 
 void
 PyBool::print(ostream& os)
 {
-    os << _val;
+    if (_val) {
+        os << true;
+    } else {
+        os << false;
+    }
 }
 
 PyValue
