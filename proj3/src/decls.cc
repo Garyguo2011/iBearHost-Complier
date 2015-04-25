@@ -40,8 +40,6 @@ static struct { const char* name; Decl** var; } builtinInit[] = {
     { NULL, NULL }
 };
 
-static gcvector<Decl*> allDecls;
-
 /** Utility for printing types in Decls. */
 static void
 outType (Type_Ptr type, ostream& out) {
@@ -527,25 +525,6 @@ protected:
 
 static NoneDecl noneObj;
 Decl* noneDecl = &noneObj;
-
-Decl*
-getDecl (size_t k)
-{
-    if (k >= allDecls.size ())
-        return NULL;
-    else
-        return allDecls[k];
-}
-
-void
-addDecl (Decl* decl)
-{
-    size_t k = decl->getIndex ();
-    if (k >= allDecls.size ())
-        allDecls.insert (allDecls.end (), k - allDecls.size () + 1, NULL);
-    allDecls[k] = decl;
-    setBuiltinDecl (decl);
-}
 
 void
 setBuiltinDecl (Decl* decl)

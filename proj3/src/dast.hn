@@ -419,6 +419,7 @@ addDecl (Decl* decl)
     if (k >= allDecls.size ())
         allDecls.insert (allDecls.end (), k - allDecls.size () + 1, NULL);
     allDecls[k] = decl;
+    setBuiltinDecl (decl);
 }
 
 AST_Ptr
