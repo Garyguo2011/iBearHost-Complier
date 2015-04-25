@@ -222,6 +222,15 @@ class If_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (If_AST, AST_Tree);
+    
+    void codeGen ()
+    {
+        cout << "if (";
+        child(0)->codeGen();
+        cout << ") {" << endl;
+        child(1)->codeGen();
+        cout << "}" << endl;
+    }
 
 };
 

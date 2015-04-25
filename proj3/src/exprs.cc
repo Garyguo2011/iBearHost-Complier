@@ -73,6 +73,13 @@ protected:
 
     }
 
+    // void codeGen () {
+    //     print(cerr, 4);
+    //     cerr << "\n";
+    //     cout << "__cons_bool__("
+    //          << this << ")";
+    // }
+
 };
 
 NODE_FACTORY(True_AST, TRUE);

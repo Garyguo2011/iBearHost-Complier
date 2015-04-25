@@ -90,8 +90,12 @@ private:
 
 class PyBool : public PyObject {
 public:
+    PyBool (const bool val);
+    void print(ostream& os);
     PyBool* asBool ();
-    const char* typeName ();    
+    const char* typeName ();
+private:
+    bool _val; 
 };
 
 class PyRange : public PyObject {
@@ -233,6 +237,12 @@ static inline PyInt*
 __cons_int__ (const int val)
 {
     return new PyInt (val);
+}
+
+static inline PyBool*
+__cons_bool__ (const bool val)
+{
+    return new PyBool(val);
 }
 
 #endif

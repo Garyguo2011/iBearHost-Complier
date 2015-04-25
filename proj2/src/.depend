@@ -1,0 +1,79 @@
+apyc2.o: apyc2.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h
+ast.o: ast.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+post1.o: post1.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+decls.o: decls.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+environ.o: environ.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h
+exprs.o: exprs.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+modules.o: modules.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+stmts.o: stmts.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+tokens.o: tokens.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+types.o: types.cc apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h ast-parser.hh
+ast-parser.o: ast-parser.cc \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-parse-lex.cc \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_allocator.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_version.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_config_macros.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/gc/gc_cpp.h apyc.h ast.h \
+ /home/ff/cs164/pkg/i86pc/horn2/include/horn-common.h ast-lexer.cc

@@ -1,1 +1,3 @@
-print 4
+if 1:
+	print "lala"
+

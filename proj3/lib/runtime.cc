@@ -164,6 +164,16 @@ static PyBool FalseObj;
 const PyValue PyTrue = &TrueObj;
 const PyValue PyFalse = &FalseObj;
 
+PyBool::PyBool (const bool val) : _val (val)
+{
+}
+
+void
+PyBool::print(ostream& os)
+{
+    os << _val;
+}
+
 PyValue
 toPyBool (int v)
 {
