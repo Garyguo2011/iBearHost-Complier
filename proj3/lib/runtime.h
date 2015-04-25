@@ -81,6 +81,7 @@ private:
 class PyInt : public PyObject {
 public:
     PyInt (const int val);
+    void print(ostream& os);
     PyInt* asInt ();
     const char* typeName ();
 private:
@@ -229,7 +230,7 @@ __cons_str__ (const char* val)
 }
 
 static inline PyInt*
-__cons_int__ (const int* val)
+__cons_int__ (const int val)
 {
     return new PyInt (val);
 }

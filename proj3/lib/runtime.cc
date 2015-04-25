@@ -138,6 +138,12 @@ PyInt::PyInt (const int val) : _val (val)
 {
 }
 
+void
+PyInt::print (ostream& os)
+{
+    os << _val;
+}
+
 PyInt*
 PyInt::asInt ()
 {

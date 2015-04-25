@@ -84,7 +84,7 @@ protected:
     {
         const int temp = this->intValue();
         cout << "__cons_int__ ("
-             << &temp
+             << temp
              << ")";
     }
 
