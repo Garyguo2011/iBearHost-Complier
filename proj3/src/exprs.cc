@@ -74,8 +74,6 @@ protected:
     }
 
     void codeGen () {
-        print(cerr, 4);
-        cerr << "\n";
         cout << "true";
     }
 
@@ -96,8 +94,6 @@ protected:
     }
 
     void codeGen () {
-        print(cerr, 4);
-        cerr << "\n";
         cout << "false";
     }
 

@@ -186,8 +186,6 @@ private:
 
     void codeGen ()
     {
-        print(cerr, 4);
-        cerr << "\n";
         cout << "__cons_str__ (\""
              << string_text() << "\")";
     }
