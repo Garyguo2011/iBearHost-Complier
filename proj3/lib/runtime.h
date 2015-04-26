@@ -93,6 +93,8 @@ private:
 
 class PyBool : public PyObject {
 public:
+    PyBool (const int val);
+    void print(ostream& os);
     PyBool* asBool ();
     const char* typeName ();
     bool getValue();
@@ -240,6 +242,12 @@ static inline PyInt*
 __cons_int__ (const int val)
 {
     return new PyInt (val);
+}
+
+static inline PyBool*
+__cons_bool__ (const int val)
+{
+    return new PyBool(val);
 }
 
 #endif

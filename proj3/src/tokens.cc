@@ -189,7 +189,7 @@ private:
         print(cerr, 4);
         cerr << "\n";
         cout << "__cons_str__ (\""
-             << string_text() + "\")" << endl;
+             << string_text() << "\")";
     }
 };
 
