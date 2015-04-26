@@ -94,7 +94,11 @@ private:
 class PyBool : public PyObject {
 public:
     PyBool* asBool ();
-    const char* typeName ();    
+    const char* typeName ();
+    bool getValue();
+
+private:
+    bool _val;
 };
 
 class PyRange : public PyObject {
