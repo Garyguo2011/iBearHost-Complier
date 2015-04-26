@@ -73,6 +73,7 @@ public:
     PyStr* asStr ();
 
     PyStr* append (PyValue other);
+    string getValue();
 
 private:
     string _val;
@@ -84,6 +85,8 @@ public:
     void print(ostream& os);
     PyInt* asInt ();
     const char* typeName ();
+    int getValue();
+
 private:
     int _val;
 };

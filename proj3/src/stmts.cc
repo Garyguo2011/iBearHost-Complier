@@ -118,6 +118,11 @@ protected:
 
     NODE_CONSTRUCTORS (Native_AST, AST_Tree);
 
+    void codeGen () {
+        
+    }
+
+
 };
 
 NODE_FACTORY (Native_AST, NATIVE);
