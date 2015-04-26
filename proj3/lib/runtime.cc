@@ -251,6 +251,13 @@ PyList::extend (PyValue other)
     vector<PyValue>& otherItems = otherp->items;
     items.insert (items.end (), otherItems.begin (), otherItems.end ());
 }
+void
+PyList::print (ostream& os)
+{
+    for (int i = 0 ; i < items.size(); i++) {
+        items[i]->print(os);
+    }
+}
 
 /* Dicts */
 

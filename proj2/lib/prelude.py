@@ -19,8 +19,8 @@ class bool:
 # class range:
 #     pass
 
-# class list of [$T]:
-#     pass
+class list of [$T]:
+    pass
 
 # class dict of [$Key, $Value]:
 #     pass

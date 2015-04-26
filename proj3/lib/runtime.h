@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cstdarg>
 
 using namespace std;
 
@@ -117,6 +118,7 @@ public:
     void append (PyValue elt);
     /** Append list OTHER to the end of this. */
     void extend (PyValue other);
+    void print(ostream& os);
 
 private:
     vector<PyValue> items;
@@ -248,6 +250,20 @@ static inline PyBool*
 __cons_bool__ (const int val)
 {
     return new PyBool(val);
+}
+
+static inline PyList*
+__cons_list__ (int count, ...)
+{
+    va_list args;
+    va_start(args, count);
+    PyList* list = new PyList();
+    for (int i = 0; i < count; i++) {
+        PyValue temp = va_arg(args, PyValue);
+        list->asList()->append(temp);
+    }
+    va_end(args);
+    return list;
 }
 
 #endif

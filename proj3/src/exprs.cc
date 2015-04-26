@@ -341,6 +341,18 @@ protected:
 
     NODE_CONSTRUCTORS (ListDisplay_AST, Typed_Tree);
 
+    void codeGen() {
+        cout << "__cons_list__("
+             << arity() << ", ";
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (ListDisplay_AST, LIST_DISPLAY);
