@@ -83,20 +83,56 @@ protected:
 
     void codeGen() {
         const char* temp = child(2)->child(0)->as_string().c_str();
-        if (((std::string) temp).compare("int") != 0 && ((std::string) temp).compare("bool") != 0) {
-            if (((std::string) temp).compare("str") == 0) {
-                temp = "char*";
-            } else {
-                temp = "void";
-            }
+        // if (((std::string) temp).compare("int") != 0 && ((std::string) temp).compare("bool") != 0) {
+        //     if (((std::string) temp).compare("str") == 0) {
+        //         temp = "char*";
+        //     } else {
+        //         temp = "void";
+        //     }
+        // }
+        // //fprintf(stderr, "haha:%s\n", temp);
+        if (((std::string) temp).compare("str") == 0) {
+            temp = "PyStr*";
         }
-        //fprintf(stderr, "haha:%s\n", temp);
+        else if (((std::string) temp).compare("int") == 0) {
+            temp = "PyInt*";
+        }
+        else if (((std::string) temp).compare("bool") == 0) {
+            temp = "PyBool*";
+        }
+        else if (((std::string) temp).compare("str") == 0) {
+            temp = "PyStr*";
+        }
+        else if (((std::string) temp).compare("range") == 0) {
+            temp = "PyRange*";
+        }
+        else if (((std::string) temp).compare("list") == 0) {
+            temp = "PyList*";
+        }
+        else if (((std::string) temp).compare("dict") == 0) {
+            temp = "PyDict*";
+        }
+        else if (((std::string) temp).compare("tuple0") == 0) {
+            temp = "PyTuple0*";
+        }
+        else if (((std::string) temp).compare("tuple1") == 0) {
+            temp = "PyTuple1*";
+        }
+        else if (((std::string) temp).compare("tuple2") == 0) {
+            temp = "PyTuple2*";
+        }
+        else if (((std::string) temp).compare("tuple3") == 0) {
+            temp = "PyTuple3*";
+        } else {
+            temp = "PyValue";
+        }
         cout << temp;
+        // child(2)->codeGen();
         cout << " " << getId()->as_string();
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
-        for (unsigned int i = 2; i < arity(); i++) {
+        for (unsigned int i = 3; i < arity(); i++) {
             child(i)->codeGen();
         }
         cout << "}" << endl;
@@ -126,6 +162,15 @@ protected:
 
     NODE_CONSTRUCTORS (FormalsList_AST, AST_Tree);
 
+    void codeGen() {
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+    }
+
 };
 
 NODE_FACTORY (FormalsList_AST, FORMALS_LIST);
@@ -154,6 +199,15 @@ protected:
     Decl* getDecl (int k = 0) {
         return child (0)->getDecl ();
     }
+
+    // void codeGen() {
+    //     //basic class, without any content inside
+    //     cout << "class ";
+    //     child(0)->codeGen();
+    //     cout << "{" << endl;
+    //     PASSDOWN(this, codeGen(), 1);
+    //     cout << "};" << endl;
+    // }
 
 private:
 };

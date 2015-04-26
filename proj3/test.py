@@ -1,4 +1,4 @@
-def f():
+def f(a :: int, b :: str, c):
 	print "lala"
-	return True
-f()
+	return a
+print f(1, "a", 3)

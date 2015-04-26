@@ -1,15 +1,13 @@
 #include "runtime.h"
-int __add__()
-{
-__cons_str__ ("__add__int__")}
-bool f()
+PyInt* f(PyInt* a, PyStr* b, PyValue c)
 {
 __print__(__cons_str__ ("lala"));
-return true;
+return a ;
 }
 void
 __main__()
 {
-f();
+__print__(f(__cons_int__ (1), __cons_str__ ("a"), __cons_int__ (3))
+);
 
 }
