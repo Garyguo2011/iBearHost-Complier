@@ -28,7 +28,6 @@ protected:
     // FIXME: Dummy implementation.
     void codeGen () {
         cout << "#include \"runtime.h\"" << endl;
-        // fprintf(stderr, "outside main: \n");
         for_each_child(c, this) {
             if (c->oper()->syntax() == DEF) {
                 c->codeGen();
@@ -37,7 +36,6 @@ protected:
         cout << "void" << endl
              << "__main__()" << endl
              << "{" << endl;
-        // fprintf(stderr, "inside main:\n");
         for_each_child_var(c, this) {
             if (c->oper()->syntax() != DEF && c->oper()->syntax() != CLASS) {
                 c->codeGen();

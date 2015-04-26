@@ -103,6 +103,8 @@ public:
     /** Do code generation for me. */
     virtual void codeGen ();
 
+    virtual void codeGenNative();
+
 protected:
 
     /** Return my type, assuming that getType is not set. */

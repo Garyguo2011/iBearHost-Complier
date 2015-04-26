@@ -95,6 +95,12 @@ AST::codeGen ()
     PASSDOWN (this, codeGen (), 0);
 }
 
+void
+AST::codeGenNative ()
+{
+    PASSDOWN (this, codeGenNative (), 0);
+}
+
 /* Definitions of methods in base class AST_Tree. */
 
 void

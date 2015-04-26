@@ -235,6 +235,11 @@ private:
         cout << "__cons_str__ (\""
              << string_text() << "\")";
     }
+
+    void codeGenNative() {
+        cout << string_text();
+    }
+
 };
 
 TOKEN_FACTORY(String_Token, STRING_LITERAL);

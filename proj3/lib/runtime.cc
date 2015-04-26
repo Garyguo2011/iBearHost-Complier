@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -132,6 +133,12 @@ PyStr::append (PyValue other)
     return new PyStr(_val + other->asStr()->_val);
 }
 
+string
+PyStr::getValue()
+{
+    return _val;
+}
+
 /* Ints */
 
 PyInt::PyInt (const int val) : _val (val)
@@ -154,6 +161,12 @@ const char*
 PyInt::typeName ()
 {
     return "int";
+}
+
+int
+PyInt::getValue()
+{
+    return _val;
 }
 
 /* Bools */
@@ -305,34 +318,39 @@ PyTuple3::typeName ()
 
 /* Integers */
 
-PyValue
-__add__int__ (PyValue v0, PyValue v1)
+PyInt*
+__add__int__ (PyInt* v0, PyInt* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return new PyInt(v0->asInt()->getValue() + v1->asInt()->getValue());
 }
 
 PyValue
 __eq__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asInt()->getValue() == v1->asInt()->getValue());
 }
 
 PyValue
 __floordiv__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyInt(v0->asInt()->getValue() / v1->asInt()->getValue());
 }
 
 PyValue
 __ge__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asInt()->getValue() >= v1->asInt()->getValue());
 }
 
 PyValue
 __gt__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asInt()->getValue() > v1->asInt()->getValue());
 }
 
 PyValue
@@ -350,37 +368,43 @@ __lt__int__ (PyValue v0, PyValue v1)
 PyValue
 __mod__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyInt(v0->asInt()->getValue() % v1->asInt()->getValue());
 }
 
 PyValue
 __mul__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyInt(v0->asInt()->getValue() * v1->asInt()->getValue());
 }
 
 PyValue
 __ne__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
-}
-
-PyValue
-__ne__str__ (PyValue v0, PyValue v1)
-{
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asInt()->getValue() != v1->asInt()->getValue());
 }
 
 PyValue
 __neg__int__ (PyValue v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    if (v0->asInt()->getValue() > 0) {
+        return (PyValue) new PyInt(-1 * v0->asInt()->getValue());
+    } else {
+        return v0;
+    }   
 }
 
 PyValue
 __pos__int__ (PyValue v0)
 {
-    return v0;
+    if (v0->asInt()->getValue() < 0) {
+        return (PyValue) new PyInt(-1 * v0->asInt()->getValue());
+    } else {
+        return v0;
+    }
 }
 
 PyValue
@@ -392,7 +416,8 @@ __pow__int__ (PyValue v0, PyValue v1)
 PyValue
 __sub__int__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyInt(v0->asInt()->getValue() - v1->asInt()->getValue());
 }
 
 
@@ -401,19 +426,29 @@ __sub__int__ (PyValue v0, PyValue v1)
 PyValue
 __add__str__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyStr (v0->asStr()->getValue() + v1->asStr()->getValue());
 }
 
 PyValue
 __eq__str__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) == 0);
+}
+
+PyValue
+__ne__str__ (PyValue v0, PyValue v1)
+{
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) != 0);
 }
 
 PyValue
 __ge__str__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) >= 0);
 }
 
 PyValue
@@ -431,7 +466,8 @@ __getslice__str__ (PyValue v0, PyValue v1, PyValue v2)
 PyValue
 __gt__str__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) > 0);
 }
 
 PyValue
@@ -443,13 +479,24 @@ __le__str__ (PyValue v0, PyValue v1)
 PyValue
 __len__str__ (PyValue v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return (PyValue) new PyInt(v0->asStr()->getValue().length());
 }
 
 PyValue
 __lmul__str__ (PyValue v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    // v0 is str
+    // v1 is int
+    string tmp = "";
+    string input_str = v0->asStr()->getValue();
+    int times = v1->asInt()->getValue();
+    for (int i = 0; i < times; ++i)
+    {
+        tmp += input_str;
+    }
+    return (PyValue) new PyStr(tmp);
 }
 
 PyValue
@@ -467,12 +514,16 @@ __rmul__str__ (PyValue v0, PyValue v1)
 PyValue
 __toint__str__ (PyValue v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    // v0 is str
+    // return int
+    // return NULL;  // REPLACE WITH BODY
+    // return (PyValue) new PyInt(std::stoi(v0->asStr()->getValue()));
 }
 
 PyValue
 __tostr__ (PyValue v0)
 {
+    // v0 can be anytype
     return NULL;  // REPLACE WITH BODY
 }
 

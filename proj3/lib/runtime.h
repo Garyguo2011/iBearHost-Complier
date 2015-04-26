@@ -73,6 +73,7 @@ public:
     PyStr* asStr ();
 
     PyStr* append (PyValue other);
+    string getValue();
 
 private:
     string _val;
@@ -84,6 +85,8 @@ public:
     void print(ostream& os);
     PyInt* asInt ();
     const char* typeName ();
+    int getValue();
+
 private:
     int _val;
 };
@@ -94,8 +97,10 @@ public:
     void print(ostream& os);
     PyBool* asBool ();
     const char* typeName ();
+    bool getValue();
+
 private:
-    bool _val; 
+    bool _val;
 };
 
 class PyRange : public PyObject {
@@ -151,7 +156,7 @@ public:
 
 /* Integers */
 
-extern PyValue __add__int__ (PyValue v0, PyValue v1);
+extern PyInt* __add__int__ (PyInt* v0, PyInt* v1);
 extern PyValue __eq__int__ (PyValue v0, PyValue v1);
 extern PyValue __floordiv__int__ (PyValue v0, PyValue v1);
 extern PyValue __ge__int__ (PyValue v0, PyValue v1);

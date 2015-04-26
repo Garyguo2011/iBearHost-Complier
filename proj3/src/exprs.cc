@@ -74,8 +74,6 @@ protected:
     }
 
     void codeGen () {
-        print(cerr, 4);
-        cerr << "\n";
         cout << "true";
     }
 
@@ -96,8 +94,6 @@ protected:
     }
 
     void codeGen () {
-        print(cerr, 4);
-        cerr << "\n";
         cout << "false";
     }
 
@@ -194,6 +190,15 @@ class Binop_AST : public Callable {
 protected:
 
     NODE_CONSTRUCTORS (Binop_AST, Callable);
+
+    void codeGen() {
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ")";
+    }
 
 };    
 

@@ -59,8 +59,8 @@ class bool:
 
 # # Type int
 
-# def __add__(x:: int, y::int)::int:
-#     native "__add__int__"
+def __add__(x:: int, y::int)::int:
+    native "__add__int__"
 
 # def __sub__(x::int, y::int)::int:
 #     native "__sub__int__"

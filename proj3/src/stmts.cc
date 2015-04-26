@@ -132,8 +132,25 @@ protected:
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
-        for (unsigned int i = 3; i < arity(); i++) {
-            child(i)->codeGen();
+        if (child(3)->oper()->syntax() == NATIVE) {
+            /** Deal with Native function*/
+            cout << "return ";
+            // child(3)->child(0)->print(cerr, 4);
+            // cerr << "\n";
+            // cout << child(3)->child(0)->as_string();
+            child(3)->child(0)->codeGenNative();
+            cout << "(";
+            for (unsigned int i = 0; i < child(1)->arity(); i++) {
+                child(1)->child(i)->child(0)->codeGen();
+                if (i < child(1)->arity()-1) {
+                    cout << ", ";
+                }
+            }
+            cout << ");" << endl;
+        } else {
+            for (unsigned int i = 3; i < arity(); i++) {
+                child(i)->codeGen();
+            }
         }
         cout << "}" << endl;
     }
@@ -183,6 +200,11 @@ class Native_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (Native_AST, AST_Tree);
+
+    // void codeGen () {
+    //     PASSDOWN(this, codeGen(), 0);
+    // }
+
 
 };
 
