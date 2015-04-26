@@ -106,8 +106,13 @@ private:
 
 class PyRange : public PyObject {
 public:
+    PyRange (PyInt* from, PyInt* to);
     PyRange* asRange ();
     const char* typeName ();
+    void print(ostream& os);
+    int getSize();
+private:
+    vector<PyValue> items;
 };
 
 class PyList : public PyObject {
@@ -134,24 +139,37 @@ class PyTuple0 : public PyObject {
 public:
     PyTuple0* asTuple0 ();
     const char* typeName ();
+    void print(ostream& os);
 };
 
 class PyTuple1 : public PyObject {
 public:
+    PyTuple1 (PyValue val);
     PyTuple1* asTuple1 ();
     const char* typeName ();
+    void print(ostream& os);
+private:
+    PyValue _vals[1];
 };
 
 class PyTuple2 : public PyObject {
 public:
+    PyTuple2 (PyValue val0, PyValue val1);
     PyTuple2* asTuple2 ();
     const char* typeName ();
+    void print(ostream& os);
+private:
+    PyValue _vals[2];
 };
 
 class PyTuple3 : public PyObject {
 public:
+    PyTuple3 (PyValue val0, PyValue val1, PyValue val2);
     PyTuple3* asTuple3 ();
-    const char* typeName (); 
+    const char* typeName ();
+    void print(ostream& os);
+private:
+    PyValue _vals[3];
 };
 
 /***** Headers of native methods. *****/
@@ -209,8 +227,8 @@ extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
 
 /* Ranges */
 
-extern PyValue __len__range__ (PyValue v0);
-extern PyValue __xrange__ (PyValue v0, PyValue v1); 
+extern PyInt* __len__range__ (PyRange* v0);
+extern PyRange* __xrange__ (PyInt* v0, PyInt* v1); 
 
 /* General values */
 
@@ -252,6 +270,12 @@ __cons_bool__ (const int val)
     return new PyBool(val);
 }
 
+static inline PyRange*
+__cons_range__ (PyInt* from, PyInt* to)
+{
+    return new PyRange(from, to);
+}
+
 static inline PyList*
 __cons_list__ (int count, ...)
 {
@@ -265,5 +289,30 @@ __cons_list__ (int count, ...)
     va_end(args);
     return list;
 }
+
+static inline PyTuple0*
+__cons_tuple0__()
+{
+    return new PyTuple0();
+}
+
+static inline PyTuple1*
+__cons_tuple1__(PyValue val)
+{
+    return new PyTuple1(val);
+}
+
+static inline PyTuple2*
+__cons_tuple2__(PyValue val0, PyValue val1)
+{
+    return new PyTuple2(val0, val1);
+}
+
+static inline PyTuple3*
+__cons_tuple3__(PyValue val0, PyValue val1, PyValue val2)
+{
+    return new PyTuple3(val0, val1, val2);
+}
+
 
 #endif

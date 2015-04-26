@@ -316,6 +316,35 @@ protected:
 
     NODE_CONSTRUCTORS (Tuple_AST, Typed_Tree);
 
+    void codeGen() {
+        switch (arity()) {
+            case 0:
+                cout << "__cons_tuple0__()";
+                break;
+            case 1:
+                cout << "__cons_tuple1__(";
+                child(0)->codeGen();
+                cout << ")";
+                break;
+            case 2:
+                cout << "__cons_tuple2__(";
+                child(0)->codeGen();
+                cout << ", ";
+                child(1)->codeGen();
+                cout << ")";
+                break;
+            case 3:
+                cout << "__cons_tuple3__(";
+                child(0)->codeGen();
+                cout << ", ";
+                child(1)->codeGen();
+                cout << ", ";
+                child(2)->codeGen();
+                cout << ")";
+                break;
+        }
+    }
+
 };
 
 NODE_FACTORY (Tuple_AST, TUPLE);

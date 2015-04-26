@@ -16,26 +16,26 @@ class int:
 class bool:
     pass
 
-# class range:
-#     pass
+class range:
+    pass
 
 class list of [$T]:
     pass
 
-# class dict of [$Key, $Value]:
-#     pass
+class dict of [$Key, $Value]:
+    pass
 
-# class tuple0:
-#     pass
+class tuple0:
+    pass
 
-# class tuple1 of [$T0]:
-#     pass
+class tuple1 of [$T0]:
+    pass
 
-# class tuple2 of [$T1, $T2]:
-#     pass
+class tuple2 of [$T1, $T2]:
+    pass
 
-# class tuple3 of [$T1, $T2, $T3]:
-#     pass
+class tuple3 of [$T1, $T2, $T3]:
+    pass
 
 
 # # Type bool
@@ -51,11 +51,11 @@ class list of [$T]:
 
 # # Type range
 
-# def xrange(low::int, high::int)::range:
-#     native "__xrange__"
+def xrange(low::int, high::int)::range:
+    native "__xrange__"
 
-# def len(r::range)::int:
-#     native "__len__range__"
+def len(r::range)::int:
+    native "__len__range__"
 
 # # Type int
 

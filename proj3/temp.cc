@@ -58,6 +58,9 @@ return __ne__int__(x , y );
 void
 __main__()
 {
-__print__(__cons_list__(4, __cons_int__ (1), __cons_int__ (2), __cons_int__ (3), __cons_int__ (4)));
+__print__(__cons_tuple0__());
+__print__(__cons_tuple1__(__cons_int__ (1)));
+__print__(__cons_tuple2__(__cons_int__ (1), __cons_int__ (2)));
+__print__(__cons_tuple3__(__cons_int__ (1), __cons_int__ (2), __cons_int__ (3)));
 
 }

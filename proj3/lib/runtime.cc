@@ -186,9 +186,9 @@ void
 PyBool::print(ostream& os)
 {
     if (_val) {
-        os << "true";
+        os << "True";
     } else {
-        os << "false";
+        os << "False";
     }
 }
 
@@ -212,6 +212,13 @@ PyBool::typeName ()
 
 /* Ranges */
 
+PyRange::PyRange (PyInt* from , PyInt* to)
+{
+    for (int i = from->getValue(); i < to->getValue(); i++) {
+        items.push_back(new PyInt(i));
+    }
+}
+
 PyRange*
 PyRange::asRange ()
 {
@@ -222,6 +229,25 @@ const char*
 PyRange::typeName ()
 {
     return "range";
+}
+
+void
+PyRange::print(ostream& os)
+{
+    os << "[";
+    for (int i = 0 ; i < items.size(); i++) {
+        items[i]->print(os);
+        if (i < items.size()-1) {
+            os << ", ";
+        }
+    }
+    os << "]";
+}
+
+int
+PyRange::getSize()
+{
+    return (int) items.size();
 }
 
 /* Lists */
@@ -254,9 +280,14 @@ PyList::extend (PyValue other)
 void
 PyList::print (ostream& os)
 {
+    os << "[";
     for (int i = 0 ; i < items.size(); i++) {
         items[i]->print(os);
+        if (i < items.size()-1) {
+            os << ", ";
+        }
     }
+    os << "]";
 }
 
 /* Dicts */
@@ -273,18 +304,29 @@ PyDict::typeName ()
     return "dict";
 }
 
+/* Tuples */
+
 PyTuple0*
 PyTuple0::asTuple0 ()
 {
     return this;
 }
 
-/* Tuples */
-
 const char*
 PyTuple0::typeName ()
 {
     return "tuple0";
+}
+
+void
+PyTuple0::print(ostream& os)
+{
+    os << "()";
+}
+
+PyTuple1::PyTuple1 (PyValue val)
+{
+    _vals[0] = val;
 }
 
 PyTuple1*
@@ -299,6 +341,19 @@ PyTuple1::typeName ()
     return "tuple1";
 }
 
+void
+PyTuple1::print(ostream& os)
+{
+    os << "(";
+    _vals[0]->print(os);
+    os <<")";
+}
+
+PyTuple2::PyTuple2 (PyValue val0, PyValue val1)
+{
+    _vals[0] = val0;
+    _vals[1] = val1;
+}
 
 PyTuple2*
 PyTuple2::asTuple2 ()
@@ -312,6 +367,23 @@ PyTuple2::typeName ()
     return "tuple2";
 }
 
+void
+PyTuple2::print(ostream& os)
+{
+    os << "(";
+    _vals[0]->print(os);
+    os << ", ";
+    _vals[1]->print(os);
+    os <<")";
+}
+
+PyTuple3::PyTuple3 (PyValue val0, PyValue val1, PyValue val2)
+{
+    _vals[0] = val0;
+    _vals[1] = val1;
+    _vals[2] = val2;
+}
+
 PyTuple3*
 PyTuple3::asTuple3 ()
 {
@@ -322,6 +394,18 @@ const char*
 PyTuple3::typeName ()
 {
     return "tuple3";
+}
+
+void
+PyTuple3::print(ostream& os)
+{
+    os << "(";
+    _vals[0]->print(os);
+    os << ", ";
+    _vals[1]->print(os);
+    os << ", ";
+    _vals[2]->print(os);
+    os <<")";
 }
 
 /* Integers */
@@ -601,16 +685,18 @@ extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
 
 /* Ranges */
 
-PyValue
-__len__range__ (PyValue v0)
+PyInt*
+__len__range__ (PyRange* v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return new PyInt(v0->getSize());
 }
 
-PyValue
-__xrange__ (PyValue v0, PyValue v1)
+PyRange*
+__xrange__ (PyInt* v0, PyInt* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return new PyRange(v0, v1);
 }
  
 
