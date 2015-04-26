@@ -74,7 +74,9 @@ protected:
     }
 
     void codeGen () {
-        cout << "true";
+        cout << "__cons_bool__ ("
+             << 1
+             << ")";
     }
 
 };
@@ -94,7 +96,9 @@ protected:
     }
 
     void codeGen () {
-        cout << "false";
+        cout << "__cons_bool__ ("
+             << 0
+             << ")";
     }
 
 };

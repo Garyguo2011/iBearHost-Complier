@@ -157,33 +157,33 @@ public:
 /* Integers */
 
 extern PyInt* __add__int__ (PyInt* v0, PyInt* v1);
-extern PyValue __eq__int__ (PyValue v0, PyValue v1);
-extern PyValue __floordiv__int__ (PyValue v0, PyValue v1);
-extern PyValue __ge__int__ (PyValue v0, PyValue v1);
-extern PyValue __gt__int__ (PyValue v0, PyValue v1);
-extern PyValue __le__int__ (PyValue v0, PyValue v1);
-extern PyValue __lt__int__ (PyValue v0, PyValue v1);
-extern PyValue __mod__int__ (PyValue v0, PyValue v1);
-extern PyValue __mul__int__ (PyValue v0, PyValue v1);
-extern PyValue __ne__int__ (PyValue v0, PyValue v1);
-extern PyValue __ne__str__ (PyValue v0, PyValue v1);
-extern PyValue __neg__int__ (PyValue v0);
-extern PyValue __pos__int__ (PyValue v0);
-extern PyValue __pow__int__ (PyValue v0, PyValue v1);
-extern PyValue __sub__int__ (PyValue v0, PyValue v1);
+extern PyBool* __eq__int__ (PyInt* v0, PyInt* v1);
+extern PyInt* __floordiv__int__ (PyInt* v0, PyInt* v1);
+extern PyBool* __ge__int__ (PyInt* v0, PyInt* v1);
+extern PyBool* __gt__int__ (PyInt* v0, PyInt* v1);
+extern PyBool* __le__int__ (PyInt* v0, PyInt* v1);
+extern PyBool* __lt__int__ (PyInt* v0, PyInt* v1);
+extern PyInt* __mod__int__ (PyInt* v0, PyInt* v1);
+extern PyInt* __mul__int__ (PyInt* v0, PyInt* v1);
+extern PyBool* __ne__int__ (PyInt* v0, PyInt* v1);
+extern PyInt* __neg__int__ (PyInt* v0);
+extern PyInt* __pos__int__ (PyInt* v0);
+extern PyInt* __pow__int__ (PyInt* v0, PyInt* v1);
+extern PyInt* __sub__int__ (PyInt* v0, PyInt* v1);
 
 /* Strings */
 
 extern PyValue __add__str__ (PyValue v0, PyValue v1);
-extern PyValue __eq__str__ (PyValue v0, PyValue v1);
-extern PyValue __ge__str__ (PyValue v0, PyValue v1);
+extern PyBool* __eq__str__ (PyValue v0, PyValue v1);
+extern PyBool* __ge__str__ (PyValue v0, PyValue v1);
 extern PyValue __getitem__str__ (PyValue v0, PyValue v1);
 extern PyValue __getslice__str__ (PyValue v0, PyValue v1, PyValue v2);
-extern PyValue __gt__str__ (PyValue v0, PyValue v1);
-extern PyValue __le__str__ (PyValue v0, PyValue v1);
+extern PyBool* __gt__str__ (PyValue v0, PyValue v1);
+extern PyBool* __le__str__ (PyValue v0, PyValue v1);
 extern PyValue __len__str__ (PyValue v0);
 extern PyValue __lmul__str__ (PyValue v0, PyValue v1);
-extern PyValue __lt__str__ (PyValue v0, PyValue v1);
+extern PyBool* __ne__str__ (PyStr* v0, PyStr* v1);
+extern PyBool* __lt__str__ (PyValue v0, PyValue v1);
 extern PyValue __rmul__str__ (PyValue v0, PyValue v1);
 extern PyValue __toint__str__ (PyValue v0);
 extern PyValue __tostr__ (PyValue v0);

@@ -62,44 +62,44 @@ class bool:
 def __add__(x:: int, y::int)::int:
     native "__add__int__"
 
-# def __sub__(x::int, y::int)::int:
-#     native "__sub__int__"
+def __sub__(x::int, y::int)::int:
+    native "__sub__int__"
 
-# def __mul__(x::int, y::int)::int:
-#     native "__mul__int__"
+def __mul__(x::int, y::int)::int:
+    native "__mul__int__"
 
-# def __floordiv__(x::int, y::int)::int:
-#     native "__floordiv__int__"
+def __floordiv__(x::int, y::int)::int:
+    native "__floordiv__int__"
 
-# def __mod__(x::int, y::int)::int:
-#     native "__mod__int__"
+def __mod__(x::int, y::int)::int:
+    native "__mod__int__"
 
-# def __pow__(x::int, y::int)::int:
-#     native "__pow__int__"
+def __pow__(x::int, y::int)::int:
+    native "__pow__int__"
 
-# def __neg__(x::int)::int:
-#     native "__neg__int__"
+def __neg__(x::int)::int:
+    native "__neg__int__"
 
-# def __pos__(x::int)::int:
-#     native "__pos__int__"
+def __pos__(x::int)::int:
+    native "__pos__int__"
 
-# def __lt__(x::int, y::int)::bool:
-#     native "__lt__int__"
+def __lt__(x::int, y::int)::bool:
+    native "__lt__int__"
 
-# def __gt__(x::int, y::int)::bool:
-#     native "__gt__int__"
+def __gt__(x::int, y::int)::bool:
+    native "__gt__int__"
 
-# def __le__(x::int, y::int)::bool:
-#     native "__le__int__"
+def __le__(x::int, y::int)::bool:
+    native "__le__int__"
 
-# def __ge__(x::int, y::int)::bool:
-#     native "__ge__int__"
+def __ge__(x::int, y::int)::bool:
+    native "__ge__int__"
 
-# def __eq__(x::int, y::int)::bool:
-#     native "__eq__int__"
+def __eq__(x::int, y::int)::bool:
+    native "__eq__int__"
 
-# def __ne__(x::int, y::int)::bool:
-#     native "__ne__int__"
+def __ne__(x::int, y::int)::bool:
+    native "__ne__int__"
 
 # # toint is the replacement for 'int' as a function in our dialect.
 # def toint(x::str)::int:
