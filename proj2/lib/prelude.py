@@ -205,24 +205,22 @@ def len(D::dict of [bool, $b])::int:
 def len(D::dict of [str, $b])::int:
     native "__len__dict__"
 
-# Backwards from regular Python
-def __contains__(x::int, D::dict of [int, $b])::bool:
+def __in__(x::int, D::dict of [int, $b])::bool:
     native "__contains__dict__"
 
-def __contains__(x::bool, D::dict of [bool, $b])::bool:
+def __in__(x::bool, D::dict of [bool, $b])::bool:
     native "__contains__dict__"
 
-def __contains__(x::str, D::dict of [str, $b])::bool:
+def __in__(x::str, D::dict of [str, $b])::bool:
     native "__contains__dict__"
 
-# Backwards from regular Python
-def __notcontains__(x::int, D::dict of [int, $b])::bool:
+def __notin__(x::int, D::dict of [int, $b])::bool:
     native "__notcontains__dict__"
 
-def __notcontains__(x::bool, D::dict of [bool, $b])::bool:
+def __notin__(x::bool, D::dict of [bool, $b])::bool:
     native "__notcontains__dict__"
 
-def __notcontains__(x::str, D::dict of [str, $b])::bool:
+def __notin__(x::str, D::dict of [str, $b])::bool:
     native "__notcontains__dict__"
 
 

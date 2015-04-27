@@ -25,7 +25,8 @@ static string_pair OPNAMES[] = {
     string_pair("__mod__", "mod operation"),
     string_pair("__pow__", "exponentiation"),
     string_pair("__neg__", "negation"),
-    string_pair("__contains__", "membership test"),
+    string_pair("__in__", "membership test"),
+    string_pair("__notin__", "membership test"),
 };
 
 static gcmap<gcstring, gcstring> 
