@@ -147,14 +147,6 @@ PyInt* len(PyDict* D)
 {
 return __len__dict__(D );
 }
-PyInt* len(PyDict* D)
-{
-return __len__dict__(D );
-}
-PyInt* len(PyDict* D)
-{
-return __len__dict__(D );
-}
 PyBool* __contains__(PyInt* x, PyDict* D)
 {
 return __contains__dict__(x , D );
@@ -182,6 +174,7 @@ return __notcontains__dict__(x , D );
 void
 __main__()
 {
-__print__(__getitem__ (__cons_dict__(2, __cons_pair__(__cons_int__ (4), __cons_int__ (12)), __cons_pair__(__cons_int__ (2), __cons_int__ (1))), __cons_int__ (4)));
+__print__(toint(__cons_str__ ("Jinge Zhang"))
+);
 
 }

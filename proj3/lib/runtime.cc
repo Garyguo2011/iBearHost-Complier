@@ -9,7 +9,6 @@
 #include <string>
 #include "math.h"
 #include <sstream>
-#include <regex>
 
 using namespace std;
 
@@ -605,21 +604,13 @@ PyInt*
 __neg__int__ (PyInt* v0)
 {
     // return NULL;  // REPLACE WITH BODY
-    if (v0->asInt()->getValue() > 0) {
-        return new PyInt(-1 * v0->asInt()->getValue());
-    } else {
-        return v0;
-    }   
+    return new PyInt(-1 * v0->asInt()->getValue()); 
 }
 
 PyInt*
 __pos__int__ (PyInt* v0)
 {
-    if (v0->asInt()->getValue() < 0) {
-        return new PyInt(-1 * v0->asInt()->getValue());
-    } else {
-        return v0;
-    }
+    return v0;    
 }
 
 PyInt*
@@ -671,7 +662,13 @@ PyStr*
 __getitem__str__ (PyStr* v0, PyInt* v1)
 {
     // return NULL;  // REPLACE WITH BODY
-    const char c = v0->getValue().at(v1->getValue());
+    int temp = 0;
+    if (v1->getValue() < 0) {
+        temp = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp = v1->getValue();
+    }
+    const char c = v0->getValue().at(temp);
     stringstream ss;
     string s;
     ss << c;
@@ -803,7 +800,13 @@ PyValue
 __getitem__list__ (PyList* v0, PyInt* v1)
 {
     // return NULL;  // REPLACE WITH BODY
-    return v0->getItem(v1);
+    int temp = 0;
+    if (v1->getValue() < 0) {
+        temp = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp = v1->getValue();
+    }
+    return v0->getItem(new PyInt(temp));
 }
 
 PyList*

@@ -18,4 +18,4 @@
 # print tostr({"a" : 0, "b" : 1, "c" : 2})
 # print __contains__("fjeowifj", {"haha" : 12, "lala" : 1})
 # print {4 : 12, 2 : 1}[4]
-print (toint("Jinge Zhang"))
+print "01234"[-1]
