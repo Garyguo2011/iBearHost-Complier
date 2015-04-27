@@ -525,12 +525,8 @@
             (id 164 int 3))
         (native 165
             (string_literal 165  "__len__list__")))
-    (println 17
-        (call 17
-            (id 17 toint 142)
-            (string_literal 17  "Jinge Zhang")
-            (type 105
-                (id 105 int 3)))))(moduledecl 1 __main__  (index_list 2 3 4 5 6 8 11 12 14 17 24 31 37 45 53 61 69 77 84 89 95 103 111 119 127 135 142 148 156 164 172 180 188 196 204 212 220 229 238 243 249 259 269))
+    (println 19
+        (string_literal 19  "lala\012")))(moduledecl 1 __main__  (index_list 2 3 4 5 6 8 11 12 14 17 24 31 37 45 53 61 69 77 84 89 95 103 111 119 127 135 142 148 156 164 172 180 188 196 204 212 220 229 238 243 249 259 269))
 (classdecl 2 str  (index_list) (index_list))
 (classdecl 3 int  (index_list) (index_list))
 (classdecl 4 bool  (index_list) (index_list))
@@ -717,10 +713,10 @@
 (funcdecl 142 toint 1  (function_type 105
     (type 105
         (id 105 int 3))
-    (type 0
-        (id 0 str 2))) (index_list 144))
-(paramdecl 144 x 142  0 (type 0
-    (id 0 str 2)))
+    (type 105
+        (id 105 str 2))) (index_list 144))
+(paramdecl 144 x 142  0 (type 105
+    (id 105 str 2)))
 (funcdecl 148 __add__ 1  (function_type 110
     (type 110
         (id 110 str 2))

@@ -232,8 +232,16 @@ private:
 
     void codeGen ()
     {
-        cout << "__cons_str__ (\""
-             << string_text() << "\")";
+        cout << "__cons_str__ (\"";
+        for (size_t i = 0; i < literal_text.size (); i += 1) {
+            char c = literal_text[i];
+            if (c < 32 || c == '\\' || c == '"') {
+                cout << "\\" << oct << setw (3) << setfill('0') << (int) c
+                    << setfill (' ') << dec;
+            } else
+                cout << c;
+        }
+        cout << "\")";
     }
 
     void codeGenNative() {

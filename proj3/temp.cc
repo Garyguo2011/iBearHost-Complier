@@ -134,7 +134,6 @@ return __len__list__(S );
 void
 __main__()
 {
-__print__(tostr(__cons_int__ (1234))
-);
+__print__(__cons_str__ ("lala\012"));
 
 }
