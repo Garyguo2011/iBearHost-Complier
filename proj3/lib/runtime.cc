@@ -347,6 +347,12 @@ PyDict::get(PyValue key)
     return items[key];
 }
 
+int
+PyDict::getSize()
+{
+    return items.size();
+}
+
 string
 PyDict::toStr ()
 {
@@ -576,21 +582,13 @@ PyInt*
 __neg__int__ (PyInt* v0)
 {
     // return NULL;  // REPLACE WITH BODY
-    if (v0->asInt()->getValue() > 0) {
-        return new PyInt(-1 * v0->asInt()->getValue());
-    } else {
-        return v0;
-    }   
+    return new PyInt(-1 * v0->asInt()->getValue()); 
 }
 
 PyInt*
 __pos__int__ (PyInt* v0)
 {
-    if (v0->asInt()->getValue() < 0) {
-        return new PyInt(-1 * v0->asInt()->getValue());
-    } else {
-        return v0;
-    }
+    return v0;    
 }
 
 PyInt*
@@ -669,7 +667,7 @@ __gt__str__ (PyStr* v0, PyStr* v1)
 PyBool*
 __le__str__ (PyStr* v0, PyStr* v1)
 {
-    return __le__str__ (v1, v0);
+    return __ge__str__ (v1, v0);
 }
 
 PyInt*
@@ -737,15 +735,16 @@ __contains__dict__ (PyValue v0, PyValue v1)
 }
 
 PyValue
-__getitem__dict__ (PyValue v0, PyValue v1)
+__getitem__dict__ (PyDict* v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return v0->get(v1);
 }
 
-PyValue
-__len__dict__ (PyValue v0)
+PyInt*
+__len__dict__ (PyDict* v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
 }
 
 PyValue

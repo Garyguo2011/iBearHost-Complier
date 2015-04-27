@@ -239,6 +239,13 @@ class Unop_AST : public Callable {
 
     NODE_CONSTRUCTORS (Unop_AST, Callable);
 
+    void codeGen() {
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ")";
+    }
+
 };    
 
 NODE_FACTORY (Unop_AST, UNOP);
