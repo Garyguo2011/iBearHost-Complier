@@ -668,6 +668,9 @@ __getitem__str__ (PyStr* v0, PyInt* v1)
     } else {
         temp = v1->getValue();
     }
+    if (temp >= __len__str__(v0)->getValue()) {
+        fatal("can't get item with index out of range!");
+    }
     const char c = v0->getValue().at(temp);
     stringstream ss;
     string s;
@@ -682,7 +685,23 @@ __getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2)
     // return NULL;  // REPLACE WITH BODY
     // char* s = v0->getValue().substr(v1->getValue(), v2->getValue());
     // fprintf(stderr, "lala: %s\n", s);
-    return new PyStr(v0->getValue().substr(v1->getValue(), v2->getValue()));
+    int temp1 = 0;
+    int temp2 = 0;
+    if (v1->getValue() < 0) {
+        temp1 = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp1 = v1->getValue();
+    }
+    if (v2->getValue() < 0) {
+        temp2 = __len__str__(v0)->getValue() + v2->getValue();
+    } else {
+        temp2 = v2->getValue();
+    }
+    if (temp1 >= __len__str__(v0)->getValue() || temp2 >= __len__str__(v0)->getValue()
+        || temp1 > temp2) {
+        fatal("can't get slice with index out of range!");
+    }
+    return new PyStr(v0->getValue().substr(temp1, temp2));
 }
 
 PyBool*
@@ -806,6 +825,9 @@ __getitem__list__ (PyList* v0, PyInt* v1)
     } else {
         temp = v1->getValue();
     }
+    if (temp >= __len__list__(v0)->getValue()) {
+        fatal("can't get item with index out of range!");
+    }
     return v0->getItem(new PyInt(temp));
 }
 
@@ -813,8 +835,24 @@ PyList*
 __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
 {
     // return NULL;  // REPLACE WITH BODY
+    int temp1 = 0;
+    int temp2 = 0;
+    if (v1->getValue() < 0) {
+        temp1 = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp1 = v1->getValue();
+    }
+    if (v2->getValue() < 0) {
+        temp2 = __len__str__(v0)->getValue() + v2->getValue();
+    } else {
+        temp2 = v2->getValue();
+    }
+    if (temp1 >= __len__str__(v0)->getValue() || temp2 >= __len__str__(v0)->getValue()
+        || temp1 > temp2) {
+        fatal("can't get slice with index out of range!");
+    }
     PyList* list = new PyList();
-    for (int i = v1->getValue(); i < v2->getValue(); i++) {
+    for (int i = temp1; i < temp2; i++) {
         list->asList()->append(__getitem__list__(v0, new PyInt(i)));
     }
     return list;
