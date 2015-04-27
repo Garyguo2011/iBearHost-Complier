@@ -311,10 +311,6 @@ public:
         return true;
     }
 
-    bool isFunctionType () {
-        return false;
-    }
-
     /** Reports an erroneous type reference, since types do not have types. */
     Type_Ptr getType ();
 

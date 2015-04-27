@@ -179,6 +179,10 @@ NODE_FACTORY (TypeVar_AST, TYPE_VAR);
 class FunctionType_AST: public Type {
 protected:
 
+    bool isFunctionType () {
+        return true;
+    }
+
     int numParams () {
         return arity () - 1;
     }
