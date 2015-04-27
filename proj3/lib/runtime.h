@@ -308,6 +308,9 @@ __cons_range__ (PyInt* from, PyInt* to)
 static inline PyList*
 __cons_list__ (int count, ...)
 {
+    if (count == 0) {
+        return new PyList();
+    }
     va_list args;
     va_start(args, count);
     PyList* list = new PyList();
