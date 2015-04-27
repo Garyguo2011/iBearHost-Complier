@@ -9,6 +9,7 @@
 #include <string>
 #include "math.h"
 #include <sstream>
+#include <regex>
 
 using namespace std;
 
@@ -744,6 +745,8 @@ __toint__str__ (PyStr* v0)
     std::stringstream sstr(v0->getValue());
     int val;
     sstr >> val;
+    // TO BE IMPLEMENTED: Should throw an error if it is not an "int string"
+    // e.g. "hello world" should throw a runtime error.
     return new PyInt(val);
 }
 
