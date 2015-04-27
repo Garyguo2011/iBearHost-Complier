@@ -49,7 +49,7 @@ class tuple3 of [$T1, $T2, $T3]:
 # def __not__(x)::bool:
 #     native "__not__"
 
-# # Type range
+# Type range
 
 def xrange(low::int, high::int)::range:
     native "__xrange__"
@@ -57,7 +57,7 @@ def xrange(low::int, high::int)::range:
 def len(r::range)::int:
     native "__len__range__"
 
-# # Type int
+# Type int
 
 def __add__(x:: int, y::int)::int:
     native "__add__int__"
@@ -101,59 +101,59 @@ def __eq__(x::int, y::int)::bool:
 def __ne__(x::int, y::int)::bool:
     native "__ne__int__"
 
-# # toint is the replacement for 'int' as a function in our dialect.
-# def toint(x::str)::int:
-#     native "__toint__str__"
+# toint is the replacement for 'int' as a function in our dialect.
+def toint(x::str)::int:
+    native "__toint__str__"
 
-# # Type str
+# Type str
 
-# def __add__(x:: str, y::str)::str:
-#     native "__add__str__"
+def __add__(x:: str, y::str)::str:
+    native "__add__str__"
 
-# def __mul__(x::str, y::int)::str:
-#     native "__lmul__str__"
+def __mul__(x::str, y::int)::str:
+    native "__lmul__str__"
 
-# def __mul__(x::int, y::str)::str:
-#     native "__rmul__str__"
+def __mul__(x::int, y::str)::str:
+    native "__rmul__str__"
 
-# def __lt__(x::str, y::str)::bool:
-#     native "__lt__str__"
+def __lt__(x::str, y::str)::bool:
+    native "__lt__str__"
 
-# def __gt__(x::str, y::str)::bool:
-#     native "__gt__str__"
+def __gt__(x::str, y::str)::bool:
+    native "__gt__str__"
 
-# def __le__(x::str, y::str)::bool:
-#     native "__le__str__"
+def __le__(x::str, y::str)::bool:
+    native "__le__str__"
 
-# def __ge__(x::str, y::str)::bool:
-#     native "__ge__str__"
+def __ge__(x::str, y::str)::bool:
+    native "__ge__str__"
 
-# def __eq__(x::str, y::str)::bool:
-#     native "__eq__str__"
+def __eq__(x::str, y::str)::bool:
+    native "__eq__str__"
 
-# def __ne__(x::str, y::str)::bool:
-#     native "__ne__str__"
+def __ne__(x::str, y::str)::bool:
+    native "__ne__str__"
 
-# def __getitem__(S::str, k::int)::str:
-#     native "__getitem__str__"
+def __getitem__(S::str, k::int)::str:
+    native "__getitem__str__"
 
-# def __getslice__(S::str, L::int, U::int)::str:
-#     native "__getslice__str__"
+def __getslice__(S::str, L::int, U::int)::str:
+    native "__getslice__str__"
 
-# def len(S::str)::int:
-#     native "__len__str__"
+def len(S::str)::int:
+    native "__len__str__"
 
-# # tostr is the replacement for 'str' as a function in our dialect.
-# def tostr(x)::str:
-#     native "__tostr__"
+# tostr is the replacement for 'str' as a function in our dialect.
+def tostr(x)::str:
+    native "__tostr__"
 
-# # Type list
+# Type list
 
-# def __getitem__(S::list of $a, k::int)::$a:
-#     native "__getitem__list__"
+def __getitem__(S::list of $a, k::int)::$a:
+    native "__getitem__list__"
 
-# def __getslice__(S::list of $a, L::int, U::int)::list of $a:
-#     native "__getslice__list__"
+def __getslice__(S::list of $a, L::int, U::int)::list of $a:
+    native "__getslice__list__"
 
 # def __setitem__(S::list of $a, k::int, val::$a)::$a:
 #     native "__setitem__list__"
@@ -161,8 +161,8 @@ def __ne__(x::int, y::int)::bool:
 # def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
 #     native "__setslice__list__"
 
-# def len(S::list of $a)::int:
-#     native "__len__list__"
+def len(S::list of $a)::int:
+    native "__len__list__"
 
 # # Replaces sys.argv
 # def argv()::list of str:

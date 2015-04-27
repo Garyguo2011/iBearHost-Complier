@@ -1,4 +1,12 @@
 #include "runtime.h"
+PyRange* xrange(PyInt* low, PyInt* high)
+{
+return __xrange__(low , high );
+}
+PyInt* len(PyRange* r)
+{
+return __len__range__(r );
+}
 PyInt* __add__(PyInt* x, PyInt* y)
 {
 return __add__int__(x , y );
@@ -55,12 +63,78 @@ PyBool* __ne__(PyInt* x, PyInt* y)
 {
 return __ne__int__(x , y );
 }
+PyInt* toint(PyStr* x)
+{
+return __toint__str__(x );
+}
+PyStr* __add__(PyStr* x, PyStr* y)
+{
+return __add__str__(x , y );
+}
+PyStr* __mul__(PyStr* x, PyInt* y)
+{
+return __lmul__str__(x , y );
+}
+PyStr* __mul__(PyInt* x, PyStr* y)
+{
+return __rmul__str__(x , y );
+}
+PyBool* __lt__(PyStr* x, PyStr* y)
+{
+return __lt__str__(x , y );
+}
+PyBool* __gt__(PyStr* x, PyStr* y)
+{
+return __gt__str__(x , y );
+}
+PyBool* __le__(PyStr* x, PyStr* y)
+{
+return __le__str__(x , y );
+}
+PyBool* __ge__(PyStr* x, PyStr* y)
+{
+return __ge__str__(x , y );
+}
+PyBool* __eq__(PyStr* x, PyStr* y)
+{
+return __eq__str__(x , y );
+}
+PyBool* __ne__(PyStr* x, PyStr* y)
+{
+return __ne__str__(x , y );
+}
+PyStr* __getitem__(PyStr* S, PyInt* k)
+{
+return __getitem__str__(S , k );
+}
+PyStr* __getslice__(PyStr* S, PyInt* L, PyInt* U)
+{
+return __getslice__str__(S , L , U );
+}
+PyInt* len(PyStr* S)
+{
+return __len__str__(S );
+}
+PyStr* tostr(PyValue x)
+{
+return __tostr__(x );
+}
+PyValue __getitem__(PyList* S, PyInt* k)
+{
+return __getitem__list__(S , k );
+}
+PyList* __getslice__(PyList* S, PyInt* L, PyInt* U)
+{
+return __getslice__list__(S , L , U );
+}
+PyInt* len(PyList* S)
+{
+return __len__list__(S );
+}
 void
 __main__()
 {
-__print__(__cons_tuple0__());
-__print__(__cons_tuple1__(__cons_int__ (1)));
-__print__(__cons_tuple2__(__cons_int__ (1), __cons_int__ (2)));
-__print__(__cons_tuple3__(__cons_int__ (1), __cons_int__ (2), __cons_int__ (3)));
+__print__(tostr(__cons_int__ (1234))
+);
 
 }

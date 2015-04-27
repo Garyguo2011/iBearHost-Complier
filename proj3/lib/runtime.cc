@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include "math.h"
+#include <sstream>
 
 using namespace std;
 
@@ -27,7 +28,15 @@ static void fatal(const char* msg)
 void
 PyObject::print(ostream& os)
 {
-    os << "<" << typeName () << "@" << (void*) this << ">";
+    os << toStr();
+}
+
+string
+PyObject::toStr()
+{
+    string str = "";
+    str.append("undefined toStr()"); 
+    return str;
 }
 
 const char*
@@ -93,10 +102,10 @@ PyNoType::typeName ()
     return "<None>";
 }
 
-void
-PyNoType::print (ostream& os)
+string
+PyNoType::toStr ()
 {
-    os << "None";
+    return "None";
 }
 
 PyNoType
@@ -110,10 +119,10 @@ PyStr::PyStr (const string& val) : _val (val)
 {
 }
 
-void
-PyStr::print (ostream& os)
+string
+PyStr::toStr ()
 {
-    os << _val;
+    return _val;
 }
 
 PyStr* 
@@ -146,10 +155,13 @@ PyInt::PyInt (const int val) : _val (val)
 {
 }
 
-void
-PyInt::print (ostream& os)
+string
+PyInt::toStr ()
 {
-    os << _val;
+    stringstream ss;
+    ss << _val;
+    string str = ss.str();
+    return str;
 }
 
 PyInt*
@@ -182,13 +194,13 @@ PyBool::PyBool (const int val) : _val (val)
 {
 }
 
-void
-PyBool::print(ostream& os)
+string
+PyBool::toStr()
 {
     if (_val) {
-        os << "True";
+        return "True";
     } else {
-        os << "False";
+        return "False";
     }
 }
 
@@ -231,17 +243,19 @@ PyRange::typeName ()
     return "range";
 }
 
-void
-PyRange::print(ostream& os)
+string
+PyRange::toStr()
 {
-    os << "[";
+    string str = "";
+    str += "[";
     for (int i = 0 ; i < items.size(); i++) {
-        items[i]->print(os);
+        str += items[i]->toStr();
         if (i < items.size()-1) {
-            os << ", ";
+            str += ", ";
         }
     }
-    os << "]";
+    str += "]";
+    return str;
 }
 
 int
@@ -277,17 +291,30 @@ PyList::extend (PyValue other)
     vector<PyValue>& otherItems = otherp->items;
     items.insert (items.end (), otherItems.begin (), otherItems.end ());
 }
-void
-PyList::print (ostream& os)
+string
+PyList::toStr ()
 {
-    os << "[";
+    string str = "";
+    str += "[";
     for (int i = 0 ; i < items.size(); i++) {
-        items[i]->print(os);
+        str += items[i]->toStr();
         if (i < items.size()-1) {
-            os << ", ";
+            str += ", ";
         }
     }
-    os << "]";
+    str += "]";
+    return str;
+}
+int
+PyList::getSize()
+{
+    return (int) items.size();
+}
+
+PyValue
+PyList::getItem(PyInt* val)
+{
+    return items[val->getValue()];
 }
 
 /* Dicts */
@@ -318,10 +345,12 @@ PyTuple0::typeName ()
     return "tuple0";
 }
 
-void
-PyTuple0::print(ostream& os)
+string
+PyTuple0::toStr()
 {
-    os << "()";
+    string str = "";
+    str += "()";
+    return str;
 }
 
 PyTuple1::PyTuple1 (PyValue val)
@@ -341,12 +370,14 @@ PyTuple1::typeName ()
     return "tuple1";
 }
 
-void
-PyTuple1::print(ostream& os)
+string
+PyTuple1::toStr()
 {
-    os << "(";
-    _vals[0]->print(os);
-    os <<")";
+    string str = "";
+    str += "(";
+    str += _vals[0]->toStr();
+    str +=")";
+    return str;
 }
 
 PyTuple2::PyTuple2 (PyValue val0, PyValue val1)
@@ -367,14 +398,16 @@ PyTuple2::typeName ()
     return "tuple2";
 }
 
-void
-PyTuple2::print(ostream& os)
+string
+PyTuple2::toStr()
 {
-    os << "(";
-    _vals[0]->print(os);
-    os << ", ";
-    _vals[1]->print(os);
-    os <<")";
+    string str = "";
+    str += "(";
+    str += _vals[0]->toStr();
+    str += ", ";
+    str += _vals[1]->toStr();
+    str +=")";
+    return str;
 }
 
 PyTuple3::PyTuple3 (PyValue val0, PyValue val1, PyValue val2)
@@ -396,16 +429,18 @@ PyTuple3::typeName ()
     return "tuple3";
 }
 
-void
-PyTuple3::print(ostream& os)
+string
+PyTuple3::toStr()
 {
-    os << "(";
-    _vals[0]->print(os);
-    os << ", ";
-    _vals[1]->print(os);
-    os << ", ";
-    _vals[2]->print(os);
-    os <<")";
+    string str = "";
+    str += "(";
+    str += _vals[0]->toStr();
+    str += ", ";
+    str += _vals[1]->toStr();
+    str += ", ";
+    str += _vals[2]->toStr();
+    str +=")";
+    return str;
 }
 
 /* Integers */
@@ -516,68 +551,77 @@ __sub__int__ (PyInt* v0, PyInt* v1)
 
 /* Strings */
 
-PyValue
-__add__str__ (PyValue v0, PyValue v1)
+PyStr*
+__add__str__ (PyStr* v0, PyStr* v1)
 {
     // return NULL;  // REPLACE WITH BODY
-    return (PyValue) new PyStr (v0->asStr()->getValue() + v1->asStr()->getValue());
+    return new PyStr (v0->asStr()->getValue() + v1->asStr()->getValue());
 }
 
 PyBool*
-__eq__str__ (PyValue v0, PyValue v1)
+__eq__str__ (PyStr* v0, PyStr* v1)
 {
     // return NULL;  // REPLACE WITH BODY
     return new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) == 0);
 }
 
 PyBool*
-__ne__str__ (PyValue v0, PyValue v1)
+__ne__str__ (PyStr* v0, PyStr* v1)
 {
     // return NULL;  // REPLACE WITH BODY
     return new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) != 0);
 }
 
 PyBool*
-__ge__str__ (PyValue v0, PyValue v1)
+__ge__str__ (PyStr* v0, PyStr* v1)
 {
     // return NULL;  // REPLACE WITH BODY
     return new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) >= 0);
 }
 
-PyValue
-__getitem__str__ (PyValue v0, PyValue v1)
+PyStr*
+__getitem__str__ (PyStr* v0, PyInt* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    const char c = v0->getValue().at(v1->getValue());
+    stringstream ss;
+    string s;
+    ss << c;
+    ss >> s;
+    return new PyStr(s);
 }
 
-PyValue
-__getslice__str__ (PyValue v0, PyValue v1, PyValue v2)
+PyStr*
+__getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    // char* s = v0->getValue().substr(v1->getValue(), v2->getValue());
+    // fprintf(stderr, "lala: %s\n", s);
+    return new PyStr(v0->getValue().substr(v1->getValue(), v2->getValue()));
 }
 
 PyBool*
-__gt__str__ (PyValue v0, PyValue v1)
+__gt__str__ (PyStr* v0, PyStr* v1)
 {
     // return NULL;  // REPLACE WITH BODY
     return new PyBool(v0->asStr()->getValue().compare(v1->asStr()->getValue()) > 0);
 }
 
 PyBool*
-__le__str__ (PyValue v0, PyValue v1)
+__le__str__ (PyStr* v0, PyStr* v1)
 {
     return __le__str__ (v1, v0);
 }
 
-PyValue
-__len__str__ (PyValue v0)
+PyInt*
+__len__str__ (PyStr* v0)
 {
     // return NULL;  // REPLACE WITH BODY
-    return (PyValue) new PyInt(v0->asStr()->getValue().length());
+    return new PyInt(v0->asStr()->getValue().length());
 }
 
-PyValue
-__lmul__str__ (PyValue v0, PyValue v1)
+PyStr*
+__lmul__str__ (PyStr* v0, PyInt* v1)
 {
     // return NULL;  // REPLACE WITH BODY
     // v0 is str
@@ -589,35 +633,39 @@ __lmul__str__ (PyValue v0, PyValue v1)
     {
         tmp += input_str;
     }
-    return (PyValue) new PyStr(tmp);
+    return new PyStr(tmp);
 }
 
 PyBool*
-__lt__str__ (PyValue v0, PyValue v1)
+__lt__str__ (PyStr* v0, PyStr* v1)
 {
     return __gt__str__ (v1, v0);
 }
 
-PyValue
-__rmul__str__ (PyValue v0, PyValue v1)
+PyStr*
+__rmul__str__ (PyInt* v0, PyStr* v1)
 {
     return __lmul__str__ (v1, v0);
 }
 
-PyValue
-__toint__str__ (PyValue v0)
+PyInt*
+__toint__str__ (PyStr* v0)
 {
     // v0 is str
     // return int
     // return NULL;  // REPLACE WITH BODY
-    // return (PyValue) new PyInt(std::stoi(v0->asStr()->getValue()));
+    std::stringstream sstr(v0->getValue());
+    int val;
+    sstr >> val;
+    return new PyInt(val);
 }
 
-PyValue
+PyStr*
 __tostr__ (PyValue v0)
 {
     // v0 can be anytype
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return new PyStr(v0->toStr());
 }
 
 
@@ -657,21 +705,28 @@ __notcontains__dict__ (PyValue v0, PyValue v1)
 /* Lists */
 
 PyValue
-__getitem__list__ (PyValue v0, PyValue v1)
+__getitem__list__ (PyList* v0, PyInt* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return v0->getItem(v1);
 }
 
-PyValue
-__getslice__list__ (PyValue v0, PyValue v1, PyValue v2)
+PyList*
+__getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    PyList* list = new PyList();
+    for (int i = v1->getValue(); i < v2->getValue(); i++) {
+        list->asList()->append(__getitem__list__(v0, new PyInt(i)));
+    }
+    return list;
 }
 
-PyValue
-__len__list__ (PyValue v0)
+PyInt*
+__len__list__ (PyList* v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return new PyInt(v0->getSize());
 }
 
 PyValue

@@ -10,6 +10,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdarg>
+#include <string>
+#include <cstdlib>
 
 using namespace std;
 
@@ -39,6 +41,7 @@ protected:
 public:
     virtual void print(ostream& os);
     virtual const char* typeName ();
+    virtual string toStr();
 
     /** Conversion functions */
     virtual PyStr* asStr ();
@@ -61,20 +64,19 @@ private:
     PyNoType() { }
 public:
     const char* typeName ();
-    void print(ostream& os);
     static PyNoType NoneObj;
+    string toStr();
 };
 
 class PyStr : public PyObject {
 public:
     PyStr (const string& val);
     const char* typeName ();
-
-    void print(ostream& os);
     PyStr* asStr ();
 
     PyStr* append (PyValue other);
     string getValue();
+    string toStr();
 
 private:
     string _val;
@@ -83,10 +85,10 @@ private:
 class PyInt : public PyObject {
 public:
     PyInt (const int val);
-    void print(ostream& os);
     PyInt* asInt ();
     const char* typeName ();
     int getValue();
+    string toStr();
 
 private:
     int _val;
@@ -95,10 +97,10 @@ private:
 class PyBool : public PyObject {
 public:
     PyBool (const int val);
-    void print(ostream& os);
     PyBool* asBool ();
     const char* typeName ();
     bool getValue();
+    string toStr();
 
 private:
     bool _val;
@@ -109,8 +111,8 @@ public:
     PyRange (PyInt* from, PyInt* to);
     PyRange* asRange ();
     const char* typeName ();
-    void print(ostream& os);
     int getSize();
+    string toStr();
 private:
     vector<PyValue> items;
 };
@@ -123,7 +125,9 @@ public:
     void append (PyValue elt);
     /** Append list OTHER to the end of this. */
     void extend (PyValue other);
-    void print(ostream& os);
+    int getSize();
+    PyValue getItem(PyInt* val);
+    string toStr();
 
 private:
     vector<PyValue> items;
@@ -139,7 +143,7 @@ class PyTuple0 : public PyObject {
 public:
     PyTuple0* asTuple0 ();
     const char* typeName ();
-    void print(ostream& os);
+    string toStr();
 };
 
 class PyTuple1 : public PyObject {
@@ -147,7 +151,7 @@ public:
     PyTuple1 (PyValue val);
     PyTuple1* asTuple1 ();
     const char* typeName ();
-    void print(ostream& os);
+    string toStr();
 private:
     PyValue _vals[1];
 };
@@ -157,7 +161,7 @@ public:
     PyTuple2 (PyValue val0, PyValue val1);
     PyTuple2* asTuple2 ();
     const char* typeName ();
-    void print(ostream& os);
+    string toStr();
 private:
     PyValue _vals[2];
 };
@@ -167,7 +171,7 @@ public:
     PyTuple3 (PyValue val0, PyValue val1, PyValue val2);
     PyTuple3* asTuple3 ();
     const char* typeName ();
-    void print(ostream& os);
+    string toStr();
 private:
     PyValue _vals[3];
 };
@@ -193,20 +197,20 @@ extern PyInt* __sub__int__ (PyInt* v0, PyInt* v1);
 
 /* Strings */
 
-extern PyValue __add__str__ (PyValue v0, PyValue v1);
-extern PyBool* __eq__str__ (PyValue v0, PyValue v1);
-extern PyBool* __ge__str__ (PyValue v0, PyValue v1);
-extern PyValue __getitem__str__ (PyValue v0, PyValue v1);
-extern PyValue __getslice__str__ (PyValue v0, PyValue v1, PyValue v2);
-extern PyBool* __gt__str__ (PyValue v0, PyValue v1);
-extern PyBool* __le__str__ (PyValue v0, PyValue v1);
-extern PyValue __len__str__ (PyValue v0);
-extern PyValue __lmul__str__ (PyValue v0, PyValue v1);
+extern PyStr* __add__str__ (PyStr* v0, PyStr* v1);
+extern PyBool* __eq__str__ (PyStr* v0, PyStr* v1);
+extern PyBool* __ge__str__ (PyStr* v0, PyStr* v1);
+extern PyStr* __getitem__str__ (PyStr* v0, PyInt* v1);
+extern PyStr* __getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2);
+extern PyBool* __gt__str__ (PyStr* v0, PyStr* v1);
+extern PyBool* __le__str__ (PyStr* v0, PyStr* v1);
+extern PyInt* __len__str__ (PyStr* v0);
+extern PyStr* __lmul__str__ (PyStr* v0, PyInt* v1);
 extern PyBool* __ne__str__ (PyStr* v0, PyStr* v1);
-extern PyBool* __lt__str__ (PyValue v0, PyValue v1);
-extern PyValue __rmul__str__ (PyValue v0, PyValue v1);
-extern PyValue __toint__str__ (PyValue v0);
-extern PyValue __tostr__ (PyValue v0);
+extern PyBool* __lt__str__ (PyStr* v0, PyStr* v1);
+extern PyStr* __rmul__str__ (PyInt* v0, PyStr* v1);
+extern PyInt* __toint__str__ (PyStr* v0);
+extern PyStr* __tostr__ (PyValue v0);
 
 /* Dictionaries */
 
@@ -218,9 +222,9 @@ extern PyValue __notcontains__dict__ (PyValue v0, PyValue v1);
 
 /* Lists */
 
-extern PyValue __getitem__list__ (PyValue v0, PyValue v1);
-extern PyValue __getslice__list__ (PyValue v0, PyValue v1, PyValue v2);
-extern PyValue __len__list__ (PyValue v0);
+extern PyValue __getitem__list__ (PyList* v0, PyInt* v1);
+extern PyList* __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2);
+extern PyInt* __len__list__ (PyList* v0);
 extern PyValue __setitem__list__ (PyValue v0, PyValue v1, PyValue v2);
 extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
                                    PyValue v3);

@@ -252,6 +252,16 @@ protected:
 
     NODE_CONSTRUCTORS (Subscription_AST, Callable);
 
+    void codeGen() {
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ")";
+
+    }
+
 };
 
 NODE_FACTORY (Subscription_AST, SUBSCRIPT);
@@ -273,6 +283,17 @@ class Slicing_AST : public Callable {
 protected:
 
     NODE_CONSTRUCTORS (Slicing_AST, Callable);
+
+    void codeGen() {
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ", ";
+        child(3)->codeGen();
+        cout << ")";
+    }
 
 };
 
