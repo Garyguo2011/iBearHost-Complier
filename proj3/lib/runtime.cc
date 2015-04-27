@@ -209,6 +209,16 @@ PyBool::toStr()
     }
 }
 
+PyBool*
+PyBool::notBool()
+{
+    if (_val) {
+        return new PyBool(0);
+    } else {
+        return new PyBool(1);
+    }
+}
+
 PyValue
 toPyBool (int v)
 {
@@ -344,7 +354,19 @@ PyDict::insert(PyValue elt)
 PyValue
 PyDict::get(PyValue key)
 {
+    //cerr << items.count(key) << ", lala\n";
     return items[key];
+}
+
+PyBool*
+PyDict::contains(PyValue key)
+{
+    if (get(key)->toStr() != "None")
+    {
+        return new PyBool(1);
+    } else {
+        return new PyBool(0);
+    }
 }
 
 int
@@ -640,7 +662,16 @@ PyStr*
 __getitem__str__ (PyStr* v0, PyInt* v1)
 {
     // return NULL;  // REPLACE WITH BODY
-    const char c = v0->getValue().at(v1->getValue());
+    int temp = 0;
+    if (v1->getValue() < 0) {
+        temp = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp = v1->getValue();
+    }
+    if (temp >= __len__str__(v0)->getValue()) {
+        fatal("can't get item with index out of range!");
+    }
+    const char c = v0->getValue().at(temp);
     stringstream ss;
     string s;
     ss << c;
@@ -654,7 +685,23 @@ __getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2)
     // return NULL;  // REPLACE WITH BODY
     // char* s = v0->getValue().substr(v1->getValue(), v2->getValue());
     // fprintf(stderr, "lala: %s\n", s);
-    return new PyStr(v0->getValue().substr(v1->getValue(), v2->getValue()));
+    int temp1 = 0;
+    int temp2 = 0;
+    if (v1->getValue() < 0) {
+        temp1 = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp1 = v1->getValue();
+    }
+    if (v2->getValue() < 0) {
+        temp2 = __len__str__(v0)->getValue() + v2->getValue();
+    } else {
+        temp2 = v2->getValue();
+    }
+    if (temp1 >= __len__str__(v0)->getValue() || temp2 >= __len__str__(v0)->getValue()
+        || temp1 > temp2) {
+        fatal("can't get slice with index out of range!");
+    }
+    return new PyStr(v0->getValue().substr(temp1, temp2));
 }
 
 PyBool*
@@ -714,6 +761,8 @@ __toint__str__ (PyStr* v0)
     std::stringstream sstr(v0->getValue());
     int val;
     sstr >> val;
+    // TO BE IMPLEMENTED: Should throw an error if it is not an "int string"
+    // e.g. "hello world" should throw a runtime error.
     return new PyInt(val);
 }
 
@@ -728,10 +777,11 @@ __tostr__ (PyValue v0)
 
 /* Dictionaries */
 
-PyValue
-__contains__dict__ (PyValue v0, PyValue v1)
+PyBool*
+__contains__dict__ (PyValue v0, PyDict* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return v1->contains(v0);
 }
 
 PyValue
@@ -745,6 +795,7 @@ PyInt*
 __len__dict__ (PyDict* v0)
 {
     // return NULL;  // REPLACE WITH BODY
+    return new PyInt(v0->getSize());
 }
 
 PyValue
@@ -753,10 +804,12 @@ __setitem__dict__ (PyValue v0, PyValue v1, PyValue v2)
     return NULL;  // REPLACE WITH BODY
 }
 
-PyValue
-__notcontains__dict__ (PyValue v0, PyValue v1)
+PyBool*
+__notcontains__dict__ (PyValue v0, PyDict* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return __notcontains__dict__(v0, v1)->notBool();
+
 }
 
 
@@ -766,15 +819,40 @@ PyValue
 __getitem__list__ (PyList* v0, PyInt* v1)
 {
     // return NULL;  // REPLACE WITH BODY
-    return v0->getItem(v1);
+    int temp = 0;
+    if (v1->getValue() < 0) {
+        temp = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp = v1->getValue();
+    }
+    if (temp >= __len__list__(v0)->getValue()) {
+        fatal("can't get item with index out of range!");
+    }
+    return v0->getItem(new PyInt(temp));
 }
 
 PyList*
 __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
 {
     // return NULL;  // REPLACE WITH BODY
+    int temp1 = 0;
+    int temp2 = 0;
+    if (v1->getValue() < 0) {
+        temp1 = __len__str__(v0)->getValue() + v1->getValue();
+    } else {
+        temp1 = v1->getValue();
+    }
+    if (v2->getValue() < 0) {
+        temp2 = __len__str__(v0)->getValue() + v2->getValue();
+    } else {
+        temp2 = v2->getValue();
+    }
+    if (temp1 >= __len__str__(v0)->getValue() || temp2 >= __len__str__(v0)->getValue()
+        || temp1 > temp2) {
+        fatal("can't get slice with index out of range!");
+    }
     PyList* list = new PyList();
-    for (int i = v1->getValue(); i < v2->getValue(); i++) {
+    for (int i = temp1; i < temp2; i++) {
         list->asList()->append(__getitem__list__(v0, new PyInt(i)));
     }
     return list;
