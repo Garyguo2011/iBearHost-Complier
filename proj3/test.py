@@ -16,4 +16,6 @@
 # print "abcdef"[3]
 # print tostr([1, 3, 4, 5, 6])
 # print tostr({"a" : 0, "b" : 1, "c" : 2})
-print "lala\n"
+print 2
+print "\n"
+print -3

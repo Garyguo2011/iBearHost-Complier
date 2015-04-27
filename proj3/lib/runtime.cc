@@ -347,6 +347,12 @@ PyDict::get(PyValue key)
     return items[key];
 }
 
+int
+PyDict::getSize()
+{
+    return items.size();
+}
+
 string
 PyDict::toStr ()
 {
@@ -737,15 +743,16 @@ __contains__dict__ (PyValue v0, PyValue v1)
 }
 
 PyValue
-__getitem__dict__ (PyValue v0, PyValue v1)
+__getitem__dict__ (PyDict* v0, PyValue v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return v0->get(v1);
 }
 
-PyValue
-__len__dict__ (PyValue v0)
+PyInt*
+__len__dict__ (PyDict* v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
 }
 
 PyValue
