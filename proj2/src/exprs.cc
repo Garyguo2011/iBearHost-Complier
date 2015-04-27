@@ -152,19 +152,18 @@ protected:
         replace (k + 1, expr);
     }
 
-public:
+    /** Perform type resolution on my children.  Arguments are as for 
+     *  resolveTypes. */
+    virtual void resolveChildTypes (Decl* context, Unifier& subst,
+                                    Resolver& resolver, Type_Ptr nextValueType) {
 
-    /** Set my type. */
-    virtual void setExprType (Unifier& subst) {
-        if (!setType (calledExpr ()->getType ()->binding ()->returnType (),
-                      subst)) {
-            error (this, "inappropriate function return type");
-            return;
-        }
-    }
-
-    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver) {
         Typed_Tree::resolveTypes (context, subst, resolver);
+    }        
+
+    /** Perform type resolution on me, assuming my children have been
+     *  resolved.  Arguments are as for resolveTypes. */
+    virtual void resolveMyType (Decl* context, Unifier& subst,
+                                Resolver& resolver) {
         Type_Ptr funcType;
         funcType = calledExpr ()->getType ();
 
@@ -190,7 +189,28 @@ public:
                 break;
             }
         }
+    }
 
+
+public:
+
+    /** Set my type. */
+    virtual void setExprType (Unifier& subst) {
+        if (!setType (calledExpr ()->getType ()->binding ()->returnType (),
+                      subst)) {
+            error (this, "inappropriate function return type");
+            return;
+        }
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver) {
+        resolveTypes (context, subst, resolver, NULL);
+    }
+
+    void resolveTypes (Decl* context, Unifier& subst, Resolver&
+                       resolver, Type_Ptr nextValueType) {
+        resolveChildTypes (context, subst, resolver, nextValueType);
+        resolveMyType (context, subst, resolver);
     }
 };
 
@@ -341,8 +361,8 @@ protected:
     void addTargetDecls (Decl* enclosing) {
     }
 
-    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver,
-                       Type_Ptr nextValueType) {
+    void resolveChildTypes (Decl* context, Unifier& subst, Resolver& resolver,
+                            Type_Ptr nextValueType) {
         PASSDOWN(this, resolveTypes(context, subst, resolver, nextValueType),
                  0);
     }
@@ -375,8 +395,8 @@ protected:
     void addTargetDecls (Decl* enclosing) {
     }
 
-    void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver,
-                       Type_Ptr nextValueType) {
+    void resolveChildTypes (Decl* context, Unifier& subst, Resolver& resolver,
+                            Type_Ptr nextValueType) {
         PASSDOWN(this, resolveTypes(context, subst, resolver, nextValueType),
                  0);
     }
@@ -620,7 +640,7 @@ protected:
 
     void otherChecks () {
         Typed_Tree::otherChecks ();
-        Type_Ptr keyType = getType ()->binding ()->typeParam (0);
+        Type_Ptr keyType = getType ()->binding ()->typeParam (0)->binding ();
         if (keyType->isTypeVariable () 
             || (!unifies (keyType, strDecl->asType ())
                 && !unifies (keyType, boolDecl->asType ())
