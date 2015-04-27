@@ -106,6 +106,7 @@ public:
     const char* typeName ();
     bool getValue();
     string toStr();
+    PyBool* notBool();
 
 private:
     bool _val;
@@ -157,6 +158,7 @@ public:
     string toStr ();
     PyValue get(PyValue key);
     int getSize();
+    PyBool* contains(PyValue key);
 
 private:
     map<PyValue, PyValue> items;
@@ -237,11 +239,11 @@ extern PyStr* __tostr__ (PyValue v0);
 
 /* Dictionaries */
 
-extern PyValue __contains__dict__ (PyValue v0, PyValue v1);
+extern PyBool* __contains__dict__ (PyValue v0, PyDict* v1);
 extern PyValue __getitem__dict__ (PyDict* v0, PyValue v1);
 extern PyInt* __len__dict__ (PyDict* v0);
 extern PyValue __setitem__dict__ (PyValue v0, PyValue v1, PyValue v2);
-extern PyValue __notcontains__dict__ (PyValue v0, PyValue v1);
+extern PyBool* __notcontains__dict__ (PyValue v0, PyDict* v1);
 
 /* Lists */
 

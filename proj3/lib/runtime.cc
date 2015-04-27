@@ -209,6 +209,16 @@ PyBool::toStr()
     }
 }
 
+PyBool*
+PyBool::notBool()
+{
+    if (_val) {
+        return new PyBool(0);
+    } else {
+        return new PyBool(1);
+    }
+}
+
 PyValue
 toPyBool (int v)
 {
@@ -344,7 +354,19 @@ PyDict::insert(PyValue elt)
 PyValue
 PyDict::get(PyValue key)
 {
+    //cerr << items.count(key) << ", lala\n";
     return items[key];
+}
+
+PyBool*
+PyDict::contains(PyValue key)
+{
+    if (get(key)->toStr() != "None")
+    {
+        return new PyBool(1);
+    } else {
+        return new PyBool(0);
+    }
 }
 
 int
@@ -675,7 +697,7 @@ __gt__str__ (PyStr* v0, PyStr* v1)
 PyBool*
 __le__str__ (PyStr* v0, PyStr* v1)
 {
-    return __le__str__ (v1, v0);
+    return __ge__str__ (v1, v0);
 }
 
 PyInt*
@@ -736,10 +758,11 @@ __tostr__ (PyValue v0)
 
 /* Dictionaries */
 
-PyValue
-__contains__dict__ (PyValue v0, PyValue v1)
+PyBool*
+__contains__dict__ (PyValue v0, PyDict* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return v1->contains(v0);
 }
 
 PyValue
@@ -753,6 +776,7 @@ PyInt*
 __len__dict__ (PyDict* v0)
 {
     // return NULL;  // REPLACE WITH BODY
+    return new PyInt(v0->getSize());
 }
 
 PyValue
@@ -761,10 +785,12 @@ __setitem__dict__ (PyValue v0, PyValue v1, PyValue v2)
     return NULL;  // REPLACE WITH BODY
 }
 
-PyValue
-__notcontains__dict__ (PyValue v0, PyValue v1)
+PyBool*
+__notcontains__dict__ (PyValue v0, PyDict* v1)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return __notcontains__dict__(v0, v1)->notBool();
+
 }
 
 

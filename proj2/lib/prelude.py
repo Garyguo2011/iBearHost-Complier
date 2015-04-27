@@ -176,16 +176,16 @@ def len(S::list of $a)::int:
 # def read()::str:
 #     native "__read__"
 
-# # Type dict
+# Type dict
 
-# def __getitem__(D::dict of [int, $b], x::int)::$b:
-#     native "__getitem__dict__"
+def __getitem__(D::dict of [int, $b], x::int)::$b:
+    native "__getitem__dict__"
 
-# def __getitem__(D::dict of [bool, $b], x::bool)::$b:
-#     native "__getitem__dict__"
+def __getitem__(D::dict of [bool, $b], x::bool)::$b:
+    native "__getitem__dict__"
 
-# def __getitem__(D::dict of [str, $b], x::str)::$b:
-#     native "__getitem__dict__"
+def __getitem__(D::dict of [str, $b], x::str)::$b:
+    native "__getitem__dict__"
 
 # def __setitem__(S::dict of [int, $b], k::int, val::$b)::$b:
 #     native "__setitem__dict__"
@@ -196,8 +196,8 @@ def len(S::list of $a)::int:
 # def __setitem__(S::dict of [str, $b], k::str, val::$b)::$b:
 #     native "__setitem__dict__"
 
-# def len(D::dict of [int, $b])::int:
-#     native "__len__dict__"
+def len(D::dict of [$a, $b])::int:
+    native "__len__dict__"
 
 # def len(D::dict of [bool, $b])::int:
 #     native "__len__dict__"
@@ -205,25 +205,25 @@ def len(S::list of $a)::int:
 # def len(D::dict of [str, $b])::int:
 #     native "__len__dict__"
 
-# # Backwards from regular Python
-# def __contains__(x::int, D::dict of [int, $b])::bool:
-#     native "__contains__dict__"
+# Backwards from regular Python
+def __contains__(x::int, D::dict of [int, $b])::bool:
+    native "__contains__dict__"
 
-# def __contains__(x::bool, D::dict of [bool, $b])::bool:
-#     native "__contains__dict__"
+def __contains__(x::bool, D::dict of [bool, $b])::bool:
+    native "__contains__dict__"
 
-# def __contains__(x::str, D::dict of [str, $b])::bool:
-#     native "__contains__dict__"
+def __contains__(x::str, D::dict of [str, $b])::bool:
+    native "__contains__dict__"
 
-# # Backwards from regular Python
-# def __notcontains__(x::int, D::dict of [int, $b])::bool:
-#     native "__notcontains__dict__"
+# Backwards from regular Python
+def __notcontains__(x::int, D::dict of [int, $b])::bool:
+    native "__notcontains__dict__"
 
-# def __notcontains__(x::bool, D::dict of [bool, $b])::bool:
-#     native "__notcontains__dict__"
+def __notcontains__(x::bool, D::dict of [bool, $b])::bool:
+    native "__notcontains__dict__"
 
-# def __notcontains__(x::str, D::dict of [str, $b])::bool:
-#     native "__notcontains__dict__"
+def __notcontains__(x::str, D::dict of [str, $b])::bool:
+    native "__notcontains__dict__"
 
 
 # # General

@@ -131,9 +131,57 @@ PyInt* len(PyList* S)
 {
 return __len__list__(S );
 }
+PyValue __getitem__(PyDict* D, PyInt* x)
+{
+return __getitem__dict__(D , x );
+}
+PyValue __getitem__(PyDict* D, PyBool* x)
+{
+return __getitem__dict__(D , x );
+}
+PyValue __getitem__(PyDict* D, PyStr* x)
+{
+return __getitem__dict__(D , x );
+}
+PyInt* len(PyDict* D)
+{
+return __len__dict__(D );
+}
+PyInt* len(PyDict* D)
+{
+return __len__dict__(D );
+}
+PyInt* len(PyDict* D)
+{
+return __len__dict__(D );
+}
+PyBool* __contains__(PyInt* x, PyDict* D)
+{
+return __contains__dict__(x , D );
+}
+PyBool* __contains__(PyBool* x, PyDict* D)
+{
+return __contains__dict__(x , D );
+}
+PyBool* __contains__(PyStr* x, PyDict* D)
+{
+return __contains__dict__(x , D );
+}
+PyBool* __notcontains__(PyInt* x, PyDict* D)
+{
+return __notcontains__dict__(x , D );
+}
+PyBool* __notcontains__(PyBool* x, PyDict* D)
+{
+return __notcontains__dict__(x , D );
+}
+PyBool* __notcontains__(PyStr* x, PyDict* D)
+{
+return __notcontains__dict__(x , D );
+}
 void
 __main__()
 {
-__print__(__cons_str__ ("lala\012"));
+__print__(__getitem__ (__cons_dict__(2, __cons_pair__(__cons_int__ (4), __cons_int__ (12)), __cons_pair__(__cons_int__ (2), __cons_int__ (1))), __cons_int__ (4)));
 
 }

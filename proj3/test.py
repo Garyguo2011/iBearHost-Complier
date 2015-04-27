@@ -16,6 +16,5 @@
 # print "abcdef"[3]
 # print tostr([1, 3, 4, 5, 6])
 # print tostr({"a" : 0, "b" : 1, "c" : 2})
-print 2
-print "\n"
-print -3
+# print __contains__("fjeowifj", {"haha" : 12, "lala" : 1})
+# print {4 : 12, 2 : 1}[4]
