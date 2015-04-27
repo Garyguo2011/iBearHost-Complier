@@ -9,6 +9,8 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
+#include <utility>
 #include <cstdarg>
 
 using namespace std;
@@ -26,6 +28,8 @@ class PyTuple0;
 class PyTuple1;
 class PyTuple2;
 class PyTuple3;
+
+class PyPair;
 
 extern const PyValue PyNone;
 extern const PyValue PyTrue;
@@ -51,6 +55,7 @@ public:
     virtual PyTuple1* asTuple1 ();
     virtual PyTuple2* asTuple2 ();
     virtual PyTuple3* asTuple3 ();
+    virtual PyPair* asPair ();
 }; 
 
 /** Represents the None value. There will only be one None object
@@ -129,10 +134,27 @@ private:
     vector<PyValue> items;
 };
 
+class PyPair : public PyObject {
+public:
+    PyPair(PyValue val0, PyValue val1);
+    PyPair* asPair ();
+    const char* typeName();
+    pair<PyValue, PyValue> getValue();
+
+private:
+    pair<PyValue, PyValue> _val;
+};
+
 class PyDict : public PyObject {
 public:
     PyDict* asDict ();
     const char* typeName ();
+    void insert (PyValue elt);
+    void print (ostream& os);
+    PyValue get(PyValue key);
+
+private:
+    map<PyValue, PyValue> items;
 };
 
 class PyTuple0 : public PyObject {
@@ -314,5 +336,24 @@ __cons_tuple3__(PyValue val0, PyValue val1, PyValue val2)
     return new PyTuple3(val0, val1, val2);
 }
 
+static inline PyPair*
+__cons_pair__(PyValue val0, PyValue val1) 
+{
+    return new PyPair(val0, val1);
+}
+
+static inline PyDict*
+__cons_dict__ (int count, ...)
+{
+    va_list args;
+    va_start(args, count);
+    PyDict* dict = new PyDict();
+    for (int i = 0; i < count; i ++) {
+        PyValue temp = va_arg(args, PyValue);
+        dict->asDict()->insert(temp);
+    }
+    va_end(args);
+    return dict;
+}
 
 #endif

@@ -86,6 +86,11 @@ PyObject::asTuple3 () {
     fatal ("invalid internal type conversion");
 }
 
+PyPair*
+PyObject::asPair () {
+    fatal ("invalid internal type conversion");
+}
+
 /* None */
 const char*
 PyNoType::typeName ()
@@ -302,6 +307,58 @@ const char*
 PyDict::typeName ()
 {
     return "dict";
+}
+void
+PyDict::insert(PyValue elt)
+{
+    items.insert(elt->asPair()->getValue());
+}
+
+PyValue
+PyDict::get(PyValue key)
+{
+    return items[key];
+}
+
+void
+PyDict::print (ostream& os)
+{
+    int i = 0;
+    os << "{";
+    for (map<PyValue, PyValue>::iterator it=items.begin(); 
+        it!=items.end(); ++it) {
+        it->first->print(os);
+        os << ": ";
+        it->second->print(os);
+        if (i != items.size() - 1) {
+            os << ", ";
+        }
+        i++;
+    }
+    os << "}";
+}
+
+/* Pair */
+PyPair::PyPair(PyValue val0, PyValue val1) {
+    _val = make_pair (val0, val1);
+}
+
+PyPair*
+PyPair::asPair ()
+{
+    return this;
+}
+
+const char*
+PyPair::typeName()
+{
+    return "pair";
+}
+
+pair<PyValue, PyValue> 
+PyPair::getValue()
+{
+    return _val;
 }
 
 /* Tuples */

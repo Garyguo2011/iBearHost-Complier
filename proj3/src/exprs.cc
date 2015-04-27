@@ -395,9 +395,39 @@ protected:
 
     NODE_CONSTRUCTORS (DictDisplay_AST, Typed_Tree);
 
+    void codeGen() {
+        cout << "__cons_dict__("
+            << arity() << ", ";
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
 };
 
 NODE_FACTORY (DictDisplay_AST, DICT_DISPLAY);
+
+class Pair_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS (Pair_AST, Typed_Tree);
+
+    void codeGen() {
+        cout << "__cons_pair__(";
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
+};
+
+NODE_FACTORY (Pair_AST, PAIR);
 
 
 /** A class of expression in which its subexpressions must agree as to
