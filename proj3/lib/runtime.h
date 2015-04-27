@@ -276,7 +276,7 @@ extern PyValue __readline__ ();
 /***** Other runtime support. *****/
 
 /** Print V on cout. */
-extern void __print__(PyValue v);
+extern void __print__(int count, ...);
 /** Print a newline on cout. */
 extern void __newline__();
 

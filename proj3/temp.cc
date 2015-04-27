@@ -174,7 +174,6 @@ return __notcontains__dict__(x , D );
 void
 __main__()
 {
-__print__(toint(__cons_str__ ("Jinge Zhang"))
-);
+__print__(2, __cons_tuple2__(__cons_int__ (1), __cons_int__ (2)), __add__ (__cons_int__ (1), __cons_int__ (2)));
 
 }

@@ -946,12 +946,22 @@ __readline__ ()
 static bool atStart;
 
 void
-__print__ (PyValue v)
+__print__ (int count, ...)
 {
-    if (!atStart) 
-	cout << " ";
-    atStart = false;
-    v->print (cout);
+ //    if (!atStart) 
+	// cout << " ";
+    va_list args;
+    va_start(args, count);
+    // atStart = false;
+    for (int i = 0; i < count; i ++) {
+        PyValue temp = va_arg(args, PyValue);
+        temp->print(cout);
+        if (i < count-1) {
+            cout << " ";
+        }
+    }
+    va_end(args);
+    cout << "\n";
 }
 
 
