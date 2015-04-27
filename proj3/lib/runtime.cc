@@ -821,7 +821,7 @@ __getitem__list__ (PyList* v0, PyInt* v1)
     // return NULL;  // REPLACE WITH BODY
     int temp = 0;
     if (v1->getValue() < 0) {
-        temp = __len__str__(v0)->getValue() + v1->getValue();
+        temp = __len__list__(v0)->getValue() + v1->getValue();
     } else {
         temp = v1->getValue();
     }
@@ -838,16 +838,16 @@ __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
     int temp1 = 0;
     int temp2 = 0;
     if (v1->getValue() < 0) {
-        temp1 = __len__str__(v0)->getValue() + v1->getValue();
+        temp1 = __len__list__(v0)->getValue() + v1->getValue();
     } else {
         temp1 = v1->getValue();
     }
     if (v2->getValue() < 0) {
-        temp2 = __len__str__(v0)->getValue() + v2->getValue();
+        temp2 = __len__list__(v0)->getValue() + v2->getValue();
     } else {
         temp2 = v2->getValue();
     }
-    if (temp1 >= __len__str__(v0)->getValue() || temp2 >= __len__str__(v0)->getValue()
+    if (temp1 >= __len__list__(v0)->getValue() || temp2 >= __len__list__(v0)->getValue()
         || temp1 > temp2) {
         fatal("can't get slice with index out of range!");
     }
