@@ -197,7 +197,7 @@ public:
         return true;
     }
 
-    bool isFunctionType () {
+    virtual bool isFunctionType () {
         return false;
     }
 
