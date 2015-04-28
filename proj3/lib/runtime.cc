@@ -692,19 +692,25 @@ __getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2)
     // fprintf(stderr, "lala: %s\n", s);
     int temp1 = 0;
     int temp2 = 0;
+    int size = __len__str__(v0)->getValue();
     if (v1->getValue() < 0) {
-        temp1 = __len__str__(v0)->getValue() + v1->getValue();
+        temp1 = size + v1->getValue();
     } else {
         temp1 = v1->getValue();
     }
     if (v2->getValue() < 0) {
-        temp2 = __len__str__(v0)->getValue() + v2->getValue();
+        temp2 = size + v2->getValue();
     } else {
         temp2 = v2->getValue();
     }
-    if (temp1 >= __len__str__(v0)->getValue() || temp2 >= __len__str__(v0)->getValue()
-        || temp1 > temp2) {
-        fatal("can't get slice with index out of range!");
+    if (temp1 > temp2) {
+        return new PyStr("");
+    }
+    if (temp1 > size) {
+        temp1 = size;
+    }
+    if (temp2 > size) {
+        temp2 = size;
     }
     return new PyStr(v0->getValue().substr(temp1, temp2));
 }
@@ -842,19 +848,25 @@ __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
     // return NULL;  // REPLACE WITH BODY
     int temp1 = 0;
     int temp2 = 0;
+    int size = __len__list__(v0)->getValue();
     if (v1->getValue() < 0) {
-        temp1 = __len__list__(v0)->getValue() + v1->getValue();
+        temp1 = size + v1->getValue();
     } else {
         temp1 = v1->getValue();
     }
     if (v2->getValue() < 0) {
-        temp2 = __len__list__(v0)->getValue() + v2->getValue();
+        temp2 = size + v2->getValue();
     } else {
         temp2 = v2->getValue();
     }
-    if (temp1 >= __len__list__(v0)->getValue() || temp2 >= __len__list__(v0)->getValue()
-        || temp1 > temp2) {
-        fatal("can't get slice with index out of range!");
+    if (temp1 > size) {
+        temp1 = size;
+    }
+    if (temp2 > size) {
+        temp2 = size;
+    }
+    if (temp1 > temp2 ) {
+        return new PyList()
     }
     PyList* list = new PyList();
     for (int i = temp1; i < temp2; i++) {
