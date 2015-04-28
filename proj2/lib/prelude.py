@@ -196,14 +196,14 @@ def __getitem__(D::dict of [str, $b], x::str)::$b:
 # def __setitem__(S::dict of [str, $b], k::str, val::$b)::$b:
 #     native "__setitem__dict__"
 
-def len(D::dict of [$a, $b])::int:
+def len(D::dict of [int, $b])::int:
     native "__len__dict__"
 
-# def len(D::dict of [bool, $b])::int:
-#     native "__len__dict__"
+def len(D::dict of [bool, $b])::int:
+    native "__len__dict__"
 
-# def len(D::dict of [str, $b])::int:
-#     native "__len__dict__"
+def len(D::dict of [str, $b])::int:
+    native "__len__dict__"
 
 def __in__(x::int, D::dict of [int, $b])::bool:
     native "__contains__dict__"

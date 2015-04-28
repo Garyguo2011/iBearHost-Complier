@@ -1,0 +1,1365 @@
+(module 0
+    (class 10
+        (id 10 str 2)
+        (type_formals_list 0)
+        (stmt_list 11))
+    (class 13
+        (id 13 int 3)
+        (type_formals_list 0)
+        (stmt_list 14))
+    (class 16
+        (id 16 bool 4)
+        (type_formals_list 0)
+        (stmt_list 17))
+    (class 19
+        (id 19 range 5)
+        (type_formals_list 0)
+        (stmt_list 20))
+    (class 22
+        (id 22 list 6)
+        (type_formals_list 22
+            (type_var 22 $T 7))
+        (stmt_list 23))
+    (class 25
+        (id 25 dict 8)
+        (type_formals_list 25
+            (type_var 25 $Key 9)
+            (type_var 25 $Value 10))
+        (stmt_list 26))
+    (class 28
+        (id 28 tuple0 11)
+        (type_formals_list 0)
+        (stmt_list 29))
+    (class 31
+        (id 31 tuple1 12)
+        (type_formals_list 31
+            (type_var 31 $T0 13))
+        (stmt_list 32))
+    (class 34
+        (id 34 tuple2 14)
+        (type_formals_list 34
+            (type_var 34 $T1 15)
+            (type_var 34 $T2 16))
+        (stmt_list 35))
+    (class 37
+        (id 37 tuple3 17)
+        (type_formals_list 37
+            (type_var 37 $T1 18)
+            (type_var 37 $T2 19)
+            (type_var 37 $T3 20))
+        (stmt_list 38))
+    (def 54
+        (id 54 xrange 24)
+        (formals_list 54
+            (typed_id 54
+                (id 54 low 26)
+                (type 54
+                    (id 54 int 3)))
+            (typed_id 54
+                (id 54 high 28)
+                (type 54
+                    (id 54 int 3))))
+        (type 54
+            (id 54 range 5))
+        (native 55
+            (string_literal 55  "__xrange__")))
+    (def 57
+        (id 57 len 31)
+        (formals_list 57
+            (typed_id 57
+                (id 57 r 33)
+                (type 57
+                    (id 57 range 5))))
+        (type 57
+            (id 57 int 3))
+        (native 58
+            (string_literal 58  "__len__range__")))
+    (def 62
+        (id 62 __add__ 37)
+        (formals_list 62
+            (typed_id 62
+                (id 62 x 39)
+                (type 62
+                    (id 62 int 3)))
+            (typed_id 62
+                (id 62 y 41)
+                (type 62
+                    (id 62 int 3))))
+        (type 62
+            (id 62 int 3))
+        (native 63
+            (string_literal 63  "__add__int__")))
+    (def 65
+        (id 65 __sub__ 45)
+        (formals_list 65
+            (typed_id 65
+                (id 65 x 47)
+                (type 65
+                    (id 65 int 3)))
+            (typed_id 65
+                (id 65 y 49)
+                (type 65
+                    (id 65 int 3))))
+        (type 65
+            (id 65 int 3))
+        (native 66
+            (string_literal 66  "__sub__int__")))
+    (def 68
+        (id 68 __mul__ 53)
+        (formals_list 68
+            (typed_id 68
+                (id 68 x 55)
+                (type 68
+                    (id 68 int 3)))
+            (typed_id 68
+                (id 68 y 57)
+                (type 68
+                    (id 68 int 3))))
+        (type 68
+            (id 68 int 3))
+        (native 69
+            (string_literal 69  "__mul__int__")))
+    (def 71
+        (id 71 __floordiv__ 61)
+        (formals_list 71
+            (typed_id 71
+                (id 71 x 63)
+                (type 71
+                    (id 71 int 3)))
+            (typed_id 71
+                (id 71 y 65)
+                (type 71
+                    (id 71 int 3))))
+        (type 71
+            (id 71 int 3))
+        (native 72
+            (string_literal 72  "__floordiv__int__")))
+    (def 74
+        (id 74 __mod__ 69)
+        (formals_list 74
+            (typed_id 74
+                (id 74 x 71)
+                (type 74
+                    (id 74 int 3)))
+            (typed_id 74
+                (id 74 y 73)
+                (type 74
+                    (id 74 int 3))))
+        (type 74
+            (id 74 int 3))
+        (native 75
+            (string_literal 75  "__mod__int__")))
+    (def 77
+        (id 77 __pow__ 77)
+        (formals_list 77
+            (typed_id 77
+                (id 77 x 79)
+                (type 77
+                    (id 77 int 3)))
+            (typed_id 77
+                (id 77 y 81)
+                (type 77
+                    (id 77 int 3))))
+        (type 77
+            (id 77 int 3))
+        (native 78
+            (string_literal 78  "__pow__int__")))
+    (def 80
+        (id 80 __neg__ 84)
+        (formals_list 80
+            (typed_id 80
+                (id 80 x 86)
+                (type 80
+                    (id 80 int 3))))
+        (type 80
+            (id 80 int 3))
+        (native 81
+            (string_literal 81  "__neg__int__")))
+    (def 83
+        (id 83 __pos__ 89)
+        (formals_list 83
+            (typed_id 83
+                (id 83 x 91)
+                (type 83
+                    (id 83 int 3))))
+        (type 83
+            (id 83 int 3))
+        (native 84
+            (string_literal 84  "__pos__int__")))
+    (def 86
+        (id 86 __lt__ 95)
+        (formals_list 86
+            (typed_id 86
+                (id 86 x 97)
+                (type 86
+                    (id 86 int 3)))
+            (typed_id 86
+                (id 86 y 99)
+                (type 86
+                    (id 86 int 3))))
+        (type 86
+            (id 86 bool 4))
+        (native 87
+            (string_literal 87  "__lt__int__")))
+    (def 89
+        (id 89 __gt__ 103)
+        (formals_list 89
+            (typed_id 89
+                (id 89 x 105)
+                (type 89
+                    (id 89 int 3)))
+            (typed_id 89
+                (id 89 y 107)
+                (type 89
+                    (id 89 int 3))))
+        (type 89
+            (id 89 bool 4))
+        (native 90
+            (string_literal 90  "__gt__int__")))
+    (def 92
+        (id 92 __le__ 111)
+        (formals_list 92
+            (typed_id 92
+                (id 92 x 113)
+                (type 92
+                    (id 92 int 3)))
+            (typed_id 92
+                (id 92 y 115)
+                (type 92
+                    (id 92 int 3))))
+        (type 92
+            (id 92 bool 4))
+        (native 93
+            (string_literal 93  "__le__int__")))
+    (def 95
+        (id 95 __ge__ 119)
+        (formals_list 95
+            (typed_id 95
+                (id 95 x 121)
+                (type 95
+                    (id 95 int 3)))
+            (typed_id 95
+                (id 95 y 123)
+                (type 95
+                    (id 95 int 3))))
+        (type 95
+            (id 95 bool 4))
+        (native 96
+            (string_literal 96  "__ge__int__")))
+    (def 98
+        (id 98 __eq__ 127)
+        (formals_list 98
+            (typed_id 98
+                (id 98 x 129)
+                (type 98
+                    (id 98 int 3)))
+            (typed_id 98
+                (id 98 y 131)
+                (type 98
+                    (id 98 int 3))))
+        (type 98
+            (id 98 bool 4))
+        (native 99
+            (string_literal 99  "__eq__int__")))
+    (def 101
+        (id 101 __ne__ 135)
+        (formals_list 101
+            (typed_id 101
+                (id 101 x 137)
+                (type 101
+                    (id 101 int 3)))
+            (typed_id 101
+                (id 101 y 139)
+                (type 101
+                    (id 101 int 3))))
+        (type 101
+            (id 101 bool 4))
+        (native 102
+            (string_literal 102  "__ne__int__")))
+    (def 105
+        (id 105 toint 142)
+        (formals_list 105
+            (typed_id 105
+                (id 105 x 144)
+                (type 105
+                    (id 105 str 2))))
+        (type 105
+            (id 105 int 3))
+        (native 106
+            (string_literal 106  "__toint__str__")))
+    (def 110
+        (id 110 __add__ 148)
+        (formals_list 110
+            (typed_id 110
+                (id 110 x 150)
+                (type 110
+                    (id 110 str 2)))
+            (typed_id 110
+                (id 110 y 152)
+                (type 110
+                    (id 110 str 2))))
+        (type 110
+            (id 110 str 2))
+        (native 111
+            (string_literal 111  "__add__str__")))
+    (def 113
+        (id 113 __mul__ 156)
+        (formals_list 113
+            (typed_id 113
+                (id 113 x 158)
+                (type 113
+                    (id 113 str 2)))
+            (typed_id 113
+                (id 113 y 160)
+                (type 113
+                    (id 113 int 3))))
+        (type 113
+            (id 113 str 2))
+        (native 114
+            (string_literal 114  "__lmul__str__")))
+    (def 116
+        (id 116 __mul__ 164)
+        (formals_list 116
+            (typed_id 116
+                (id 116 x 166)
+                (type 116
+                    (id 116 int 3)))
+            (typed_id 116
+                (id 116 y 168)
+                (type 116
+                    (id 116 str 2))))
+        (type 116
+            (id 116 str 2))
+        (native 117
+            (string_literal 117  "__rmul__str__")))
+    (def 119
+        (id 119 __lt__ 172)
+        (formals_list 119
+            (typed_id 119
+                (id 119 x 174)
+                (type 119
+                    (id 119 str 2)))
+            (typed_id 119
+                (id 119 y 176)
+                (type 119
+                    (id 119 str 2))))
+        (type 119
+            (id 119 bool 4))
+        (native 120
+            (string_literal 120  "__lt__str__")))
+    (def 122
+        (id 122 __gt__ 180)
+        (formals_list 122
+            (typed_id 122
+                (id 122 x 182)
+                (type 122
+                    (id 122 str 2)))
+            (typed_id 122
+                (id 122 y 184)
+                (type 122
+                    (id 122 str 2))))
+        (type 122
+            (id 122 bool 4))
+        (native 123
+            (string_literal 123  "__gt__str__")))
+    (def 125
+        (id 125 __le__ 188)
+        (formals_list 125
+            (typed_id 125
+                (id 125 x 190)
+                (type 125
+                    (id 125 str 2)))
+            (typed_id 125
+                (id 125 y 192)
+                (type 125
+                    (id 125 str 2))))
+        (type 125
+            (id 125 bool 4))
+        (native 126
+            (string_literal 126  "__le__str__")))
+    (def 128
+        (id 128 __ge__ 196)
+        (formals_list 128
+            (typed_id 128
+                (id 128 x 198)
+                (type 128
+                    (id 128 str 2)))
+            (typed_id 128
+                (id 128 y 200)
+                (type 128
+                    (id 128 str 2))))
+        (type 128
+            (id 128 bool 4))
+        (native 129
+            (string_literal 129  "__ge__str__")))
+    (def 131
+        (id 131 __eq__ 204)
+        (formals_list 131
+            (typed_id 131
+                (id 131 x 206)
+                (type 131
+                    (id 131 str 2)))
+            (typed_id 131
+                (id 131 y 208)
+                (type 131
+                    (id 131 str 2))))
+        (type 131
+            (id 131 bool 4))
+        (native 132
+            (string_literal 132  "__eq__str__")))
+    (def 134
+        (id 134 __ne__ 212)
+        (formals_list 134
+            (typed_id 134
+                (id 134 x 214)
+                (type 134
+                    (id 134 str 2)))
+            (typed_id 134
+                (id 134 y 216)
+                (type 134
+                    (id 134 str 2))))
+        (type 134
+            (id 134 bool 4))
+        (native 135
+            (string_literal 135  "__ne__str__")))
+    (def 137
+        (id 137 __getitem__ 220)
+        (formals_list 137
+            (typed_id 137
+                (id 137 S 222)
+                (type 137
+                    (id 137 str 2)))
+            (typed_id 137
+                (id 137 k 224)
+                (type 137
+                    (id 137 int 3))))
+        (type 137
+            (id 137 str 2))
+        (native 138
+            (string_literal 138  "__getitem__str__")))
+    (def 140
+        (id 140 __getslice__ 229)
+        (formals_list 140
+            (typed_id 140
+                (id 140 S 231)
+                (type 140
+                    (id 140 str 2)))
+            (typed_id 140
+                (id 140 L 233)
+                (type 140
+                    (id 140 int 3)))
+            (typed_id 140
+                (id 140 U 235)
+                (type 140
+                    (id 140 int 3))))
+        (type 140
+            (id 140 str 2))
+        (native 141
+            (string_literal 141  "__getslice__str__")))
+    (def 143
+        (id 143 len 238)
+        (formals_list 143
+            (typed_id 143
+                (id 143 S 240)
+                (type 143
+                    (id 143 str 2))))
+        (type 143
+            (id 143 int 3))
+        (native 144
+            (string_literal 144  "__len__str__")))
+    (def 147
+        (id 147 tostr 243)
+        (formals_list 147
+            (typed_id 147
+                (id 147 x 245)
+                (type_var 0 $#168 242)))
+        (type 147
+            (id 147 str 2))
+        (native 148
+            (string_literal 148  "__tostr__")))
+    (def 152
+        (id 152 __getitem__ 249)
+        (formals_list 152
+            (typed_id 152
+                (id 152 S 251)
+                (type 152
+                    (id 152 list 6)
+                    (type_var 152 $a 254)))
+            (typed_id 152
+                (id 152 k 253)
+                (type 152
+                    (id 152 int 3))))
+        (type_var 152 $a 254)
+        (native 153
+            (string_literal 153  "__getitem__list__")))
+    (def 155
+        (id 155 __getslice__ 259)
+        (formals_list 155
+            (typed_id 155
+                (id 155 S 261)
+                (type 155
+                    (id 155 list 6)
+                    (type_var 155 $a 266)))
+            (typed_id 155
+                (id 155 L 263)
+                (type 155
+                    (id 155 int 3)))
+            (typed_id 155
+                (id 155 U 265)
+                (type 155
+                    (id 155 int 3))))
+        (type 155
+            (id 155 list 6)
+            (type_var 155 $a 266))
+        (native 156
+            (string_literal 156  "__getslice__list__")))
+    (def 164
+        (id 164 len 269)
+        (formals_list 164
+            (typed_id 164
+                (id 164 S 271)
+                (type 164
+                    (id 164 list 6)
+                    (type_var 164 $a 272))))
+        (type 164
+            (id 164 int 3))
+        (native 165
+            (string_literal 165  "__len__list__")))
+    (def 181
+        (id 181 __getitem__ 276)
+        (formals_list 181
+            (typed_id 181
+                (id 181 D 278)
+                (type 181
+                    (id 181 dict 8)
+                    (type 181
+                        (id 181 int 3))
+                    (type_var 181 $b 281)))
+            (typed_id 181
+                (id 181 x 280)
+                (type 181
+                    (id 181 int 3))))
+        (type_var 181 $b 281)
+        (native 182
+            (string_literal 182  "__getitem__dict__")))
+    (def 184
+        (id 184 __getitem__ 285)
+        (formals_list 184
+            (typed_id 184
+                (id 184 D 287)
+                (type 184
+                    (id 184 dict 8)
+                    (type 184
+                        (id 184 bool 4))
+                    (type_var 184 $b 290)))
+            (typed_id 184
+                (id 184 x 289)
+                (type 184
+                    (id 184 bool 4))))
+        (type_var 184 $b 290)
+        (native 185
+            (string_literal 185  "__getitem__dict__")))
+    (def 187
+        (id 187 __getitem__ 294)
+        (formals_list 187
+            (typed_id 187
+                (id 187 D 296)
+                (type 187
+                    (id 187 dict 8)
+                    (type 187
+                        (id 187 str 2))
+                    (type_var 187 $b 299)))
+            (typed_id 187
+                (id 187 x 298)
+                (type 187
+                    (id 187 str 2))))
+        (type_var 187 $b 299)
+        (native 188
+            (string_literal 188  "__getitem__dict__")))
+    (def 199
+        (id 199 len 302)
+        (formals_list 199
+            (typed_id 199
+                (id 199 D 304)
+                (type 199
+                    (id 199 dict 8)
+                    (type 199
+                        (id 199 int 3))
+                    (type_var 199 $b 305))))
+        (type 199
+            (id 199 int 3))
+        (native 200
+            (string_literal 200  "__len__dict__")))
+    (def 202
+        (id 202 len 308)
+        (formals_list 202
+            (typed_id 202
+                (id 202 D 310)
+                (type 202
+                    (id 202 dict 8)
+                    (type 202
+                        (id 202 bool 4))
+                    (type_var 202 $b 311))))
+        (type 202
+            (id 202 int 3))
+        (native 203
+            (string_literal 203  "__len__dict__")))
+    (def 205
+        (id 205 len 314)
+        (formals_list 205
+            (typed_id 205
+                (id 205 D 316)
+                (type 205
+                    (id 205 dict 8)
+                    (type 205
+                        (id 205 str 2))
+                    (type_var 205 $b 317))))
+        (type 205
+            (id 205 int 3))
+        (native 206
+            (string_literal 206  "__len__dict__")))
+    (def 208
+        (id 208 __in__ 321)
+        (formals_list 208
+            (typed_id 208
+                (id 208 x 323)
+                (type 208
+                    (id 208 int 3)))
+            (typed_id 208
+                (id 208 D 325)
+                (type 208
+                    (id 208 dict 8)
+                    (type 208
+                        (id 208 int 3))
+                    (type_var 208 $b 326))))
+        (type 208
+            (id 208 bool 4))
+        (native 209
+            (string_literal 209  "__contains__dict__")))
+    (def 211
+        (id 211 __in__ 330)
+        (formals_list 211
+            (typed_id 211
+                (id 211 x 332)
+                (type 211
+                    (id 211 bool 4)))
+            (typed_id 211
+                (id 211 D 334)
+                (type 211
+                    (id 211 dict 8)
+                    (type 211
+                        (id 211 bool 4))
+                    (type_var 211 $b 335))))
+        (type 211
+            (id 211 bool 4))
+        (native 212
+            (string_literal 212  "__contains__dict__")))
+    (def 214
+        (id 214 __in__ 339)
+        (formals_list 214
+            (typed_id 214
+                (id 214 x 341)
+                (type 214
+                    (id 214 str 2)))
+            (typed_id 214
+                (id 214 D 343)
+                (type 214
+                    (id 214 dict 8)
+                    (type 214
+                        (id 214 str 2))
+                    (type_var 214 $b 344))))
+        (type 214
+            (id 214 bool 4))
+        (native 215
+            (string_literal 215  "__contains__dict__")))
+    (def 217
+        (id 217 __notin__ 348)
+        (formals_list 217
+            (typed_id 217
+                (id 217 x 350)
+                (type 217
+                    (id 217 int 3)))
+            (typed_id 217
+                (id 217 D 352)
+                (type 217
+                    (id 217 dict 8)
+                    (type 217
+                        (id 217 int 3))
+                    (type_var 217 $b 353))))
+        (type 217
+            (id 217 bool 4))
+        (native 218
+            (string_literal 218  "__notcontains__dict__")))
+    (def 220
+        (id 220 __notin__ 357)
+        (formals_list 220
+            (typed_id 220
+                (id 220 x 359)
+                (type 220
+                    (id 220 bool 4)))
+            (typed_id 220
+                (id 220 D 361)
+                (type 220
+                    (id 220 dict 8)
+                    (type 220
+                        (id 220 bool 4))
+                    (type_var 220 $b 362))))
+        (type 220
+            (id 220 bool 4))
+        (native 221
+            (string_literal 221  "__notcontains__dict__")))
+    (def 223
+        (id 223 __notin__ 366)
+        (formals_list 223
+            (typed_id 223
+                (id 223 x 368)
+                (type 223
+                    (id 223 str 2)))
+            (typed_id 223
+                (id 223 D 370)
+                (type 223
+                    (id 223 dict 8)
+                    (type 223
+                        (id 223 str 2))
+                    (type_var 223 $b 371))))
+        (type 223
+            (id 223 bool 4))
+        (native 224
+            (string_literal 224  "__notcontains__dict__")))
+    (println 23
+        (call 23
+            (id 23 len 308)
+            (dict_display 0
+                (pair 0
+                    (True 0)
+                    (False 0))
+                (pair 0
+                    (False 0)
+                    (True 0))
+                (type 0
+                    (id 0 dict 8)
+                    (type 0
+                        (id 0 bool 4))
+                    (type 0
+                        (id 0 bool 4))))
+            (type 202
+                (id 202 int 3))))
+    (println 24
+        (call 24
+            (id 24 len 314)
+            (dict_display 24
+                (pair 24
+                    (string_literal 24  "a")
+                    (int_literal 24 6))
+                (pair 24
+                    (string_literal 24  "b")
+                    (int_literal 24 7))
+                (pair 24
+                    (string_literal 24  "c")
+                    (int_literal 24 8))
+                (pair 24
+                    (string_literal 24  "d")
+                    (int_literal 24 9))
+                (type 0
+                    (id 0 dict 8)
+                    (type 0
+                        (id 0 str 2))
+                    (type 0
+                        (id 0 int 3))))
+            (type 205
+                (id 205 int 3))))
+    (println 25
+        (call 25
+            (id 25 len 302)
+            (dict_display 25
+                (pair 25
+                    (int_literal 25 1)
+                    (int_literal 25 6))
+                (pair 25
+                    (int_literal 25 2)
+                    (int_literal 25 7))
+                (pair 25
+                    (int_literal 25 3)
+                    (int_literal 25 8))
+                (pair 25
+                    (int_literal 25 5)
+                    (int_literal 25 9))
+                (type 0
+                    (id 0 dict 8)
+                    (type 0
+                        (id 0 int 3))
+                    (type 0
+                        (id 0 int 3))))
+            (type 199
+                (id 199 int 3)))))(moduledecl 1 __main__  (index_list 2 3 4 5 6 8 11 12 14 17 24 31 37 45 53 61 69 77 84 89 95 103 111 119 127 135 142 148 156 164 172 180 188 196 204 212 220 229 238 243 249 259 269 276 285 294 302 308 314 321 330 339 348 357 366))
+(classdecl 2 str  (index_list) (index_list))
+(classdecl 3 int  (index_list) (index_list))
+(classdecl 4 bool  (index_list) (index_list))
+(classdecl 5 range  (index_list) (index_list))
+(classdecl 6 list  (index_list 7) (index_list 7))
+(typevardecl 7 $T  (type_var 22 $T 7))
+(classdecl 8 dict  (index_list 9 10) (index_list 9 10))
+(typevardecl 9 $Key  (type_var 25 $Key 9))
+(typevardecl 10 $Value  (type_var 25 $Value 10))
+(classdecl 11 tuple0  (index_list) (index_list))
+(classdecl 12 tuple1  (index_list 13) (index_list 13))
+(typevardecl 13 $T0  (type_var 31 $T0 13))
+(classdecl 14 tuple2  (index_list 15 16) (index_list 15 16))
+(typevardecl 15 $T1  (type_var 34 $T1 15))
+(typevardecl 16 $T2  (type_var 34 $T2 16))
+(classdecl 17 tuple3  (index_list 18 19 20) (index_list 18 19 20))
+(typevardecl 18 $T1  (type_var 37 $T1 18))
+(typevardecl 19 $T2  (type_var 37 $T2 19))
+(typevardecl 20 $T3  (type_var 37 $T3 20))
+(funcdecl 24 xrange 1  (function_type 54
+    (type 54
+        (id 54 range 5))
+    (type 54
+        (id 54 int 3))
+    (type 54
+        (id 54 int 3))) (index_list 26 28))
+(paramdecl 26 low 24  0 (type 54
+    (id 54 int 3)))
+(paramdecl 28 high 24  1 (type 54
+    (id 54 int 3)))
+(funcdecl 31 len 1  (function_type 57
+    (type 57
+        (id 57 int 3))
+    (type 57
+        (id 57 range 5))) (index_list 33))
+(paramdecl 33 r 31  0 (type 57
+    (id 57 range 5)))
+(funcdecl 37 __add__ 1  (function_type 62
+    (type 62
+        (id 62 int 3))
+    (type 62
+        (id 62 int 3))
+    (type 62
+        (id 62 int 3))) (index_list 39 41))
+(paramdecl 39 x 37  0 (type 62
+    (id 62 int 3)))
+(paramdecl 41 y 37  1 (type 62
+    (id 62 int 3)))
+(funcdecl 45 __sub__ 1  (function_type 65
+    (type 65
+        (id 65 int 3))
+    (type 65
+        (id 65 int 3))
+    (type 65
+        (id 65 int 3))) (index_list 47 49))
+(paramdecl 47 x 45  0 (type 65
+    (id 65 int 3)))
+(paramdecl 49 y 45  1 (type 65
+    (id 65 int 3)))
+(funcdecl 53 __mul__ 1  (function_type 68
+    (type 68
+        (id 68 int 3))
+    (type 68
+        (id 68 int 3))
+    (type 68
+        (id 68 int 3))) (index_list 55 57))
+(paramdecl 55 x 53  0 (type 68
+    (id 68 int 3)))
+(paramdecl 57 y 53  1 (type 68
+    (id 68 int 3)))
+(funcdecl 61 __floordiv__ 1  (function_type 71
+    (type 71
+        (id 71 int 3))
+    (type 71
+        (id 71 int 3))
+    (type 71
+        (id 71 int 3))) (index_list 63 65))
+(paramdecl 63 x 61  0 (type 71
+    (id 71 int 3)))
+(paramdecl 65 y 61  1 (type 71
+    (id 71 int 3)))
+(funcdecl 69 __mod__ 1  (function_type 74
+    (type 74
+        (id 74 int 3))
+    (type 74
+        (id 74 int 3))
+    (type 74
+        (id 74 int 3))) (index_list 71 73))
+(paramdecl 71 x 69  0 (type 74
+    (id 74 int 3)))
+(paramdecl 73 y 69  1 (type 74
+    (id 74 int 3)))
+(funcdecl 77 __pow__ 1  (function_type 77
+    (type 77
+        (id 77 int 3))
+    (type 77
+        (id 77 int 3))
+    (type 77
+        (id 77 int 3))) (index_list 79 81))
+(paramdecl 79 x 77  0 (type 77
+    (id 77 int 3)))
+(paramdecl 81 y 77  1 (type 77
+    (id 77 int 3)))
+(funcdecl 84 __neg__ 1  (function_type 80
+    (type 80
+        (id 80 int 3))
+    (type 80
+        (id 80 int 3))) (index_list 86))
+(paramdecl 86 x 84  0 (type 80
+    (id 80 int 3)))
+(funcdecl 89 __pos__ 1  (function_type 83
+    (type 83
+        (id 83 int 3))
+    (type 83
+        (id 83 int 3))) (index_list 91))
+(paramdecl 91 x 89  0 (type 83
+    (id 83 int 3)))
+(funcdecl 95 __lt__ 1  (function_type 86
+    (type 86
+        (id 86 bool 4))
+    (type 86
+        (id 86 int 3))
+    (type 86
+        (id 86 int 3))) (index_list 97 99))
+(paramdecl 97 x 95  0 (type 86
+    (id 86 int 3)))
+(paramdecl 99 y 95  1 (type 86
+    (id 86 int 3)))
+(funcdecl 103 __gt__ 1  (function_type 89
+    (type 89
+        (id 89 bool 4))
+    (type 89
+        (id 89 int 3))
+    (type 89
+        (id 89 int 3))) (index_list 105 107))
+(paramdecl 105 x 103  0 (type 89
+    (id 89 int 3)))
+(paramdecl 107 y 103  1 (type 89
+    (id 89 int 3)))
+(funcdecl 111 __le__ 1  (function_type 92
+    (type 92
+        (id 92 bool 4))
+    (type 92
+        (id 92 int 3))
+    (type 92
+        (id 92 int 3))) (index_list 113 115))
+(paramdecl 113 x 111  0 (type 92
+    (id 92 int 3)))
+(paramdecl 115 y 111  1 (type 92
+    (id 92 int 3)))
+(funcdecl 119 __ge__ 1  (function_type 95
+    (type 95
+        (id 95 bool 4))
+    (type 95
+        (id 95 int 3))
+    (type 95
+        (id 95 int 3))) (index_list 121 123))
+(paramdecl 121 x 119  0 (type 95
+    (id 95 int 3)))
+(paramdecl 123 y 119  1 (type 95
+    (id 95 int 3)))
+(funcdecl 127 __eq__ 1  (function_type 98
+    (type 98
+        (id 98 bool 4))
+    (type 98
+        (id 98 int 3))
+    (type 98
+        (id 98 int 3))) (index_list 129 131))
+(paramdecl 129 x 127  0 (type 98
+    (id 98 int 3)))
+(paramdecl 131 y 127  1 (type 98
+    (id 98 int 3)))
+(funcdecl 135 __ne__ 1  (function_type 101
+    (type 101
+        (id 101 bool 4))
+    (type 101
+        (id 101 int 3))
+    (type 101
+        (id 101 int 3))) (index_list 137 139))
+(paramdecl 137 x 135  0 (type 101
+    (id 101 int 3)))
+(paramdecl 139 y 135  1 (type 101
+    (id 101 int 3)))
+(funcdecl 142 toint 1  (function_type 105
+    (type 105
+        (id 105 int 3))
+    (type 105
+        (id 105 str 2))) (index_list 144))
+(paramdecl 144 x 142  0 (type 105
+    (id 105 str 2)))
+(funcdecl 148 __add__ 1  (function_type 110
+    (type 110
+        (id 110 str 2))
+    (type 110
+        (id 110 str 2))
+    (type 110
+        (id 110 str 2))) (index_list 150 152))
+(paramdecl 150 x 148  0 (type 110
+    (id 110 str 2)))
+(paramdecl 152 y 148  1 (type 110
+    (id 110 str 2)))
+(funcdecl 156 __mul__ 1  (function_type 113
+    (type 113
+        (id 113 str 2))
+    (type 113
+        (id 113 str 2))
+    (type 113
+        (id 113 int 3))) (index_list 158 160))
+(paramdecl 158 x 156  0 (type 113
+    (id 113 str 2)))
+(paramdecl 160 y 156  1 (type 113
+    (id 113 int 3)))
+(funcdecl 164 __mul__ 1  (function_type 116
+    (type 116
+        (id 116 str 2))
+    (type 116
+        (id 116 int 3))
+    (type 116
+        (id 116 str 2))) (index_list 166 168))
+(paramdecl 166 x 164  0 (type 116
+    (id 116 int 3)))
+(paramdecl 168 y 164  1 (type 116
+    (id 116 str 2)))
+(funcdecl 172 __lt__ 1  (function_type 119
+    (type 119
+        (id 119 bool 4))
+    (type 119
+        (id 119 str 2))
+    (type 119
+        (id 119 str 2))) (index_list 174 176))
+(paramdecl 174 x 172  0 (type 119
+    (id 119 str 2)))
+(paramdecl 176 y 172  1 (type 119
+    (id 119 str 2)))
+(funcdecl 180 __gt__ 1  (function_type 122
+    (type 122
+        (id 122 bool 4))
+    (type 122
+        (id 122 str 2))
+    (type 122
+        (id 122 str 2))) (index_list 182 184))
+(paramdecl 182 x 180  0 (type 122
+    (id 122 str 2)))
+(paramdecl 184 y 180  1 (type 122
+    (id 122 str 2)))
+(funcdecl 188 __le__ 1  (function_type 125
+    (type 125
+        (id 125 bool 4))
+    (type 125
+        (id 125 str 2))
+    (type 125
+        (id 125 str 2))) (index_list 190 192))
+(paramdecl 190 x 188  0 (type 125
+    (id 125 str 2)))
+(paramdecl 192 y 188  1 (type 125
+    (id 125 str 2)))
+(funcdecl 196 __ge__ 1  (function_type 128
+    (type 128
+        (id 128 bool 4))
+    (type 128
+        (id 128 str 2))
+    (type 128
+        (id 128 str 2))) (index_list 198 200))
+(paramdecl 198 x 196  0 (type 128
+    (id 128 str 2)))
+(paramdecl 200 y 196  1 (type 128
+    (id 128 str 2)))
+(funcdecl 204 __eq__ 1  (function_type 131
+    (type 131
+        (id 131 bool 4))
+    (type 131
+        (id 131 str 2))
+    (type 131
+        (id 131 str 2))) (index_list 206 208))
+(paramdecl 206 x 204  0 (type 131
+    (id 131 str 2)))
+(paramdecl 208 y 204  1 (type 131
+    (id 131 str 2)))
+(funcdecl 212 __ne__ 1  (function_type 134
+    (type 134
+        (id 134 bool 4))
+    (type 134
+        (id 134 str 2))
+    (type 134
+        (id 134 str 2))) (index_list 214 216))
+(paramdecl 214 x 212  0 (type 134
+    (id 134 str 2)))
+(paramdecl 216 y 212  1 (type 134
+    (id 134 str 2)))
+(funcdecl 220 __getitem__ 1  (function_type 137
+    (type 137
+        (id 137 str 2))
+    (type 137
+        (id 137 str 2))
+    (type 137
+        (id 137 int 3))) (index_list 222 224))
+(paramdecl 222 S 220  0 (type 137
+    (id 137 str 2)))
+(paramdecl 224 k 220  1 (type 137
+    (id 137 int 3)))
+(funcdecl 229 __getslice__ 1  (function_type 140
+    (type 140
+        (id 140 str 2))
+    (type 140
+        (id 140 str 2))
+    (type 140
+        (id 140 int 3))
+    (type 140
+        (id 140 int 3))) (index_list 231 233 235))
+(paramdecl 231 S 229  0 (type 140
+    (id 140 str 2)))
+(paramdecl 233 L 229  1 (type 140
+    (id 140 int 3)))
+(paramdecl 235 U 229  2 (type 140
+    (id 140 int 3)))
+(funcdecl 238 len 1  (function_type 143
+    (type 143
+        (id 143 int 3))
+    (type 143
+        (id 143 str 2))) (index_list 240))
+(paramdecl 240 S 238  0 (type 143
+    (id 143 str 2)))
+(typevardecl 242 $#168  (type_var 0 $#168 242))
+(funcdecl 243 tostr 1  (function_type 147
+    (type 147
+        (id 147 str 2))
+    (type_var 0 $#168 242)) (index_list 245))
+(paramdecl 245 x 243  0 (type_var 0 $#168 242))
+(funcdecl 249 __getitem__ 1  (function_type 152
+    (type_var 152 $a 254)
+    (type 152
+        (id 152 list 6)
+        (type_var 152 $a 254))
+    (type 152
+        (id 152 int 3))) (index_list 251 253 254))
+(paramdecl 251 S 249  0 (type 152
+    (id 152 list 6)
+    (type_var 152 $a 254)))
+(paramdecl 253 k 249  1 (type 152
+    (id 152 int 3)))
+(typevardecl 254 $a  (type_var 152 $a 254))
+(funcdecl 259 __getslice__ 1  (function_type 155
+    (type 155
+        (id 155 list 6)
+        (type_var 155 $a 266))
+    (type 155
+        (id 155 list 6)
+        (type_var 155 $a 266))
+    (type 155
+        (id 155 int 3))
+    (type 155
+        (id 155 int 3))) (index_list 261 263 265 266))
+(paramdecl 261 S 259  0 (type 155
+    (id 155 list 6)
+    (type_var 155 $a 266)))
+(paramdecl 263 L 259  1 (type 155
+    (id 155 int 3)))
+(paramdecl 265 U 259  2 (type 155
+    (id 155 int 3)))
+(typevardecl 266 $a  (type_var 155 $a 266))
+(funcdecl 269 len 1  (function_type 164
+    (type 164
+        (id 164 int 3))
+    (type 164
+        (id 164 list 6)
+        (type_var 164 $a 272))) (index_list 271 272))
+(paramdecl 271 S 269  0 (type 164
+    (id 164 list 6)
+    (type_var 164 $a 272)))
+(typevardecl 272 $a  (type_var 164 $a 272))
+(funcdecl 276 __getitem__ 1  (function_type 181
+    (type_var 181 $b 281)
+    (type 181
+        (id 181 dict 8)
+        (type 181
+            (id 181 int 3))
+        (type_var 181 $b 281))
+    (type 181
+        (id 181 int 3))) (index_list 278 280 281))
+(paramdecl 278 D 276  0 (type 181
+    (id 181 dict 8)
+    (type 181
+        (id 181 int 3))
+    (type_var 181 $b 281)))
+(paramdecl 280 x 276  1 (type 181
+    (id 181 int 3)))
+(typevardecl 281 $b  (type_var 181 $b 281))
+(funcdecl 285 __getitem__ 1  (function_type 184
+    (type_var 184 $b 290)
+    (type 184
+        (id 184 dict 8)
+        (type 184
+            (id 184 bool 4))
+        (type_var 184 $b 290))
+    (type 184
+        (id 184 bool 4))) (index_list 287 289 290))
+(paramdecl 287 D 285  0 (type 184
+    (id 184 dict 8)
+    (type 184
+        (id 184 bool 4))
+    (type_var 184 $b 290)))
+(paramdecl 289 x 285  1 (type 184
+    (id 184 bool 4)))
+(typevardecl 290 $b  (type_var 184 $b 290))
+(funcdecl 294 __getitem__ 1  (function_type 187
+    (type_var 187 $b 299)
+    (type 187
+        (id 187 dict 8)
+        (type 187
+            (id 187 str 2))
+        (type_var 187 $b 299))
+    (type 187
+        (id 187 str 2))) (index_list 296 298 299))
+(paramdecl 296 D 294  0 (type 187
+    (id 187 dict 8)
+    (type 187
+        (id 187 str 2))
+    (type_var 187 $b 299)))
+(paramdecl 298 x 294  1 (type 187
+    (id 187 str 2)))
+(typevardecl 299 $b  (type_var 187 $b 299))
+(funcdecl 302 len 1  (function_type 199
+    (type 199
+        (id 199 int 3))
+    (type 199
+        (id 199 dict 8)
+        (type 199
+            (id 199 int 3))
+        (type_var 199 $b 305))) (index_list 304 305))
+(paramdecl 304 D 302  0 (type 199
+    (id 199 dict 8)
+    (type 199
+        (id 199 int 3))
+    (type_var 199 $b 305)))
+(typevardecl 305 $b  (type_var 199 $b 305))
+(funcdecl 308 len 1  (function_type 202
+    (type 202
+        (id 202 int 3))
+    (type 202
+        (id 202 dict 8)
+        (type 202
+            (id 202 bool 4))
+        (type_var 202 $b 311))) (index_list 310 311))
+(paramdecl 310 D 308  0 (type 202
+    (id 202 dict 8)
+    (type 202
+        (id 202 bool 4))
+    (type_var 202 $b 311)))
+(typevardecl 311 $b  (type_var 202 $b 311))
+(funcdecl 314 len 1  (function_type 205
+    (type 205
+        (id 205 int 3))
+    (type 205
+        (id 205 dict 8)
+        (type 205
+            (id 205 str 2))
+        (type_var 205 $b 317))) (index_list 316 317))
+(paramdecl 316 D 314  0 (type 205
+    (id 205 dict 8)
+    (type 205
+        (id 205 str 2))
+    (type_var 205 $b 317)))
+(typevardecl 317 $b  (type_var 205 $b 317))
+(funcdecl 321 __in__ 1  (function_type 208
+    (type 208
+        (id 208 bool 4))
+    (type 208
+        (id 208 int 3))
+    (type 208
+        (id 208 dict 8)
+        (type 208
+            (id 208 int 3))
+        (type_var 208 $b 326))) (index_list 323 325 326))
+(paramdecl 323 x 321  0 (type 208
+    (id 208 int 3)))
+(paramdecl 325 D 321  1 (type 208
+    (id 208 dict 8)
+    (type 208
+        (id 208 int 3))
+    (type_var 208 $b 326)))
+(typevardecl 326 $b  (type_var 208 $b 326))
+(funcdecl 330 __in__ 1  (function_type 211
+    (type 211
+        (id 211 bool 4))
+    (type 211
+        (id 211 bool 4))
+    (type 211
+        (id 211 dict 8)
+        (type 211
+            (id 211 bool 4))
+        (type_var 211 $b 335))) (index_list 332 334 335))
+(paramdecl 332 x 330  0 (type 211
+    (id 211 bool 4)))
+(paramdecl 334 D 330  1 (type 211
+    (id 211 dict 8)
+    (type 211
+        (id 211 bool 4))
+    (type_var 211 $b 335)))
+(typevardecl 335 $b  (type_var 211 $b 335))
+(funcdecl 339 __in__ 1  (function_type 214
+    (type 214
+        (id 214 bool 4))
+    (type 214
+        (id 214 str 2))
+    (type 214
+        (id 214 dict 8)
+        (type 214
+            (id 214 str 2))
+        (type_var 214 $b 344))) (index_list 341 343 344))
+(paramdecl 341 x 339  0 (type 214
+    (id 214 str 2)))
+(paramdecl 343 D 339  1 (type 214
+    (id 214 dict 8)
+    (type 214
+        (id 214 str 2))
+    (type_var 214 $b 344)))
+(typevardecl 344 $b  (type_var 214 $b 344))
+(funcdecl 348 __notin__ 1  (function_type 217
+    (type 217
+        (id 217 bool 4))
+    (type 217
+        (id 217 int 3))
+    (type 217
+        (id 217 dict 8)
+        (type 217
+            (id 217 int 3))
+        (type_var 217 $b 353))) (index_list 350 352 353))
+(paramdecl 350 x 348  0 (type 217
+    (id 217 int 3)))
+(paramdecl 352 D 348  1 (type 217
+    (id 217 dict 8)
+    (type 217
+        (id 217 int 3))
+    (type_var 217 $b 353)))
+(typevardecl 353 $b  (type_var 217 $b 353))
+(funcdecl 357 __notin__ 1  (function_type 220
+    (type 220
+        (id 220 bool 4))
+    (type 220
+        (id 220 bool 4))
+    (type 220
+        (id 220 dict 8)
+        (type 220
+            (id 220 bool 4))
+        (type_var 220 $b 362))) (index_list 359 361 362))
+(paramdecl 359 x 357  0 (type 220
+    (id 220 bool 4)))
+(paramdecl 361 D 357  1 (type 220
+    (id 220 dict 8)
+    (type 220
+        (id 220 bool 4))
+    (type_var 220 $b 362)))
+(typevardecl 362 $b  (type_var 220 $b 362))
+(funcdecl 366 __notin__ 1  (function_type 223
+    (type 223
+        (id 223 bool 4))
+    (type 223
+        (id 223 str 2))
+    (type 223
+        (id 223 dict 8)
+        (type 223
+            (id 223 str 2))
+        (type_var 223 $b 371))) (index_list 368 370 371))
+(paramdecl 368 x 366  0 (type 223
+    (id 223 str 2)))
+(paramdecl 370 D 366  1 (type 223
+    (id 223 dict 8)
+    (type 223
+        (id 223 str 2))
+    (type_var 223 $b 371)))
+(typevardecl 371 $b  (type_var 223 $b 371))

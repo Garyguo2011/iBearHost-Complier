@@ -492,6 +492,7 @@ PyTuple1::toStr()
     string str = "";
     str += "(";
     str += _vals[0]->toStr();
+    str += ",";
     str +=")";
     return str;
 }

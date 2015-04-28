@@ -179,10 +179,14 @@ PyBool* __notin__(PyStr* x, PyDictStr* D)
 {
 return __notcontains__dict__(x , D );
 }
+PyInt* f(PyInt* a, PyStr* b, PyValue c)
+{
+__print__(1, __cons_str__ ("lala"));
+return a ;
+}
 void
 __main__()
 {
-__print__(1, len(__cons_list__(3, __cons_int__ (1), __cons_int__ (2), __cons_int__ (3)))
-);
+f(__cons_int__ (1), __cons_str__ ("i"), __cons_int__ (2))
 
 }
