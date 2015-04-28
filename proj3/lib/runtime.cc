@@ -354,8 +354,13 @@ PyDict::insert(PyValue elt)
 PyValue
 PyDict::get(PyValue key)
 {
-    //cerr << items.count(key) << ", lala\n";
-    return items[key];
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            return it->second;
+        }
+        
+    }
+    return PyNone;
 }
 
 PyBool*
