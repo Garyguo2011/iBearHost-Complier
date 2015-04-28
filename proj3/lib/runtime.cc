@@ -354,8 +354,13 @@ PyDict::insert(PyValue elt)
 PyValue
 PyDict::get(PyValue key)
 {
-    //cerr << items.count(key) << ", lala\n";
-    return items[key];
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            return it->second;
+        }
+        
+    }
+    return PyNone;
 }
 
 PyBool*
@@ -946,12 +951,22 @@ __readline__ ()
 static bool atStart;
 
 void
-__print__ (PyValue v)
+__print__ (int count, ...)
 {
-    if (!atStart) 
-	cout << " ";
-    atStart = false;
-    v->print (cout);
+ //    if (!atStart) 
+	// cout << " ";
+    va_list args;
+    va_start(args, count);
+    // atStart = false;
+    for (int i = 0; i < count; i ++) {
+        PyValue temp = va_arg(args, PyValue);
+        temp->print(cout);
+        if (i < count-1) {
+            cout << " ";
+        }
+    }
+    va_end(args);
+    cout << "\n";
 }
 
 

@@ -313,7 +313,9 @@ protected:
 
     void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver) {
         int errs0 = numErrors ();
-        Typed_Tree::resolveTypes (context, subst, resolver);
+        child (1)->resolveTypes (context, subst, resolver);
+        child (0)->resolveTypes (context, subst, resolver, 
+                                 child (1)->getType ());
         if (!unify (child (0)->getType (), child (1)->getType (), subst)
             && errs0 == numErrors ())
             error (this, "type mismatch in assignment");

@@ -23,9 +23,16 @@ protected:
     void codeGen ()
     {
         cout << "__print__(";
-        for_each_child_var(c, this) {
-            c->codeGen();
-        } end_for;
+        cout << arity() << ", ";
+        // for_each_child_var(c, this) {
+        //     c->codeGen();
+        // } end_for;
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
         cout << ");" << endl;
         //PASSDOWN (this, codeGen(), 0);
     }
