@@ -866,7 +866,7 @@ __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
         temp2 = size;
     }
     if (temp1 > temp2 ) {
-        return new PyList()
+        return new PyList();
     }
     PyList* list = new PyList();
     for (int i = temp1; i < temp2; i++) {
