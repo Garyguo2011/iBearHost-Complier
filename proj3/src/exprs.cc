@@ -400,7 +400,10 @@ protected:
 
     void codeGen() {
         cout << "__cons_list__("
-             << arity() << ", ";
+             << arity();
+        if (arity() != 0) {
+            cout << ", ";
+        }
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
             if (i < arity()-1) {

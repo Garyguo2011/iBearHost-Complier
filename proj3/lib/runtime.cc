@@ -955,6 +955,9 @@ __print__ (int count, ...)
 {
  //    if (!atStart) 
 	// cout << " ";
+    // if (count == 0) {
+    //     cout << "";
+    // }
     va_list args;
     va_start(args, count);
     // atStart = false;
