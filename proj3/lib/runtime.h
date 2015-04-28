@@ -32,6 +32,9 @@ class PyTuple2;
 class PyTuple3;
 
 class PyPair;
+class PyDictInt;
+class PyDictStr;
+class PyDictBool;
 
 extern const PyValue PyNone;
 extern const PyValue PyTrue;
@@ -162,6 +165,21 @@ public:
 
 private:
     map<PyValue, PyValue> items;
+};
+
+class PyDictInt : public PyDict {
+public:
+    const char* typeName ();
+};
+
+class PyDictStr : public PyDict {
+public:
+    const char* typeName ();
+};
+
+class PyDictBool : public PyDict {
+public:
+    const char* typeName ();
 };
 
 class PyTuple0 : public PyObject {
@@ -361,6 +379,48 @@ __cons_dict__ (int count, ...)
     for (int i = 0; i < count; i ++) {
         PyValue temp = va_arg(args, PyValue);
         dict->asDict()->insert(temp);
+    }
+    va_end(args);
+    return dict;
+}
+
+static inline PyDictInt*
+__cons_dictint__ (int count, ...)
+{
+    va_list args;
+    va_start(args, count);
+    PyDictInt* dict = new PyDictInt();
+    for (int i = 0; i < count; i ++) {
+        PyValue temp = va_arg(args, PyValue);
+        dict->insert(temp);
+    }
+    va_end(args);
+    return dict;
+}
+
+static inline PyDictStr*
+__cons_dictstr__ (int count, ...)
+{
+    va_list args;
+    va_start(args, count);
+    PyDictStr* dict = new PyDictStr();
+    for (int i = 0; i < count; i ++) {
+        PyValue temp = va_arg(args, PyValue);
+        dict->insert(temp);
+    }
+    va_end(args);
+    return dict;
+}
+
+static inline PyDictBool*
+__cons_dictbool__ (int count, ...)
+{
+    va_list args;
+    va_start(args, count);
+    PyDictBool* dict = new PyDictBool();
+    for (int i = 0; i < count; i ++) {
+        PyValue temp = va_arg(args, PyValue);
+        dict->insert(temp);
     }
     va_end(args);
     return dict;

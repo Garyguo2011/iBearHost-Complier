@@ -20,4 +20,4 @@
 # print 1 in {4 : 12, 2 : 1}
 # print "01234"[-1]
 # print len([])
-print()
+print len({"lal" : 1, "ll" : 3})

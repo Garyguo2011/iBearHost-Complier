@@ -400,6 +400,30 @@ PyDict::toStr ()
     return str;
 }
 
+/* PyDictInt */
+
+const char*
+PyDictInt::typeName ()
+{
+    return "dictInt";
+}
+
+/* PyDictStr */
+
+const char*
+PyDictStr::typeName ()
+{
+    return "dictStr";
+}
+
+/* PyDictBool */
+
+const char*
+PyDictBool::typeName ()
+{
+    return "dictBool";
+}
+
 /* Pair */
 PyPair::PyPair(PyValue val0, PyValue val1) {
     _val = make_pair (val0, val1);
@@ -866,7 +890,7 @@ __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
         temp2 = size;
     }
     if (temp1 > temp2 ) {
-        return new PyList()
+        return new PyList();
     }
     PyList* list = new PyList();
     for (int i = temp1; i < temp2; i++) {

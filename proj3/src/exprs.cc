@@ -427,7 +427,13 @@ protected:
     NODE_CONSTRUCTORS (DictDisplay_AST, Typed_Tree);
 
     void codeGen() {
-        cout << "__cons_dict__("
+        // getType()->print(cerr, 4);
+        // cerr << "\n";
+        // cerr << getType()->arity() << ", size\n";
+        const char* temp = getType()->child(1)->child(0)->as_string().c_str();
+        cout << "__cons_dict";
+        cout << temp;
+        cout << "__("
             << arity() << ", ";
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
@@ -568,6 +574,11 @@ protected:
         //     }
         // }
         // fprintf(stderr, "%s\n", temp);
+        // if (getType()->arity() == 3) {
+        //     cerr << getType()->child(1)->child(0)->as_string();
+        //     cerr << "\n";
+        // }
+        
 
         if (((std::string) temp).compare("str") == 0) {
             temp = "PyStr*";
@@ -589,6 +600,14 @@ protected:
         }
         else if (((std::string) temp).compare("dict") == 0) {
             temp = "PyDict*";
+            if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("int") == 0)
+            {
+                temp = "PyDictInt*";
+            } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("str") == 0) {
+                temp = "PyDictStr*";
+            } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("bool") == 0) {
+                temp = "PyDictBool*";
+            }
         }
         else if (((std::string) temp).compare("tuple0") == 0) {
             temp = "PyTuple0*";

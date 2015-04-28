@@ -131,49 +131,58 @@ PyInt* len(PyList* S)
 {
 return __len__list__(S );
 }
-PyValue __getitem__(PyDict* D, PyInt* x)
+PyValue __getitem__(PyDictInt* D, PyInt* x)
 {
 return __getitem__dict__(D , x );
 }
-PyValue __getitem__(PyDict* D, PyBool* x)
+PyValue __getitem__(PyDictBool* D, PyBool* x)
 {
 return __getitem__dict__(D , x );
 }
-PyValue __getitem__(PyDict* D, PyStr* x)
+PyValue __getitem__(PyDictStr* D, PyStr* x)
 {
 return __getitem__dict__(D , x );
 }
-PyInt* len(PyDict* D)
+PyInt* len(PyDictInt* D)
 {
 return __len__dict__(D );
 }
-PyBool* __contains__(PyInt* x, PyDict* D)
+PyInt* len(PyDictBool* D)
+{
+return __len__dict__(D );
+}
+PyInt* len(PyDictStr* D)
+{
+return __len__dict__(D );
+}
+PyBool* __in__(PyInt* x, PyDictInt* D)
 {
 return __contains__dict__(x , D );
 }
-PyBool* __contains__(PyBool* x, PyDict* D)
+PyBool* __in__(PyBool* x, PyDictBool* D)
 {
 return __contains__dict__(x , D );
 }
-PyBool* __contains__(PyStr* x, PyDict* D)
+PyBool* __in__(PyStr* x, PyDictStr* D)
 {
 return __contains__dict__(x , D );
 }
-PyBool* __notcontains__(PyInt* x, PyDict* D)
+PyBool* __notin__(PyInt* x, PyDictInt* D)
 {
 return __notcontains__dict__(x , D );
 }
-PyBool* __notcontains__(PyBool* x, PyDict* D)
+PyBool* __notin__(PyBool* x, PyDictBool* D)
 {
 return __notcontains__dict__(x , D );
 }
-PyBool* __notcontains__(PyStr* x, PyDict* D)
+PyBool* __notin__(PyStr* x, PyDictStr* D)
 {
 return __notcontains__dict__(x , D );
 }
 void
 __main__()
 {
-__print__(2, __cons_tuple2__(__cons_int__ (1), __cons_int__ (2)), __add__ (__cons_int__ (1), __cons_int__ (2)));
+__print__(1, len(__cons_list__(3, __cons_int__ (1), __cons_int__ (2), __cons_int__ (3)))
+);
 
 }

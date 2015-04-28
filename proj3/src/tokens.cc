@@ -151,6 +151,14 @@ protected:
         // }
         // else if (((std::string) temp).compare("dict") == 0) {
         //     temp = "PyDict*";
+        // if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("int"))
+        //     {
+        //         temp = "PyDictInt*"
+        //     } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("str")) {
+        //         temp = "PyDictStr*";
+        //     } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("bool")) {
+        //         temp = "PyDictBool*";
+        //     }
         // }
         // else if (((std::string) temp).compare("tuple0") == 0) {
         //     temp = "PyTuple0*";
