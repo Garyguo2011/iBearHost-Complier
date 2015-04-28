@@ -19,4 +19,5 @@
 # print __contains__("fjeowifj", {"haha" : 12, "lala" : 1})
 # print 1 in {4 : 12, 2 : 1}
 # print "01234"[-1]
-print len([])
+# print len([])
+print()
