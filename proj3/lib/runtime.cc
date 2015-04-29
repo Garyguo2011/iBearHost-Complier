@@ -1006,7 +1006,6 @@ __print__ (int count, ...)
         }
     }
     va_end(args);
-    cout << "\n";
 }
 
 
