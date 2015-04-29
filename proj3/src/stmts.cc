@@ -115,9 +115,6 @@ protected:
         else if (((std::string) temp).compare("bool") == 0) {
             temp = "PyBool*";
         }
-        else if (((std::string) temp).compare("str") == 0) {
-            temp = "PyStr*";
-        }
         else if (((std::string) temp).compare("range") == 0) {
             temp = "PyRange*";
         }
