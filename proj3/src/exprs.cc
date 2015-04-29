@@ -157,7 +157,7 @@ protected:
                 cout << ", ";   
             }
         }
-        cout << ")" << endl;
+        cout << ")";
     }
 
 };
