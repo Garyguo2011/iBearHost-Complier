@@ -57,6 +57,11 @@ protected:
 	return "println";
     }
 
+    void codeGen() {
+        Print_AST::codeGen();
+        cout << "__newline__();" << endl;
+    }
+
 };
 
 NODE_FACTORY (Println_AST, PRINTLN);
