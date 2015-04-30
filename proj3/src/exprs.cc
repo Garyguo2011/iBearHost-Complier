@@ -77,6 +77,11 @@ protected:
         cout << "__cons_bool__ ("
              << 1
              << ")";
+        // cout << true;
+    }
+
+    void codeGenCondition() {
+        cout << true;
     }
 
 };
@@ -99,6 +104,10 @@ protected:
         cout << "__cons_bool__ ("
              << 0
              << ")";
+        // cout << false;
+    }
+    void codeGenCondition() {
+        cout << false;
     }
 
 };

@@ -182,7 +182,7 @@ return __notcontains__dict__(x , D );
 void
 __main__()
 {
-if (__cons_bool__ (0)) {
+if (0) {
 __print__(1, __cons_int__ (0));
 __newline__();
 }
@@ -190,5 +190,9 @@ else {
 __print__(1, __cons_int__ (1));
 __newline__();
 }
+__print__(1, __cons_bool__ (1));
+__newline__();
+__print__(1, __cons_bool__ (0));
+__newline__();
 
 }

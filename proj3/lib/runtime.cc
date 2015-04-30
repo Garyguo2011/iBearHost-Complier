@@ -209,16 +209,6 @@ PyBool::toStr()
     }
 }
 
-void
-PyBool::print(ostream& os)
-{
-    if (_val) {
-        os << 1;
-    } else {
-        os << 0;
-    }
-}
-
 PyBool*
 PyBool::notBool()
 {
@@ -245,6 +235,10 @@ const char*
 PyBool::typeName ()
 {
     return "bool";
+}
+bool
+PyBool::getValue() {
+    return _val;
 }
 
 /* Ranges */
@@ -1010,7 +1004,7 @@ __print__ (int count, ...)
     // atStart = false;
     for (int i = 0; i < count; i ++) {
         PyValue temp = va_arg(args, PyValue);
-        temp->print(cout);
+        temp->print(cout);   
         if (i < count-1) {
             cout << " ";
         }

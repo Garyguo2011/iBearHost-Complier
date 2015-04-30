@@ -378,7 +378,11 @@ protected:
     void codeGen ()
     {
         cout << "if (";
-        child(0)->codeGen();
+        if (child(0)->oper()->syntax() == TRUE || child(0)->oper()->syntax() == FALSE) {
+            child(0)->codeGenCondition();
+        } else {
+            child(0)->codeGen();
+        }
         cout << ") {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
@@ -405,7 +409,11 @@ protected:
     void codeGen ()
     {
         cout << "while (";
-        child(0)->codeGen();
+        if (child(0)->oper()->syntax() == TRUE || child(0)->oper()->syntax() == FALSE) {
+            child(0)->codeGenCondition();
+        } else {
+            child(0)->codeGen();
+        }
         cout << ") {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
