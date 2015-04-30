@@ -124,55 +124,6 @@ protected:
 
     void codeGen() {
         const char* temp = as_string().c_str();
-        // if (((std::string) temp).compare("int") != 0 && ((std::string) temp).compare("bool") != 0) {
-        //     if (((std::string) temp).compare("str") == 0) {
-        //         temp = "char*";
-        //     } else {
-        //         temp = "void";
-        //     }
-        // }
-        // if (((std::string) temp).compare("str") == 0) {
-        //     temp = "PyStr*";
-        // }
-        // else if (((std::string) temp).compare("int") == 0) {
-        //     temp = "PyInt*";
-        // }
-        // else if (((std::string) temp).compare("bool") == 0) {
-        //     temp = "PyBool*";
-        // }
-        // else if (((std::string) temp).compare("str") == 0) {
-        //     temp = "PyStr*";
-        // }
-        // else if (((std::string) temp).compare("range") == 0) {
-        //     temp = "PyRange*";
-        // }
-        // else if (((std::string) temp).compare("list") == 0) {
-        //     temp = "PyList*";
-        // }
-        // else if (((std::string) temp).compare("dict") == 0) {
-        //     temp = "PyDict*";
-        // if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("int"))
-        //     {
-        //         temp = "PyDictInt*"
-        //     } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("str")) {
-        //         temp = "PyDictStr*";
-        //     } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("bool")) {
-        //         temp = "PyDictBool*";
-        //     }
-        // }
-        // else if (((std::string) temp).compare("tuple0") == 0) {
-        //     temp = "PyTuple0*";
-        // }
-        // else if (((std::string) temp).compare("tuple1") == 0) {
-        //     temp = "PyTuple1*";
-        // }
-        // else if (((std::string) temp).compare("tuple2") == 0) {
-        //     temp = "PyTuple2*";
-        // }
-        // else if (((std::string) temp).compare("tuple3") == 0) {
-        //     temp = "PyTuple3*";
-        // }
-        // fprintf(stderr, "ID: %s\n", temp);
         cout << temp << " ";
     }
 

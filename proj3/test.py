@@ -1,6 +1,6 @@
-def f(a :: int, b :: str, c):
-	print "lala"
-	return a
+# def f(a :: int, b :: str, c):
+# 	print "lala"
+# 	return a
 # print ()
 # print (1,)
 # print (1, 2), 1 + 2
@@ -23,4 +23,14 @@ def f(a :: int, b :: str, c):
 # print len({True: False, False: True})
 # print len({'a':6, 'b':7, 'c':8, 'd':9})
 # print len({1:6, 2:7, 3:8, 5:9})
-print f(1, "i", 2)
+# print f(1, "i", 2)
+# x = 5
+# def f(a :: int, b :: int)::int:
+# 	x = a + b
+# 	return x
+# a, b = 1, 2
+# print f(a, b)
+if False:
+	print 0
+else:
+	print 1

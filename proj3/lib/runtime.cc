@@ -209,6 +209,16 @@ PyBool::toStr()
     }
 }
 
+void
+PyBool::print(ostream& os)
+{
+    if (_val) {
+        os << 1;
+    } else {
+        os << 0;
+    }
+}
+
 PyBool*
 PyBool::notBool()
 {
