@@ -43,11 +43,11 @@ class tuple3 of [$T1, $T2, $T3]:
 # # truth replaces bool(...) in regular Python.  truth(x) is True iff x is a
 # # true value, according to the Python spec.
 
-# def truth(x)::bool:
-#     native "__truth__"
+def truth(x)::bool:
+    native "__truth__"
 
-# def __not__(x)::bool:
-#     native "__not__"
+def __not__(x)::bool:
+    native "__not_bool__"
 
 # Type range
 
@@ -226,9 +226,9 @@ def __notin__(x::str, D::dict of [str, $b])::bool:
 
 # # General
 
-# def __is__(x, y)::bool:
-#     native "__is__"
+def __is__(x, y)::bool:
+    native "__is_bool__"
 
-# def __isnot__(x, y)::bool:
-#     native "__isnot__"
+def __isnot__(x, y)::bool:
+    native "__isnot_bool__"
 

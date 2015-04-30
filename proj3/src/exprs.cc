@@ -496,6 +496,17 @@ protected:
 
     NODE_CONSTRUCTORS (IfExpr_AST, BalancedExpr);
 
+    void codeGen()
+    {
+        cout << "__eval_bool__(";
+            child(0)->codeGen();
+        cout << ") ? ";
+            child(1)->codeGen();
+        cout << " : ";
+            child(2)->codeGen();
+        cout << ";";
+    }
+
 };              
 
 

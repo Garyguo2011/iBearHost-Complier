@@ -279,10 +279,10 @@ extern PyRange* __xrange__ (PyInt* v0, PyInt* v1);
 
 /* General values */
 
-extern PyValue __is__ (PyValue v0, PyValue v1);
-extern PyValue __isnot__ (PyValue v0, PyValue v1);
-extern PyValue __not__ (PyValue v0);
-extern PyValue __truth__ (PyValue v0);
+extern PyBool* __is_bool__ (PyValue v0, PyValue v1);
+extern PyBool* __isnot_bool__ (PyValue v0, PyValue v1);
+extern PyBool* __not_bool__ (PyValue v0);
+extern PyBool* __truth__ (PyValue v0);
 
 /* Communication with environment. */
 
@@ -299,6 +299,11 @@ extern void __print__(int count, ...);
 extern void __newline__();
 
 /** Convert VAL into a Python string. */
+static inline PyNoType*
+__cons_none__(){
+    return (PyNoType*) PyNone;
+}
+
 static inline PyStr*
 __cons_str__ (const char* val)
 {
@@ -426,11 +431,11 @@ __cons_dictbool__ (int count, ...)
     return dict;
 }
 
-static inline PyValue
-__cons_none__()
-{
-    return PyNone;
-}
+// static inline PyValue
+// __cons_none__()
+// {
+//     return PyNone;
+// }
 
 static inline int
 __eval_bool__(PyValue val)
