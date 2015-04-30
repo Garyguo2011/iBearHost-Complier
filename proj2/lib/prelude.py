@@ -226,9 +226,9 @@ def __notin__(x::str, D::dict of [str, $b])::bool:
 
 # # General
 
-# def __is__(x, y)::bool:
-#     native "__is__"
+def __is__(x, y)::bool:
+    native "__is_bool__"
 
-# def __isnot__(x, y)::bool:
-#     native "__isnot__"
+def __isnot__(x, y)::bool:
+    native "__isnot_bool__"
 
