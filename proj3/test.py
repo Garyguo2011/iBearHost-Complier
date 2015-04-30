@@ -63,10 +63,16 @@
 # print len(xrange(1, 5))
 # a = [1, 2, 3, 4]
 # print a[0]
-b = 4
 
+
+# def f():
+# 	a = 4
+# 	a = 5
+# 	return a
+# print f()
+
+x = 5
 def f():
-	a = 4
-	a = 5
-	return a
+	return x
 print f()
+
