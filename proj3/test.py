@@ -30,15 +30,37 @@
 # 	return x
 # a, b = 1, 2
 # print f(a, b)
-x = 2
-print x != 2
-if x == 0:
-	print 0
-elif x == 1:
-	print 1
-elif x == 2:
-	print 2
-else:
-	print 3
+# print x != 2
+# if x == 0:
+# 	print 0
+# elif x == 1:
+# 	print 1
+# elif x == 2:
+# 	print 2
+# else:
+# 	print 3
 # print True
 # print False
+# a = 1
+# b = 2
+# def f(a):
+# 	# print a
+# 	def g(b):
+# 		print b
+# 		def h(c):
+# 			print "c in g"
+# 			return c
+# 		return h(b)
+# 	def h(c):
+# 		print c
+# 		# return c
+# 	print h("c")
+# 	return g(a)
+# def g(b):
+# 	return b
+# print f("a")
+# print g(b)
+print len(xrange(1, 5))
+
+
+

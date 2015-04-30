@@ -55,6 +55,10 @@ protected:
         return noneType;
     }
 
+    void codeGen() {
+        cout << "__cons_none__()";
+    }
+
 };
 
 NODE_FACTORY(None_AST, NONE);
@@ -151,7 +155,9 @@ protected:
 
     void codeGen() {
         // Don't know whether add semi-colon or not
-        cout << child(0)->as_string() << "(";
+        cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        child(0)->codeGen();
+        cout<< "(";
         for (unsigned int i = 1; i < arity(); i++) {
             child(i)->codeGen();
             if (i < arity()-1)
@@ -198,6 +204,7 @@ protected:
     NODE_CONSTRUCTORS (Binop_AST, Callable);
 
     void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();
@@ -242,6 +249,7 @@ class Unop_AST : public Callable {
     NODE_CONSTRUCTORS (Unop_AST, Callable);
 
     void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();
@@ -262,6 +270,7 @@ protected:
     NODE_CONSTRUCTORS (Subscription_AST, Callable);
 
     void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();
@@ -294,6 +303,7 @@ protected:
     NODE_CONSTRUCTORS (Slicing_AST, Callable);
 
     void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();
@@ -569,7 +579,7 @@ protected:
         // To be implemented. Right now assuming undefined type_var to be void at this time.
         // const char* temp = getType()->child(0)->as_string().c_str();
         cout << convertAsPyType(getType());
-        cout << " " << getId()->as_string();
+        cout << " " << getId()->as_string() << "_" << getDecl()->getIndex();
     }
 
 };

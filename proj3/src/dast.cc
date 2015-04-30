@@ -101,6 +101,12 @@ AST::codeGenNative ()
     PASSDOWN (this, codeGenNative (), 0);
 }
 
+void
+AST::codeGenInternalFunc()
+{
+    PASSDOWN(this, codeGenInternalFunc(), 0);
+}
+
 string
 AST::convertAsPyType(Type_Ptr TP)
 {

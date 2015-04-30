@@ -426,6 +426,12 @@ __cons_dictbool__ (int count, ...)
     return dict;
 }
 
+static inline PyValue
+__cons_none__()
+{
+    return PyNone;
+}
+
 static inline int
 __eval_bool__(PyValue val)
 {

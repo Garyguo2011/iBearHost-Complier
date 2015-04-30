@@ -124,7 +124,11 @@ protected:
 
     void codeGen() {
         const char* temp = as_string().c_str();
-        cout << temp << " ";
+        cout << temp;
+        if (temp[0] != '_') {
+            cout << "_" << getDecl()->getIndex();
+        }
+        cout << "";
     }
 
 private:
