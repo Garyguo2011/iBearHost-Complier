@@ -8,12 +8,13 @@ if False:
 else:
 	print -1
 
-# x = 1
-# if x == 0:
-# 	print 'no'
-# elif x == 2:
-# 	print 'no'
-# elif x == 1:
-# 	print 'yes'
-# else:
-# 	print 'no'
+x = 1
+print x
+if x == 0:
+	print '1'
+elif x == 2:
+	print '2'
+elif x == 1:
+	print 'yes'
+else:
+	print '3'

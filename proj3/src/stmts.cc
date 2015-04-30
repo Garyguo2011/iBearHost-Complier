@@ -268,12 +268,12 @@ protected:
     NODE_CONSTRUCTORS (Assign_AST, Typed_Tree);
 
     void codeGen() {
-        print(cerr, 4);
-        cerr << ", assign, with arity of " << arity() << "\n";
-        cerr << "child 0 arity :" << child(0)->arity() << "\n";
-        cerr << "child 1 arity :" << child(1)->arity() << "\n";
-        getType()->print(cerr, 4);
-        cerr << ", as type\n";
+        // print(cerr, 4);
+        // cerr << ", assign, with arity of " << arity() << "\n";
+        // cerr << "child 0 arity :" << child(0)->arity() << "\n";
+        // cerr << "child 1 arity :" << child(1)->arity() << "\n";
+        // getType()->print(cerr, 4);
+        // cerr << ", as type\n";
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
                 cout << convertAsPyType(getType()) << " ";
