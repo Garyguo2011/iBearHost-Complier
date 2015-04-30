@@ -236,7 +236,7 @@ PyBool::typeName ()
 {
     return "bool";
 }
-bool
+int
 PyBool::getValue() {
     return _val;
 }

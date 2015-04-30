@@ -105,8 +105,6 @@ public:
 
     virtual void codeGenNative();
 
-    virtual void codeGenCondition();
-
     virtual string convertAsPyType(Type_Ptr TP);
 
 protected:

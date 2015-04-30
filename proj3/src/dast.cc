@@ -101,12 +101,6 @@ AST::codeGenNative ()
     PASSDOWN (this, codeGenNative (), 0);
 }
 
-void
-AST::codeGenCondition ()
-{
-    PASSDOWN (this, codeGenCondition (), 0);
-}
-
 string
 AST::convertAsPyType(Type_Ptr TP)
 {

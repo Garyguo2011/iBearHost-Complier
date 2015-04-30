@@ -268,12 +268,12 @@ protected:
     NODE_CONSTRUCTORS (Assign_AST, Typed_Tree);
 
     void codeGen() {
-        print(cerr, 4);
-        cerr << ", assign, with arity of " << arity() << "\n";
-        cerr << "child 0 arity :" << child(0)->arity() << "\n";
-        cerr << "child 1 arity :" << child(1)->arity() << "\n";
-        getType()->print(cerr, 4);
-        cerr << ", as type\n";
+        // print(cerr, 4);
+        // cerr << ", assign, with arity of " << arity() << "\n";
+        // cerr << "child 0 arity :" << child(0)->arity() << "\n";
+        // cerr << "child 1 arity :" << child(1)->arity() << "\n";
+        // getType()->print(cerr, 4);
+        // cerr << ", as type\n";
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
                 cout << convertAsPyType(getType()) << " ";
@@ -377,19 +377,22 @@ protected:
     
     void codeGen ()
     {
-        cout << "if (";
-        if (child(0)->oper()->syntax() == TRUE || child(0)->oper()->syntax() == FALSE) {
-            child(0)->codeGenCondition();
-        } else {
-            child(0)->codeGen();
-        }
-        cout << ") {" << endl;
+        cout << "if (__eval_bool__(";
+        child(0)->codeGen();
+        cout << ")) {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {
-            cout << "else {" << endl;
-            child(2)->codeGen();
-            cout << "}" << endl;
+            if (child(2)->oper()->syntax() == IF) {
+                cout << "else ";
+                // child(2)->print(cerr, 4);
+                // cerr << ",lala \n";
+                child(2)->codeGen();
+            } else {
+                cout << "else {" << endl;
+                child(2)->codeGen();
+                cout << "}" << endl;
+            }
         }
     }
 
@@ -408,13 +411,9 @@ protected:
 
     void codeGen ()
     {
-        cout << "while (";
-        if (child(0)->oper()->syntax() == TRUE || child(0)->oper()->syntax() == FALSE) {
-            child(0)->codeGenCondition();
-        } else {
-            child(0)->codeGen();
-        }
-        cout << ") {" << endl;
+        cout << "while (__eval_bool__(";
+        child(0)->codeGen();
+        cout << ")) {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {

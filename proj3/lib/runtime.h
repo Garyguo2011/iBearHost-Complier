@@ -107,12 +107,12 @@ public:
     PyBool (const int val);
     PyBool* asBool ();
     const char* typeName ();
-    bool getValue();
+    int getValue();
     string toStr();
     PyBool* notBool();
 
 private:
-    bool _val;
+    int _val;
 };
 
 class PyRange : public PyObject {
@@ -424,6 +424,12 @@ __cons_dictbool__ (int count, ...)
     }
     va_end(args);
     return dict;
+}
+
+static inline int
+__eval_bool__(PyValue val)
+{
+    return val->asBool()->getValue();
 }
 
 #endif

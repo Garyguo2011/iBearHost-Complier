@@ -182,17 +182,24 @@ return __notcontains__dict__(x , D );
 void
 __main__()
 {
-if (0) {
+PyInt* x  = __cons_int__ (2);
+__print__(1, __ne__ (x , __cons_int__ (2)));
+__newline__();
+if (__eval_bool__(__eq__ (x , __cons_int__ (0)))) {
 __print__(1, __cons_int__ (0));
 __newline__();
 }
-else {
+else if (__eval_bool__(__eq__ (x , __cons_int__ (1)))) {
 __print__(1, __cons_int__ (1));
 __newline__();
 }
-__print__(1, __cons_bool__ (1));
+else if (__eval_bool__(__eq__ (x , __cons_int__ (2)))) {
+__print__(1, __cons_int__ (2));
 __newline__();
-__print__(1, __cons_bool__ (0));
+}
+else {
+__print__(1, __cons_int__ (3));
 __newline__();
+}
 
 }

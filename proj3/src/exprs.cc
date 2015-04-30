@@ -80,10 +80,6 @@ protected:
         // cout << true;
     }
 
-    void codeGenCondition() {
-        cout << true;
-    }
-
 };
 
 NODE_FACTORY(True_AST, TRUE);
@@ -105,9 +101,6 @@ protected:
              << 0
              << ")";
         // cout << false;
-    }
-    void codeGenCondition() {
-        cout << false;
     }
 
 };

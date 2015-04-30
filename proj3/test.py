@@ -30,9 +30,15 @@
 # 	return x
 # a, b = 1, 2
 # print f(a, b)
-if False:
+x = 2
+print x != 2
+if x == 0:
 	print 0
-else:
+elif x == 1:
 	print 1
-print True
-print False
+elif x == 2:
+	print 2
+else:
+	print 3
+# print True
+# print False
