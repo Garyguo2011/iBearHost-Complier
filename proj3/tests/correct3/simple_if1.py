@@ -9,7 +9,6 @@ else:
 	print -1
 
 x = 1
-print x
 if x == 0:
 	print '1'
 elif x == 2:

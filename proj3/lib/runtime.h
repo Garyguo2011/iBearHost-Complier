@@ -107,12 +107,12 @@ public:
     PyBool (const int val);
     PyBool* asBool ();
     const char* typeName ();
-    bool getValue();
+    int getValue();
     string toStr();
     PyBool* notBool();
 
 private:
-    bool _val;
+    int _val;
 };
 
 class PyRange : public PyObject {
@@ -279,8 +279,8 @@ extern PyRange* __xrange__ (PyInt* v0, PyInt* v1);
 
 /* General values */
 
-extern PyValue __is__ (PyValue v0, PyValue v1);
-extern PyValue __isnot__ (PyValue v0, PyValue v1);
+extern PyBool* __is_bool__ (PyValue v0, PyValue v1);
+extern PyBool* __isnot_bool__ (PyValue v0, PyValue v1);
 extern PyValue __not__ (PyValue v0);
 extern PyValue __truth__ (PyValue v0);
 
@@ -299,6 +299,11 @@ extern void __print__(int count, ...);
 extern void __newline__();
 
 /** Convert VAL into a Python string. */
+static inline PyNoType*
+__cons_none__(){
+    return (PyNoType*) PyNone;
+}
+
 static inline PyStr*
 __cons_str__ (const char* val)
 {
@@ -424,6 +429,12 @@ __cons_dictbool__ (int count, ...)
     }
     va_end(args);
     return dict;
+}
+
+static inline int
+__eval_bool__(PyValue val)
+{
+    return val->asBool()->getValue();
 }
 
 #endif

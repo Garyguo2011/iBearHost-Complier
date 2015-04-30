@@ -377,19 +377,22 @@ protected:
     
     void codeGen ()
     {
-        cout << "if (";
-        if (child(0)->oper()->syntax() == TRUE || child(0)->oper()->syntax() == FALSE) {
-            child(0)->codeGenCondition();
-        } else {
-            child(0)->codeGen();
-        }
-        cout << ") {" << endl;
+        cout << "if (__eval_bool__(";
+        child(0)->codeGen();
+        cout << ")) {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {
-            cout << "else {" << endl;
-            child(2)->codeGen();
-            cout << "}" << endl;
+            if (child(2)->oper()->syntax() == IF) {
+                cout << "else ";
+                // child(2)->print(cerr, 4);
+                // cerr << ",lala \n";
+                child(2)->codeGen();
+            } else {
+                cout << "else {" << endl;
+                child(2)->codeGen();
+                cout << "}" << endl;
+            }
         }
     }
 
@@ -408,13 +411,9 @@ protected:
 
     void codeGen ()
     {
-        cout << "while (";
-        if (child(0)->oper()->syntax() == TRUE || child(0)->oper()->syntax() == FALSE) {
-            child(0)->codeGenCondition();
-        } else {
-            child(0)->codeGen();
-        }
-        cout << ") {" << endl;
+        cout << "while (__eval_bool__(";
+        child(0)->codeGen();
+        cout << ")) {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {

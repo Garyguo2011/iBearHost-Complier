@@ -219,10 +219,10 @@ PyBool::notBool()
     }
 }
 
-PyValue
+PyBool*
 toPyBool (int v)
 {
-    return v ? PyTrue : PyFalse;
+    return v ? new PyBool(1) : new PyBool(0);
 }
 
 PyBool*
@@ -236,7 +236,7 @@ PyBool::typeName ()
 {
     return "bool";
 }
-bool
+int
 PyBool::getValue() {
     return _val;
 }
@@ -939,16 +939,33 @@ __xrange__ (PyInt* v0, PyInt* v1)
 
 /* General values */
 
-PyValue
-__is__ (PyValue v0, PyValue v1)
+PyBool*
+__is_bool__ (PyValue v0, PyValue v1)
 {
-    return toPyBool (v0 == v1);
+    int i;
+    if (v0->typeName() == v1->typeName()){
+        if (v0->toStr() == v1->toStr())
+            i = 1;
+        else
+            i = 0;
+    } else {
+        i = 0;
+    }
+    return toPyBool (i);
 }
 
-PyValue
-__isnot__ (PyValue v0, PyValue v1)
+PyBool*
+__isnot_bool__ (PyValue v0, PyValue v1)
 {
-    return toPyBool (v0 != v1);
+    int i;
+    if (v0->typeName() != v1->typeName()){
+        i = 1;
+    } else if (v0->toStr() != v1->toStr()){
+        i = 1;
+    } else {
+        i = 0;
+    }
+    return toPyBool (i);
 }
 
 PyValue

@@ -55,6 +55,10 @@ protected:
         return noneType;
     }
 
+    void codeGen() {
+        cout << "__cons_none__()";
+    }
+
 };
 
 NODE_FACTORY(None_AST, NONE);
@@ -80,10 +84,6 @@ protected:
         // cout << true;
     }
 
-    void codeGenCondition() {
-        cout << true;
-    }
-
 };
 
 NODE_FACTORY(True_AST, TRUE);
@@ -105,9 +105,6 @@ protected:
              << 0
              << ")";
         // cout << false;
-    }
-    void codeGenCondition() {
-        cout << false;
     }
 
 };
@@ -492,6 +489,17 @@ class IfExpr_AST : public BalancedExpr {
 protected:
 
     NODE_CONSTRUCTORS (IfExpr_AST, BalancedExpr);
+
+    void codeGen()
+    {
+        cout << "__eval_bool__(";
+            child(0)->codeGen();
+        cout << ") ? ";
+            child(1)->codeGen();
+        cout << " : ";
+            child(2)->codeGen();
+        cout << ";";
+    }
 
 };              
 
