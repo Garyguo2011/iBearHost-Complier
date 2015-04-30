@@ -13,6 +13,8 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
+vector<string> names;
+
 /***** PRINT *****/
 
 class Print_AST : public AST_Tree {
@@ -124,11 +126,12 @@ protected:
                 }
             }
             cout << ");" << endl;
-        } else if (child(arity()-1)->oper()->syntax() != RETURN) {
-            cout << "return NULL;";
-        } else {
+        }else {
             for (unsigned int i = 3; i < arity(); i++) {
                 child(i)->codeGen();
+            }
+            if (child(arity()-1)->oper()->syntax() != RETURN) {
+                cout << "return NULL;" << endl;
             }
         }
         cout << "}" << endl;
@@ -252,7 +255,14 @@ protected:
         // cerr << ", as type\n";
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
-                cout << convertAsPyType(getType()) << " ";
+                stringstream ss;
+                ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+                string temp;
+                ss >> temp;
+                if (find(names.begin(), names.end(), temp) == names.end()) {
+                    names.push_back (temp);
+                    cout << convertAsPyType(getType()) << " ";
+                }
                 child(0)->codeGen();
                 cout << " = ";
                 child(1)->codeGen();
@@ -263,7 +273,19 @@ protected:
         } else {
             for (unsigned int i = 1; i < getType()->arity(); i++) {
                 if (child(0)->child(i-1)->getDecl()->assignable()) {
-                    cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                    stringstream ss;
+                    ss << child(0)->child(i-1)->as_string()
+                       << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                    string temp;
+                    ss >> temp;
+
+                    if (find(names.begin(), names.end(), temp) == names.end()) {
+                        names.push_back (temp);
+                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        child(0)->child(i-1)->codeGen();
+                        cout << ";" << endl;
+                    }
+
                     child(0)->child(i-1)->codeGen();
                     cout << " = ";
                     child(1)->child(i-1)->codeGen();

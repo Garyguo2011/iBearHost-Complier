@@ -15,6 +15,8 @@ static GCINIT _gcdummy;
 
 Decl* mainModule;
 
+// vector<string> names;
+
 /*****   MODULE    *****/
 
 /** A module, representing a complete source file. */

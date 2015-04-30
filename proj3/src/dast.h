@@ -14,6 +14,8 @@
 #include <string>
 #include <iostream>
 #include "horn-common.h"
+#include <algorithm>
+#include <sstream>
 
 #include "../lib/runtime.h"
 
