@@ -15,18 +15,18 @@ static GCINIT _gcdummy;
 
 /***** PRINT *****/
 
-/**       */
 class Print_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (Print_AST, AST_Tree);
+
+    /** Output code which invokes __print__ function
+     * 
+     */
     void codeGen ()
     {
         cout << "__print__(";
         cout << arity();
-        // for_each_child_var(c, this) {
-        //     c->codeGen();
-        // } end_for;
         if (arity() != 0) {
             cout << ", ";
         }
@@ -37,7 +37,6 @@ protected:
             }
         }
         cout << ");" << endl;
-        //PASSDOWN (this, codeGen(), 0);
     }
 
 };
@@ -57,6 +56,9 @@ protected:
 	return "println";
     }
 
+    /** Same as the print node but call __newline__ to 
+     * generate the newline.
+     */
     void codeGen() {
         Print_AST::codeGen();
         cout << "__newline__();" << endl;
@@ -96,6 +98,9 @@ protected:
         return child (0);
     }
 
+    /* Output return type followed by function header 
+     * and then function body.
+     */
     void codeGen() {
         const char* temp = child(2)->child(0)->as_string().c_str();
         // if (((std::string) temp).compare("int") != 0 && ((std::string) temp).compare("bool") != 0) {
@@ -139,17 +144,15 @@ protected:
             temp = "PyValue";
         }
         cout << temp;
-        // child(2)->codeGen();
         cout << " " << getId()->as_string();
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
+        /** Case of native function
+         *  Output return followed by native code
+         */
         if (child(3)->oper()->syntax() == NATIVE) {
-            /** Deal with Native function*/
             cout << "return ";
-            // child(3)->child(0)->print(cerr, 4);
-            // cerr << "\n";
-            // cout << child(3)->child(0)->as_string();
             child(3)->child(0)->codeGenNative();
             cout << "(";
             for (unsigned int i = 0; i < child(1)->arity(); i++) {
@@ -191,6 +194,7 @@ protected:
 
     NODE_CONSTRUCTORS (FormalsList_AST, AST_Tree);
 
+    /** Join code of each formal with commas */
     void codeGen() {
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
@@ -212,12 +216,6 @@ class Native_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (Native_AST, AST_Tree);
-
-    // void codeGen () {
-    //     PASSDOWN(this, codeGen(), 0);
-    // }
-
-
 };
 
 NODE_FACTORY (Native_AST, NATIVE);
