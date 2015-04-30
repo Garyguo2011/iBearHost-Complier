@@ -37,18 +37,18 @@ protected:
              << "__main__()" << endl
              << "{" << endl;
         for_each_child_var(c, this) {
-            /** 
+            if (c->oper()->syntax() != DEF 
+                && c->oper()->syntax() != CLASS) {
+                c->codeGen();
+            }
+             /** 
              * Kludge to add semicolon after function call
              * if it makes up a whole statement
              */
             if (c->oper()->syntax() == CALL ||
                 c->oper()->syntax() == CALL1) {
-                c->codeGen();
+                // c->codeGen();
                 cout << ";" << endl;
-            }
-            if (c->oper()->syntax() != DEF 
-                && c->oper()->syntax() != CLASS) {
-                c->codeGen();
             }
         } end_for;
         cout << endl;

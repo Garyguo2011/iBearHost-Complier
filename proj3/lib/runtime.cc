@@ -968,16 +968,48 @@ __isnot_bool__ (PyValue v0, PyValue v1)
     return toPyBool (i);
 }
 
-PyValue
-__not__ (PyValue v0)
+PyBool*
+__not_bool__ (PyValue v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    int i;
+    if (v0->typeName() == "bool"){
+        if (v0->toStr() == "True"){
+            i = 0;
+        } else {
+            i = 1;
+        }
+    } else if (v0->typeName() == "int") {
+        if (v0->asInt()->getValue() == 1){
+            i = 0;
+        } else {
+            i = 1;
+        }
+    } else {
+        i = 0;
+    }
+    return toPyBool(i);
 }
 
-PyValue
+PyBool*
 __truth__ (PyValue v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    int i;
+    if (v0->typeName() == "bool"){
+        if (v0->toStr() == "True"){
+            i = 1;
+        } else {
+            i = 0;
+        }
+    } else if (v0->typeName() == "int") {
+        if (v0->asInt()->getValue() == 1){
+            i = 1;
+        } else {
+            i = 0;
+        }
+    } else {
+        i = 1;
+    }
+    return toPyBool(i);
 }
 
 
