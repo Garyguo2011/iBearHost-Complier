@@ -137,6 +137,7 @@ public:
     int getSize();
     PyValue getItem(PyInt* val);
     string toStr();
+    PyValue setItem(PyInt* position, PyValue val);
 
 private:
     vector<PyValue> items;
@@ -268,7 +269,7 @@ extern PyBool* __notcontains__dict__ (PyValue v0, PyDict* v1);
 extern PyValue __getitem__list__ (PyList* v0, PyInt* v1);
 extern PyList* __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2);
 extern PyInt* __len__list__ (PyList* v0);
-extern PyValue __setitem__list__ (PyValue v0, PyValue v1, PyValue v2);
+extern PyValue __setitem__list__ (PyList* v0, PyInt* v1, PyValue v2);
 extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
                                    PyValue v3);
 
