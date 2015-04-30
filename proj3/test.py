@@ -60,7 +60,7 @@
 # 	return b
 # print f("a")
 # print g(b)
-print len(xrange(1, 5))
-
-
+# print len(xrange(1, 5))
+a = [1, 2, 3, 4]
+print a[0]
 

@@ -134,6 +134,7 @@ protected:
         cout << "}" << endl;
         cout << "} ";
         cout << getId()->as_string() << "_" << getId()->getDecl()->getIndex() << ";" << endl;
+        cout << "\n";
     }
 
     // void codeGenInternalFunc() {
@@ -259,16 +260,17 @@ protected:
             } else {
                 fatal("This ID can't be assigned.");
             }
-        }
-        for (unsigned int i = 1; i < getType()->arity(); i++) {
-            if (child(0)->child(i-1)->getDecl()->assignable()) {
-                cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
-                child(0)->child(i-1)->codeGen();
-                cout << " = ";
-                child(1)->child(i-1)->codeGen();
-                cout << ";\n";
-            } else {
-                fatal("This ID can't be assigned.");
+        } else {
+            for (unsigned int i = 1; i < getType()->arity(); i++) {
+                if (child(0)->child(i-1)->getDecl()->assignable()) {
+                    cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                    child(0)->child(i-1)->codeGen();
+                    cout << " = ";
+                    child(1)->child(i-1)->codeGen();
+                    cout << ";\n";
+                } else {
+                    fatal("This ID can't be assigned.");
+                }
             }
         }
     }
