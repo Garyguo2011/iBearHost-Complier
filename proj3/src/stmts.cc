@@ -267,6 +267,37 @@ protected:
 
     NODE_CONSTRUCTORS (Assign_AST, Typed_Tree);
 
+    void codeGen() {
+        print(cerr, 4);
+        cerr << ", assign, with arity of " << arity() << "\n";
+        cerr << "child 0 arity :" << child(0)->arity() << "\n";
+        cerr << "child 1 arity :" << child(1)->arity() << "\n";
+        getType()->print(cerr, 4);
+        cerr << ", as type\n";
+        if (child(0)->arity() == 0) {
+            if (child(0)->getDecl()->assignable()) {
+                cout << convertAsPyType(getType()) << " ";
+                child(0)->codeGen();
+                cout << " = ";
+                child(1)->codeGen();
+                cout << ";\n";
+            } else {
+                fatal("This ID can't be assigned.");
+            }
+        }
+        for (unsigned int i = 1; i < getType()->arity(); i++) {
+            if (child(0)->child(i-1)->getDecl()->assignable()) {
+                cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                child(0)->child(i-1)->codeGen();
+                cout << " = ";
+                child(1)->child(i-1)->codeGen();
+                cout << ";\n";
+            } else {
+                fatal("This ID can't be assigned.");
+            }
+        }
+    }
+
 };
 
 NODE_FACTORY (Assign_AST, ASSIGN);
@@ -279,6 +310,10 @@ protected:
 
     NODE_CONSTRUCTORS (Break_AST, AST_Tree);
 
+    void codeGen() {
+        cout << "break;";
+    }
+
 };
 
 NODE_FACTORY (Break_AST, BREAK);
@@ -290,6 +325,10 @@ class Continue_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (Continue_AST, AST_Tree);
+
+    void codeGen() {
+        cout << "continue;";
+    }
 
 };
 

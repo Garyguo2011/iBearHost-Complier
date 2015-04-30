@@ -110,6 +110,7 @@ public:
     bool getValue();
     string toStr();
     PyBool* notBool();
+    void print(ostream& os);
 
 private:
     bool _val;

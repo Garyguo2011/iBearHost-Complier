@@ -105,6 +105,8 @@ public:
 
     virtual void codeGenNative();
 
+    virtual string convertAsPyType(Type_Ptr TP);
+
 protected:
 
     /** Return my type, assuming that getType is not set. */
