@@ -101,7 +101,8 @@ protected:
     }
 
     /* Output return type followed by function header 
-     * and then function body.
+     * and then function body wrapped in struct to carry
+     * local variables from outer scope
      */
     void codeGen() {
         cout << "struct " << getId()->as_string() << getId()->getDecl()->getIndex() << "_local ";
@@ -161,6 +162,48 @@ protected:
 
     NODE_CONSTRUCTORS (Method_AST, Def_AST);
 
+    /** Generate code for method, no need to wrap in struct
+     * in case of __init__ replace with class name
+     */
+    void codeGen() {
+        cout << convertAsPyType((Type_Ptr) child(2));
+        cout << " ";
+        std::string method_name = (std::string)(getId()->as_string().c_str());
+        if (method_name.compare("__init__") == 0) {
+            AST_Ptr my_class = getDecl()->getContainer()->getAst();
+            cout << (std::string)(my_class->getId()->as_string().c_str());
+        }
+        else {
+            cout << method_name << " ";
+        }
+        cout << "(";
+        child(1)->codeGen();
+        cout << ")" << endl <<  "{" << endl;
+        /** Case of native function
+         *  Output return followed by native code
+         */
+        if (child(3)->oper()->syntax() == NATIVE) {
+            cout << "return ";
+            child(3)->child(0)->codeGenNative();
+            cout << "(";
+            for (unsigned int i = 0; i < child(1)->arity(); i++) {
+                child(1)->child(i)->child(0)->codeGen();
+                if (i < child(1)->arity()-1) {
+                    cout << ", ";
+                }
+            }
+            cout << ");" << endl;
+        }else {
+            for (unsigned int i = 3; i < arity(); i++) {
+                child(i)->codeGen();
+            }
+            if (child(arity()-1)->oper()->syntax() != RETURN) {
+                cout << "return NULL;" << endl;
+            }
+        }
+        cout << "}" << endl;
+    }
+
 };
 
 NODE_FACTORY (Method_AST, METHOD);
@@ -211,6 +254,10 @@ protected:
         return child (0)->getDecl ();
     }
 
+    AST_Ptr getId() {
+        return child(0);
+    }
+
     /** Generate code for class definition */
     void codeGen() {
         std::string class_name = (std::string)(child(0)->as_string().c_str());
@@ -229,8 +276,15 @@ protected:
             cout << "class ";
             cout << class_name;
             cout << " {" << endl;
-            for (int i = 0; i < child(2)->arity(); i++) {
-                child(2)->child(i)->codeGen();
+            for (unsigned int i = 2; i < arity(); i++) {
+                AST_Ptr c = child(i);
+                if (c->oper()->syntax() == ASSIGN) {
+                    c->codeGenVarDecl();
+                    cout << ";" << endl;
+                }
+                else {
+                    c->codeGen();
+                }
             }
             cout << "};" << endl;
         }

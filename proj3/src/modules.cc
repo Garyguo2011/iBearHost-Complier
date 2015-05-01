@@ -63,7 +63,6 @@ protected:
              */
             if (c->oper()->syntax() == CALL ||
                 c->oper()->syntax() == CALL1) {
-                // c->codeGen();
                 cout << ";" << endl;
             }
         } end_for;
