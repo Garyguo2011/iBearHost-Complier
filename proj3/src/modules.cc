@@ -33,6 +33,8 @@ protected:
         for_each_child(c, this) {
             if (c->oper()->syntax() == DEF) {
                 c->codeGen();
+            } else if (c->oper()->syntax() == ASSIGN) {
+                c->codeGenVarDecl();
             }
         } end_for;
         cout << "void" << endl

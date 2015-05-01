@@ -109,6 +109,8 @@ public:
 
     virtual void codeGenInternalFunc();
 
+    virtual void codeGenVarDecl();
+
     virtual string convertAsPyType(Type_Ptr TP);
 
 protected:
