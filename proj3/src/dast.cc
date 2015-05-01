@@ -106,11 +106,16 @@ AST::codeGenInternalFunc()
 {
     PASSDOWN(this, codeGenInternalFunc(), 0);
 }
-
 void
 AST::codeGenVarDecl()
 {
     PASSDOWN(this, codeGenVarDecl(), 0);
+}
+
+void
+AST::codeGenInit(AST_Ptr class_id)
+{
+    PASSDOWN(this, codeGenInit(class_id), 0);
 }
 
 string
@@ -118,49 +123,46 @@ AST::convertAsPyType(Type_Ptr TP)
 {
     const char* temp = TP->child(0)->as_string().c_str();
     if (((std::string) temp).compare("str") == 0) {
-            temp = "PyStr*";
+        temp = "PyStr*";
+    }
+    else if (((std::string) temp).compare("int") == 0) {
+        temp = "PyInt*";
+    }
+    else if (((std::string) temp).compare("bool") == 0) {
+        temp = "PyBool*";
+    }
+    else if (((std::string) temp).compare("range") == 0) {
+        temp = "PyRange*";
+    }
+    else if (((std::string) temp).compare("list") == 0) {
+        temp = "PyList*";
+    }
+    else if (((std::string) temp).compare("dict") == 0) {
+        temp = "PyDict*";
+        if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("int") == 0)
+        {
+            temp = "PyDictInt*";
+        } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("str") == 0) {
+            temp = "PyDictStr*";
+        } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("bool") == 0) {
+            temp = "PyDictBool*";
         }
-        else if (((std::string) temp).compare("int") == 0) {
-            temp = "PyInt*";
-        }
-        else if (((std::string) temp).compare("bool") == 0) {
-            temp = "PyBool*";
-        }
-        else if (((std::string) temp).compare("str") == 0) {
-            temp = "PyStr*";
-        }
-        else if (((std::string) temp).compare("range") == 0) {
-            temp = "PyRange*";
-        }
-        else if (((std::string) temp).compare("list") == 0) {
-            temp = "PyList*";
-        }
-        else if (((std::string) temp).compare("dict") == 0) {
-            temp = "PyDict*";
-            if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("int") == 0)
-            {
-                temp = "PyDictInt*";
-            } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("str") == 0) {
-                temp = "PyDictStr*";
-            } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("bool") == 0) {
-                temp = "PyDictBool*";
-            }
-        }
-        else if (((std::string) temp).compare("tuple0") == 0) {
-            temp = "PyTuple0*";
-        }
-        else if (((std::string) temp).compare("tuple1") == 0) {
-            temp = "PyTuple1*";
-        }
-        else if (((std::string) temp).compare("tuple2") == 0) {
-            temp = "PyTuple2*";
-        }
-        else if (((std::string) temp).compare("tuple3") == 0) {
-            temp = "PyTuple3*";
-        } else {
-            temp = "PyValue";
-        }
-        return temp;
+    }
+    else if (((std::string) temp).compare("tuple0") == 0) {
+        temp = "PyTuple0*";
+    }
+    else if (((std::string) temp).compare("tuple1") == 0) {
+        temp = "PyTuple1*";
+    }
+    else if (((std::string) temp).compare("tuple2") == 0) {
+        temp = "PyTuple2*";
+    }
+    else if (((std::string) temp).compare("tuple3") == 0) {
+        temp = "PyTuple3*";
+    } else {
+        temp = "PyValue";
+    }
+    return temp;
 }
 
 /* Definitions of methods in base class AST_Tree. */

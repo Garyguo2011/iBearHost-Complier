@@ -101,7 +101,8 @@ protected:
     }
 
     /* Output return type followed by function header 
-     * and then function body.
+     * and then function body wrapped in struct to carry
+     * local variables from outer scope
      */
     void codeGen() {
         cout << "struct " << getId()->as_string() << getId()->getDecl()->getIndex() << "_local ";
@@ -161,6 +162,56 @@ protected:
 
     NODE_CONSTRUCTORS (Method_AST, Def_AST);
 
+/** Generate code for method, no need to wrap in struct
+     * in case of __init__ replace with class name
+     */
+    void codeGen() {
+        cout << convertAsPyType((Type_Ptr) child(2));
+        cout << " ";
+        std::string method_name = (std::string)(getId()->as_string().c_str());
+        cout << method_name << " ";
+        cout << "(";
+        child(1)->codeGen();
+        cout << ")" << endl <<  "{" << endl;
+        /** Case of native function
+         *  Output return followed by native code
+         */
+        if (child(3)->oper()->syntax() == NATIVE) {
+            cout << "return ";
+            child(3)->child(0)->codeGenNative();
+            cout << "(";
+            for (unsigned int i = 0; i < child(1)->arity(); i++) {
+                child(1)->child(i)->child(0)->codeGen();
+                if (i < child(1)->arity()-1) {
+                    cout << ", ";
+                }
+            }
+            cout << ");" << endl;
+        }else {
+            for (unsigned int i = 3; i < arity(); i++) {
+                child(i)->codeGen();
+            }
+            if (child(arity()-1)->oper()->syntax() != RETURN) {
+                cout << "return NULL;" << endl;
+            }
+        }
+        cout << "}" << endl;
+    }
+
+
+    /** codeGen for __init__ */
+    void codeGenInit(AST_Ptr class_id) {
+        cout << (std::string) (class_id->as_string().c_str());
+        cout << " (";
+        child(1)->codeGen();
+        cout << ")" << endl <<  "{" << endl;
+        for (unsigned int i = 3; i < arity(); i++) {
+            child(i)->codeGen();
+        }
+        cout << "}" << endl;
+
+    }
+
 };
 
 NODE_FACTORY (Method_AST, METHOD);
@@ -177,7 +228,8 @@ protected:
     void codeGen() {
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
-            if (i < arity()-1) {
+            if (i < arity()-1
+                && ((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
                 cout << ", ";
             }
         }
@@ -211,14 +263,45 @@ protected:
         return child (0)->getDecl ();
     }
 
-    // void codeGen() {
-    //     //basic class, without any content inside
-    //     cout << "class ";
-    //     child(0)->codeGen();
-    //     cout << "{" << endl;
-    //     PASSDOWN(this, codeGen(), 1);
-    //     cout << "};" << endl;
-    // }
+    AST_Ptr getId() {
+        return child(0);
+    }
+
+    /** Generate code for class definition */
+    void codeGen() {
+        std::string class_name = (std::string)(child(0)->as_string().c_str());
+        /** Only generate code if not predefined class */
+        if (class_name.compare("str") != 0 &&
+            class_name.compare("int") != 0 &&
+            class_name.compare("bool") != 0 &&
+            class_name.compare("range") != 0 &&
+            class_name.compare("dict") != 0 &&
+            class_name.compare("list") != 0 &&
+            class_name.compare("tuple0") != 0 &&
+            class_name.compare("tuple1") != 0 &&
+            class_name.compare("tuple2") != 0 &&
+            class_name.compare("tuple3") != 0
+            ) {
+            cout << "class ";
+            cout << class_name;
+            cout << " {" << endl;
+            for (unsigned int i = 2; i < arity(); i++) {
+                AST_Ptr c = child(i);
+                if (c->oper()->syntax() == ASSIGN) {
+                    c->codeGenVarDecl();
+                    cout << ";" << endl;
+                }
+                else if (c->oper()->syntax() == METHOD 
+                    && ((std::string) c->child(0)->as_string().c_str()).compare("__init__") == 0) {
+                    c->codeGenInit(getId());
+                }
+                else {
+                    c->codeGen();
+                }
+            }
+            cout << "};" << endl;
+        }
+    }
 
 private:
 };
@@ -384,14 +467,33 @@ protected:
 
     void codeGen ()
     {
+        stringstream ss;
+        ss << "index_";
+        ss << child(0)->getDecl()->getIndex();
+        string temp;
+        ss >> temp;
         cout << "for (";
-        child(0)->codeGen();
-        cout << ") {" << endl;
+        cout << "int " << temp  << " = 0; ";
+        cout << temp;
+        cout << " < ";
         child(1)->codeGen();
+        cout << "->getSize(); ";
+        cout << temp << "++";
+        cout << ") {" << endl;
+
+        cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
+        cout << " ";
+        child(0)->codeGen();
+        cout << " = ";
+        cout << "(" << AST::convertAsPyType(child(0)->getDecl()->getType ()) << ") ";
+        child(1)->codeGen();
+        cout << "->get(" << temp << ");" << endl;
+        child(2)->codeGen();
+
         cout << "}" << endl;
-        if (arity() > 2) {
+        if (arity() > 3) {
             // cout << "else {" << endl;
-            child(2)->codeGen();
+            child(3)->codeGen();
             // cout << "}" << endl;
         }
     }
@@ -481,5 +583,3 @@ protected:
 };
 
 NODE_FACTORY (While_AST, WHILE);
-
-
