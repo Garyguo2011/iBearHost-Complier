@@ -101,7 +101,8 @@ protected:
     }
 
     /* Output return type followed by function header 
-     * and then function body.
+     * and then function body wrapped in struct to carry
+     * local variables from outer scope
      */
     void codeGen() {
         cout << "struct " << getId()->as_string() << getId()->getDecl()->getIndex() << "_local ";
@@ -161,10 +162,14 @@ protected:
 
     NODE_CONSTRUCTORS (Method_AST, Def_AST);
 
-    void codeGen () {
+/** Generate code for method, no need to wrap in struct
+     * in case of __init__ replace with class name
+     */
+    void codeGen() {
         cout << convertAsPyType((Type_Ptr) child(2));
         cout << " ";
-        getId()->codeGen();
+        std::string method_name = (std::string)(getId()->as_string().c_str());
+        cout << method_name << " ";
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
@@ -186,18 +191,18 @@ protected:
             for (unsigned int i = 3; i < arity(); i++) {
                 child(i)->codeGen();
             }
+            if (child(arity()-1)->oper()->syntax() != RETURN) {
+                cout << "return NULL;" << endl;
+            }
         }
         cout << "}" << endl;
-        // cout << "} ";
-        // cout << getId()->as_string() << "_" << getId()->getDecl()->getIndex() << ";" << endl;
-        // cout << "\n";
     }
 
+
     /** codeGen for __init__ */
-    void codeGenInit() {
-        // cout << child(1)->child(0)->getType()->child(0)->as_string();
-        // cout << " ";
-        cout << "(";
+    void codeGenInit(AST_Ptr class_id) {
+        cout << (std::string) (class_id->as_string().c_str());
+        cout << " (";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
         for (unsigned int i = 3; i < arity(); i++) {
@@ -258,6 +263,10 @@ protected:
         return child (0)->getDecl ();
     }
 
+    AST_Ptr getId() {
+        return child(0);
+    }
+
     /** Generate code for class definition */
     void codeGen() {
         std::string class_name = (std::string)(child(0)->as_string().c_str());
@@ -274,16 +283,20 @@ protected:
             class_name.compare("tuple3") != 0
             ) {
             cout << "class ";
-            child(0)->codeGen();
-            cout << " : public PyObject {" << endl;
-            cout << "public:" << endl;
-            for (unsigned int i = 1; i < arity(); i++) {
-                if (child(i)->oper()->syntax() == METHOD
-                    && ((std::string) child(i)->child(0)->as_string().c_str()).compare("__init__") == 0) {
-                    child(0)->codeGen();
-                    child(i)->codeGenInit();
-                } else {
-                    child(i)->codeGen();
+            cout << class_name;
+            cout << " {" << endl;
+            for (unsigned int i = 2; i < arity(); i++) {
+                AST_Ptr c = child(i);
+                if (c->oper()->syntax() == ASSIGN) {
+                    c->codeGenVarDecl();
+                    cout << ";" << endl;
+                }
+                else if (c->oper()->syntax() == METHOD 
+                    && ((std::string) c->child(0)->as_string().c_str()).compare("__init__") == 0) {
+                    c->codeGenInit(getId());
+                }
+                else {
+                    c->codeGen();
                 }
             }
             cout << "};" << endl;

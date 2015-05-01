@@ -363,8 +363,14 @@ protected:
 
     /** Generate code for attribute reference*/
     void codeGen() {
-        child(0)->codeGen();
-        cout << ".";
+        const char* instance_name = child(0)->as_string().c_str();
+        if (((std::string)instance_name).compare("self") == 0) {
+            //cout << "this";
+        }
+        else {
+            child(0)->codeGen();
+            cout << ".";
+        }
         child(1)->codeGen();
     }
 

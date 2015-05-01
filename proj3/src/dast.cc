@@ -113,9 +113,9 @@ AST::codeGenVarDecl()
 }
 
 void
-AST::codeGenInit()
+AST::codeGenInit(AST_Ptr class_id)
 {
-    PASSDOWN(this, codeGenInit(), 0);
+    PASSDOWN(this, codeGenInit(class_id), 0);
 }
 
 string
