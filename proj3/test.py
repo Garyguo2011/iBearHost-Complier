@@ -75,7 +75,18 @@
 # def f():
 # 	return x
 # print f()
+x = 5
+def f():
+	x = 6
+	return x
+print f()
 
-for x in xrange(1, 4):
-	print x
+a = [1, 2]
+print a
+a = [2, 3, 4, 5]
+print a
+b = 4
+print b
+b = 7
+print b
 
