@@ -366,6 +366,20 @@ protected:
 
     NODE_CONSTRUCTORS (For_AST, AST_Tree);
 
+    void codeGen ()
+    {
+        cout << "for (";
+        child(0)->codeGen();
+        cout << ") {" << endl;
+        child(1)->codeGen();
+        cout << "}" << endl;
+        if (arity() > 2) {
+            // cout << "else {" << endl;
+            child(2)->codeGen();
+            // cout << "}" << endl;
+        }
+    }
+
 };
 
 NODE_FACTORY (For_AST, FOR);
@@ -442,9 +456,9 @@ protected:
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {
-            cout << "else {" << endl;
+            // cout << "else {" << endl;
             child(2)->codeGen();
-            cout << "}" << endl;
+            // cout << "}" << endl;
         }
     }
 

@@ -71,8 +71,12 @@
 # 	return a
 # print f()
 
-x = 5
-def f():
-	return x
-print f()
+# x = 5
+# def f():
+# 	return x
+# print f()
+
+for x in xrange(1, 4):
+	print x
+
 
