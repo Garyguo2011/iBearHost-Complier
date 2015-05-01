@@ -336,6 +336,13 @@ PyList::getItem(PyInt* val)
     return items[val->getValue()];
 }
 
+PyValue
+PyList::setItem(PyInt* position, PyValue val)
+{
+    items[position->getValue()] = val;
+    return PyNone;
+}
+
 /* Dicts */
 
 PyDict*
@@ -912,9 +919,10 @@ __len__list__ (PyList* v0)
 }
 
 PyValue
-__setitem__list__ (PyValue v0, PyValue v1, PyValue v2)
+__setitem__list__ (PyList* v0, PyInt* v1, PyValue v2)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    v0->asList()->setItem(v1, v2);
 }
 
 extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,

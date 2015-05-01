@@ -1,0 +1,20 @@
+#!/bin/bash
+if [ "$1" == "" ]; then
+	cd proj1
+	make clean; make
+	cd ../proj2
+	make clean; make
+	cd ../proj3
+	make clean; make
+	make check
+fi
+
+if [ "$1" == "clean" ]; then
+	cd proj1
+	make clean;
+	cd ../proj2
+	make clean;
+	cd ../proj3
+	make clean;
+	cd ..
+fi

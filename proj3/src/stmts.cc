@@ -253,6 +253,19 @@ protected:
         // cerr << "child 1 arity :" << child(1)->arity() << "\n";
         // getType()->print(cerr, 4);
         // cerr << ", as type\n";
+        if (child(0)->oper()->syntax() == SUBSCRIPT_ASSIGN){
+            child(0)->child(0)->codeGen();
+            cout << "_" << child(0)->child(0)->getDecl()->getIndex() << ".";
+            child(0)->child(0)->codeGen();
+            cout << "(";
+            child(0)->child(1)->codeGen();
+            cout << ",";
+            child(0)->child(2)->codeGen();
+            cout << ",";
+            child(1)->codeGen();
+            cout << ");";
+        } 
+
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
                 stringstream ss;
