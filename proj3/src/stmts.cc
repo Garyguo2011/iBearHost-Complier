@@ -266,7 +266,6 @@ protected:
             cout << ");";
         } 
 
-
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
                 // stringstream ss;
@@ -320,9 +319,9 @@ protected:
             if (find(names.begin(), names.end(), temp) == names.end()) {
                 names.push_back (temp);
                 cout << convertAsPyType(getType()) << " ";
+                child(0)->codeGen();
+                cout << ";" << endl;
             }
-            child(0)->codeGen();
-            cout << ";" << endl;
         } else {
             for (unsigned int i = 1; i < getType()->arity(); i++) {
                 stringstream ss;
@@ -385,6 +384,20 @@ class For_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (For_AST, AST_Tree);
+
+    void codeGen ()
+    {
+        cout << "for (";
+        child(0)->codeGen();
+        cout << ") {" << endl;
+        child(1)->codeGen();
+        cout << "}" << endl;
+        if (arity() > 2) {
+            // cout << "else {" << endl;
+            child(2)->codeGen();
+            // cout << "}" << endl;
+        }
+    }
 
 };
 
@@ -462,9 +475,9 @@ protected:
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {
-            cout << "else {" << endl;
+            // cout << "else {" << endl;
             child(2)->codeGen();
-            cout << "}" << endl;
+            // cout << "}" << endl;
         }
     }
 
