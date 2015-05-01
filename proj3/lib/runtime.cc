@@ -39,6 +39,12 @@ PyObject::toStr()
     return str;
 }
 
+int
+PyObject::getSize()
+{
+    return 1;
+}
+
 const char*
 PyObject::typeName ()
 {
@@ -152,6 +158,18 @@ string
 PyStr::getValue()
 {
     return _val;
+}
+
+PyStr*
+PyStr::get(int index)
+{
+    return new PyStr(getValue().substr(index, 1));
+}
+
+int
+PyStr::getSize()
+{
+    return getValue().size();
 }
 
 /* Ints */
@@ -283,6 +301,12 @@ PyRange::getSize()
     return (int) items.size();
 }
 
+PyValue
+PyRange::get(int index)
+{
+    return items[index];
+}
+
 /* Lists */
 
 PyList*
@@ -341,6 +365,12 @@ PyList::setItem(PyInt* position, PyValue val)
 {
     items[position->getValue()] = val;
     return PyNone;
+}
+
+PyValue
+PyList::get(int index)
+{
+    return items[index];
 }
 
 /* Dicts */

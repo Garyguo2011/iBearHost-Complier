@@ -383,14 +383,33 @@ protected:
 
     void codeGen ()
     {
+        stringstream ss;
+        ss << "index_";
+        ss << child(0)->getDecl()->getIndex();
+        string temp;
+        ss >> temp;
         cout << "for (";
-        child(0)->codeGen();
-        cout << ") {" << endl;
+        cout << "int " << temp  << " = 0; ";
+        cout << temp;
+        cout << " < ";
         child(1)->codeGen();
+        cout << "->getSize(); ";
+        cout << temp << "++";
+        cout << ") {" << endl;
+
+        cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
+        cout << " ";
+        child(0)->codeGen();
+        cout << " = ";
+        cout << "(" << AST::convertAsPyType(child(0)->getDecl()->getType ()) << ") ";
+        child(1)->codeGen();
+        cout << "->get(" << temp << ");" << endl;
+        child(2)->codeGen();
+
         cout << "}" << endl;
-        if (arity() > 2) {
+        if (arity() > 3) {
             // cout << "else {" << endl;
-            child(2)->codeGen();
+            child(3)->codeGen();
             // cout << "}" << endl;
         }
     }

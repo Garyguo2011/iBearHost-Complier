@@ -49,6 +49,7 @@ public:
     virtual void print(ostream& os);
     virtual const char* typeName ();
     virtual string toStr();
+    virtual int getSize();
 
     /** Conversion functions */
     virtual PyStr* asStr ();
@@ -85,6 +86,8 @@ public:
     PyStr* append (PyValue other);
     string getValue();
     string toStr();
+    PyStr* get(int index);
+    int getSize();
 
 private:
     string _val;
@@ -122,6 +125,7 @@ public:
     const char* typeName ();
     int getSize();
     string toStr();
+    PyValue get(int index);
 private:
     vector<PyValue> items;
 };
@@ -138,6 +142,7 @@ public:
     PyValue getItem(PyInt* val);
     string toStr();
     PyValue setItem(PyInt* position, PyValue val);
+    PyValue get(int index);
 
 private:
     vector<PyValue> items;
