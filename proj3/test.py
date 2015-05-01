@@ -43,7 +43,12 @@
 # print True
 # print False
 class Hello:
-	pass
+	x = 5
+	def hello(self):
+		return self.x
+	# def __init__(self):
+	#	pass
+		
 
 # a = 1
 # b = 2
@@ -69,10 +74,10 @@ class Hello:
 # print a[0]
 
 
-# def f():
-# 	a = 4
-# 	a = 5
-# 	return a
+def f():
+	a = 4
+	a = 5
+	return a
 # print f()
 
 # x = 5
@@ -101,9 +106,9 @@ class Hello:
 # a = makeAdder(8)
 # print a(7)
 
-for x in xrange(0, 6):
-	print x
-	a = ["a", "b", "c", "d", "e", "f"]
-	print a[x]
+# for x in xrange(0, 6):
+# 	print x
+# 	a = ["a", "b", "c", "d", "e", "f"]
+# 	print a[x]
 
 
