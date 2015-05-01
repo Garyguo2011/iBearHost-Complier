@@ -211,14 +211,30 @@ protected:
         return child (0)->getDecl ();
     }
 
-    // void codeGen() {
-    //     //basic class, without any content inside
-    //     cout << "class ";
-    //     child(0)->codeGen();
-    //     cout << "{" << endl;
-    //     PASSDOWN(this, codeGen(), 1);
-    //     cout << "};" << endl;
-    // }
+    /** Generate code for class definition */
+    void codeGen() {
+        std::string class_name = (std::string)(child(0)->as_string().c_str());
+        /** Only generate code if not predefined class */
+        if (class_name.compare("str") != 0 &&
+            class_name.compare("int") != 0 &&
+            class_name.compare("bool") != 0 &&
+            class_name.compare("range") != 0 &&
+            class_name.compare("dict") != 0 &&
+            class_name.compare("list") != 0 &&
+            class_name.compare("tuple0") != 0 &&
+            class_name.compare("tuple1") != 0 &&
+            class_name.compare("tuple2") != 0 &&
+            class_name.compare("tuple3") != 0
+            ) {
+            cout << "class ";
+            cout << class_name;
+            cout << " {" << endl;
+            for (int i = 0; i < child(2)->arity(); i++) {
+                child(2)->child(i)->codeGen();
+            }
+            cout << "};" << endl;
+        }
+    }
 
 private:
 };
@@ -499,5 +515,3 @@ protected:
 };
 
 NODE_FACTORY (While_AST, WHILE);
-
-

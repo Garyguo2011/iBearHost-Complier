@@ -344,6 +344,13 @@ protected:
         return getId ()->getDecl ();
     }
 
+    /** Generate code for attribute reference*/
+    void codeGen() {
+        child(0)->codeGen();
+        cout << ".";
+        child(1)->codeGen();
+    }
+
 };
 
 NODE_FACTORY (AttributeRef_AST, ATTRIBUTEREF);
