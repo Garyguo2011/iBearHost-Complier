@@ -180,6 +180,23 @@ protected:
 
     NODE_CONSTRUCTORS (Call1_AST, Call_AST);
 
+    void codeGen() {
+        // getType()->print(cerr, 4);
+        // cerr << ", type!\n";
+        // child(1)->getType()->print(cerr, 3);
+        // cerr << ", child 1 type!\n";
+        cout << "new ";
+        getType()->child(0)->codeGen();
+        cout << "(";
+        for (unsigned int i = 2; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (Call1_AST, CALL1);
@@ -596,8 +613,11 @@ protected:
     void codeGen() {
         // To be implemented. Right now assuming undefined type_var to be void at this time.
         // const char* temp = getType()->child(0)->as_string().c_str();
-        cout << convertAsPyType(getType());
-        cout << " " << getId()->as_string() << "_" << getDecl()->getIndex();
+        std::string name = getId()->as_string().c_str();
+        if (name.compare("self") != 0) {
+            cout << convertAsPyType(getType());
+            cout << " " << getId()->as_string() << "_" << getDecl()->getIndex();
+        }
     }
 
 };

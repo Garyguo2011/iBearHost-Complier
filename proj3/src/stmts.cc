@@ -161,6 +161,52 @@ protected:
 
     NODE_CONSTRUCTORS (Method_AST, Def_AST);
 
+    void codeGen () {
+        cout << convertAsPyType((Type_Ptr) child(2));
+        cout << " ";
+        getId()->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ")" << endl <<  "{" << endl;
+        /** Case of native function
+         *  Output return followed by native code
+         */
+        if (child(3)->oper()->syntax() == NATIVE) {
+            cout << "return ";
+            child(3)->child(0)->codeGenNative();
+            cout << "(";
+            for (unsigned int i = 0; i < child(1)->arity(); i++) {
+                child(1)->child(i)->child(0)->codeGen();
+                if (i < child(1)->arity()-1) {
+                    cout << ", ";
+                }
+            }
+            cout << ");" << endl;
+        }else {
+            for (unsigned int i = 3; i < arity(); i++) {
+                child(i)->codeGen();
+            }
+        }
+        cout << "}" << endl;
+        // cout << "} ";
+        // cout << getId()->as_string() << "_" << getId()->getDecl()->getIndex() << ";" << endl;
+        // cout << "\n";
+    }
+
+    /** codeGen for __init__ */
+    void codeGenInit() {
+        // cout << child(1)->child(0)->getType()->child(0)->as_string();
+        // cout << " ";
+        cout << "(";
+        child(1)->codeGen();
+        cout << ")" << endl <<  "{" << endl;
+        for (unsigned int i = 3; i < arity(); i++) {
+            child(i)->codeGen();
+        }
+        cout << "}" << endl;
+
+    }
+
 };
 
 NODE_FACTORY (Method_AST, METHOD);
@@ -177,7 +223,8 @@ protected:
     void codeGen() {
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
-            if (i < arity()-1) {
+            if (i < arity()-1
+                && ((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
                 cout << ", ";
             }
         }
@@ -227,10 +274,17 @@ protected:
             class_name.compare("tuple3") != 0
             ) {
             cout << "class ";
-            cout << class_name;
-            cout << " {" << endl;
-            for (int i = 0; i < child(2)->arity(); i++) {
-                child(2)->child(i)->codeGen();
+            child(0)->codeGen();
+            cout << " : public PyObject {" << endl;
+            cout << "public:" << endl;
+            for (unsigned int i = 1; i < arity(); i++) {
+                if (child(i)->oper()->syntax() == METHOD
+                    && ((std::string) child(i)->child(0)->as_string().c_str()).compare("__init__") == 0) {
+                    child(0)->codeGen();
+                    child(i)->codeGenInit();
+                } else {
+                    child(i)->codeGen();
+                }
             }
             cout << "};" << endl;
         }
