@@ -204,6 +204,7 @@ protected:
         cout << "}" << endl;
     }
 
+
 };
 
 NODE_FACTORY (Method_AST, METHOD);
