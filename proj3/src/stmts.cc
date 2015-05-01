@@ -162,20 +162,14 @@ protected:
 
     NODE_CONSTRUCTORS (Method_AST, Def_AST);
 
-    /** Generate code for method, no need to wrap in struct
+/** Generate code for method, no need to wrap in struct
      * in case of __init__ replace with class name
      */
     void codeGen() {
         cout << convertAsPyType((Type_Ptr) child(2));
         cout << " ";
         std::string method_name = (std::string)(getId()->as_string().c_str());
-        if (method_name.compare("__init__") == 0) {
-            AST_Ptr my_class = getDecl()->getContainer()->getAst();
-            cout << (std::string)(my_class->getId()->as_string().c_str());
-        }
-        else {
-            cout << method_name << " ";
-        }
+        cout << method_name << " ";
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
@@ -205,6 +199,19 @@ protected:
     }
 
 
+    /** codeGen for __init__ */
+    void codeGenInit(AST_Ptr class_id) {
+        cout << (std::string) (class_id->as_string().c_str());
+        cout << " (";
+        child(1)->codeGen();
+        cout << ")" << endl <<  "{" << endl;
+        for (unsigned int i = 3; i < arity(); i++) {
+            child(i)->codeGen();
+        }
+        cout << "}" << endl;
+
+    }
+
 };
 
 NODE_FACTORY (Method_AST, METHOD);
@@ -221,7 +228,8 @@ protected:
     void codeGen() {
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
-            if (i < arity()-1) {
+            if (i < arity()-1
+                && ((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
                 cout << ", ";
             }
         }
@@ -282,6 +290,10 @@ protected:
                 if (c->oper()->syntax() == ASSIGN) {
                     c->codeGenVarDecl();
                     cout << ";" << endl;
+                }
+                else if (c->oper()->syntax() == METHOD 
+                    && ((std::string) c->child(0)->as_string().c_str()).compare("__init__") == 0) {
+                    c->codeGenInit(getId());
                 }
                 else {
                     c->codeGen();

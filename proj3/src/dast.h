@@ -111,6 +111,8 @@ public:
 
     virtual void codeGenVarDecl();
 
+    virtual void codeGenInit(AST_Ptr class_id);
+
     virtual string convertAsPyType(Type_Ptr TP);
 
 protected:

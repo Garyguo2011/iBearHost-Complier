@@ -112,6 +112,12 @@ AST::codeGenVarDecl()
     PASSDOWN(this, codeGenVarDecl(), 0);
 }
 
+void
+AST::codeGenInit(AST_Ptr class_id)
+{
+    PASSDOWN(this, codeGenInit(class_id), 0);
+}
+
 string
 AST::convertAsPyType(Type_Ptr TP)
 {
