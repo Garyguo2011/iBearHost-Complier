@@ -30,6 +30,7 @@
 # 	return x
 # a, b = 1, 2
 # print f(a, b)
+# x = 2
 # print x != 2
 # if x == 0:
 # 	print 0
@@ -41,26 +42,6 @@
 # 	print 3
 # print True
 # print False
-# a = 1
-# b = 2
-# def f(a):
-# 	# print a
-# 	def g(b):
-# 		print b
-# 		def h(c):
-# 			print "c in g"
-# 			return c
-# 		return h(b)
-# 	def h(c):
-# 		print c
-# 		# return c
-# 	print h("c")
-# 	return g(a)
-# def g(b):
-# 	return b
-# print f("a")
-# print g(b)
-# print len(xrange(1, 5))
-a = [1, 2, 3, 4]
-print a[0]
-
+class Hello:
+	pass
+	
