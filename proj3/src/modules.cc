@@ -28,11 +28,22 @@ protected:
     // FIXME: Dummy implementation.
     void codeGen () {
         cout << "#include \"runtime.h\"" << endl;
+
+        /** Generate code for class definitions*/
+        for_each_child(c, this) {
+            if (c->oper()->syntax() == CLASS) {
+                c->codeGen();
+            }
+        } end_for;
+
+        /** Generate code for function definitions*/
         for_each_child(c, this) {
             if (c->oper()->syntax() == DEF) {
                 c->codeGen();
             }
         } end_for;
+
+        /** Generate code for main function*/
         cout << "void" << endl
              << "__main__()" << endl
              << "{" << endl;
