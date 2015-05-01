@@ -1055,22 +1055,32 @@ __truth__ (PyValue v0)
 
 static PyList* commandLine;
 
-PyValue
+PyList*
 __argv__ ()
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    return commandLine;
 }
 
-PyValue
+PyStr*
 __read__ ()
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    string input_line;
+    while (cin) {
+        getline(cin, input_line);
+    }
+    return new PyStr(input_line);
 }
 
-PyValue
+PyStr*
 __readline__ ()
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    string s;
+    cin >> s;
+    s += "\\n";
+    return new PyStr(s);
 }
 
 

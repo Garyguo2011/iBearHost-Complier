@@ -14,6 +14,7 @@
 #include <cstdarg>
 #include <string>
 #include <cstdlib>
+#include <cstdio>
 
 using namespace std;
 
@@ -292,9 +293,9 @@ extern PyBool* __truth__ (PyValue v0);
 
 /* Communication with environment. */
 
-extern PyValue __argv__ ();
-extern PyValue __read__ ();
-extern PyValue __readline__ ();
+extern PyList* __argv__ ();
+extern PyStr* __read__ ();
+extern PyStr* __readline__ ();
 
 
 /***** Other runtime support. *****/
