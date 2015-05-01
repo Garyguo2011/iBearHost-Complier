@@ -267,14 +267,14 @@ protected:
         } 
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
-                // stringstream ss;
-                // ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
-                // string temp;
-                // ss >> temp;
-                // if (find(names.begin(), names.end(), temp) == names.end()) {
-                //     names.push_back (temp);
-                //     cout << convertAsPyType(getType()) << " ";
-                // }
+                stringstream ss;
+                ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+                string temp;
+                ss >> temp;
+                if (find(names.begin(), names.end(), temp) == names.end()) {
+                    names.push_back (temp);
+                    cout << convertAsPyType(getType()) << " ";
+                }
                 child(0)->codeGen();
                 cout << " = ";
                 child(1)->codeGen();
@@ -285,18 +285,17 @@ protected:
         } else {
             for (unsigned int i = 1; i < getType()->arity(); i++) {
                 if (child(0)->child(i-1)->getDecl()->assignable()) {
-                    // stringstream ss;
-                    // ss << child(0)->child(i-1)->as_string()
-                    //    << "_" << child(0)->child(i-1)->getDecl()->getIndex();
-                    // string temp;
-                    // ss >> temp;
+                    stringstream ss;
+                    ss << child(0)->child(i-1)->as_string()
+                       << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                    string temp;
+                    ss >> temp;
 
-                    // if (find(names.begin(), names.end(), temp) == names.end()) {
-                    //     names.push_back (temp);
-                    //     cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
-                    //     child(0)->child(i-1)->codeGen();
-                    //     cout << ";" << endl;
-                    // }
+                    if (find(names.begin(), names.end(), temp) == names.end()) {
+                        names.push_back (temp);
+                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        // child(0)->child(i-1)->codeGen();
+                    }
 
                     child(0)->child(i-1)->codeGen();
                     cout << " = ";
@@ -319,7 +318,6 @@ protected:
                 names.push_back (temp);
                 cout << convertAsPyType(getType()) << " ";
                 child(0)->codeGen();
-                cout << ";" << endl;
             }
         } else {
             for (unsigned int i = 1; i < getType()->arity(); i++) {
@@ -333,7 +331,6 @@ protected:
                     names.push_back (temp);
                     cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
                     child(0)->child(i-1)->codeGen();
-                    cout << ";" << endl;
                 }
             }
         }

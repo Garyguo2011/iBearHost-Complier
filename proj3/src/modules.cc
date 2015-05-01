@@ -35,6 +35,7 @@ protected:
                 c->codeGen();
             } else if (c->oper()->syntax() == ASSIGN) {
                 c->codeGenVarDecl();
+                cout << ";" << endl;
             }
         } end_for;
         cout << "void" << endl
