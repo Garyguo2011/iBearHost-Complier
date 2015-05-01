@@ -885,7 +885,7 @@ PyBool*
 __notcontains__dict__ (PyValue v0, PyDict* v1)
 {
     // return NULL;  // REPLACE WITH BODY
-    return __notcontains__dict__(v0, v1)->notBool();
+    return v1->contains(v0)->notBool();
 
 }
 
