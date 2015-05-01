@@ -43,11 +43,11 @@ class tuple3 of [$T1, $T2, $T3]:
 # # truth replaces bool(...) in regular Python.  truth(x) is True iff x is a
 # # true value, according to the Python spec.
 
-# def truth(x)::bool:
-#     native "__truth__"
+def truth(x)::bool:
+    native "__truth__"
 
-# def __not__(x)::bool:
-#     native "__not__"
+def __not__(x)::bool:
+    native "__not_bool__"
 
 # Type range
 
@@ -155,8 +155,8 @@ def __getitem__(S::list of $a, k::int)::$a:
 def __getslice__(S::list of $a, L::int, U::int)::list of $a:
     native "__getslice__list__"
 
-# def __setitem__(S::list of $a, k::int, val::$a)::$a:
-#     native "__setitem__list__"
+def __setitem__(S::list of $a, k::int, val::$a)::$a:
+    native "__setitem__list__"
 
 # def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
 #     native "__setslice__list__"
@@ -226,9 +226,9 @@ def __notin__(x::str, D::dict of [str, $b])::bool:
 
 # # General
 
-# def __is__(x, y)::bool:
-#     native "__is__"
+def __is__(x, y)::bool:
+    native "__is_bool__"
 
-# def __isnot__(x, y)::bool:
-#     native "__isnot__"
+def __isnot__(x, y)::bool:
+    native "__isnot_bool__"
 

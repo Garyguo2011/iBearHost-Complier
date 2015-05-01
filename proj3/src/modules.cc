@@ -15,6 +15,8 @@ static GCINIT _gcdummy;
 
 Decl* mainModule;
 
+// vector<string> names;
+
 /*****   MODULE    *****/
 
 /** A module, representing a complete source file. */
@@ -40,6 +42,9 @@ protected:
         for_each_child(c, this) {
             if (c->oper()->syntax() == DEF) {
                 c->codeGen();
+            } else if (c->oper()->syntax() == ASSIGN) {
+                c->codeGenVarDecl();
+                cout << ";" << endl;
             }
         } end_for;
 

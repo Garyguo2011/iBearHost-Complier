@@ -219,10 +219,10 @@ PyBool::notBool()
     }
 }
 
-PyValue
+PyBool*
 toPyBool (int v)
 {
-    return v ? PyTrue : PyFalse;
+    return v ? new PyBool(1) : new PyBool(0);
 }
 
 PyBool*
@@ -334,6 +334,13 @@ PyValue
 PyList::getItem(PyInt* val)
 {
     return items[val->getValue()];
+}
+
+PyValue
+PyList::setItem(PyInt* position, PyValue val)
+{
+    items[position->getValue()] = val;
+    return PyNone;
 }
 
 /* Dicts */
@@ -912,9 +919,10 @@ __len__list__ (PyList* v0)
 }
 
 PyValue
-__setitem__list__ (PyValue v0, PyValue v1, PyValue v2)
+__setitem__list__ (PyList* v0, PyInt* v1, PyValue v2)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    v0->asList()->setItem(v1, v2);
 }
 
 extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
@@ -939,28 +947,77 @@ __xrange__ (PyInt* v0, PyInt* v1)
 
 /* General values */
 
-PyValue
-__is__ (PyValue v0, PyValue v1)
+PyBool*
+__is_bool__ (PyValue v0, PyValue v1)
 {
-    return toPyBool (v0 == v1);
+    int i;
+    if (v0->typeName() == v1->typeName()){
+        if (v0->toStr() == v1->toStr())
+            i = 1;
+        else
+            i = 0;
+    } else {
+        i = 0;
+    }
+    return toPyBool (i);
 }
 
-PyValue
-__isnot__ (PyValue v0, PyValue v1)
+PyBool*
+__isnot_bool__ (PyValue v0, PyValue v1)
 {
-    return toPyBool (v0 != v1);
+    int i;
+    if (v0->typeName() != v1->typeName()){
+        i = 1;
+    } else if (v0->toStr() != v1->toStr()){
+        i = 1;
+    } else {
+        i = 0;
+    }
+    return toPyBool (i);
 }
 
-PyValue
-__not__ (PyValue v0)
+PyBool*
+__not_bool__ (PyValue v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    int i;
+    if (v0->typeName() == "bool"){
+        if (v0->toStr() == "True"){
+            i = 0;
+        } else {
+            i = 1;
+        }
+    } else if (v0->typeName() == "int") {
+        if (v0->asInt()->getValue() == 1){
+            i = 0;
+        } else {
+            i = 1;
+        }
+    } else {
+        i = 0;
+    }
+    return toPyBool(i);
 }
 
-PyValue
+PyBool*
 __truth__ (PyValue v0)
 {
-    return NULL;  // REPLACE WITH BODY
+    int i;
+    if (v0->typeName() == "bool"){
+        if (v0->toStr() == "True"){
+            i = 1;
+        } else {
+            i = 0;
+        }
+    } else if (v0->typeName() == "int") {
+        if (v0->asInt()->getValue() == 1){
+            i = 1;
+        } else {
+            i = 0;
+        }
+    } else {
+        i = 1;
+    }
+    return toPyBool(i);
 }
 
 

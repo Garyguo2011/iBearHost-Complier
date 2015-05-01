@@ -14,6 +14,8 @@
 #include <string>
 #include <iostream>
 #include "horn-common.h"
+#include <algorithm>
+#include <sstream>
 
 #include "../lib/runtime.h"
 
@@ -106,6 +108,8 @@ public:
     virtual void codeGenNative();
 
     virtual void codeGenInternalFunc();
+
+    virtual void codeGenVarDecl();
 
     virtual string convertAsPyType(Type_Ptr TP);
 

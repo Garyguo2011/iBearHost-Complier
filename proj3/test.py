@@ -44,4 +44,53 @@
 # print False
 class Hello:
 	pass
-	
+
+# a = 1
+# b = 2
+# def f(a):
+# 	# print a
+# 	def g(b):
+# 		print b
+# 		def h(c):
+# 			print "c in g"
+# 			return c
+# 		return h(b)
+# 	def h(c):
+# 		print c
+# 		# return c
+# 	print h("c")
+# 	return g(a)
+# def g(b):
+# 	return b
+# print f("a")
+# print g(b)
+# print len(xrange(1, 5))
+# a = [1, 2, 3, 4]
+# print a[0]
+
+
+# def f():
+# 	a = 4
+# 	a = 5
+# 	return a
+# print f()
+
+# x = 5
+# def f():
+# 	return x
+# print f()
+x = 5
+def f():
+	x = 6
+	return x
+print f()
+
+a = [1, 2]
+print a
+a = [2, 3, 4, 5]
+print a
+b = 4
+print b
+b = 7
+print b
+

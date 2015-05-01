@@ -1,322 +1,384 @@
 #include "runtime.h"
-struct xrange24_local {
-PyRange* xrange_24(PyInt* low_26, PyInt* high_28)
+struct truth30_local {
+PyBool* truth_30(PyValue x_32)
 {
-return __xrange__(low_26, high_28);
+return __truth__(x_32);
 }
-} xrange_24;
+} truth_30;
 
-struct len31_local {
-PyInt* len_31(PyRange* r_33)
+struct __not__35_local {
+PyBool* __not__(PyValue x_37)
 {
-return __len__range__(r_33);
+return __not_bool__(x_37);
 }
-} len_31;
+} __not___35;
 
-struct __add__37_local {
-PyInt* __add__(PyInt* x_39, PyInt* y_41)
+struct xrange41_local {
+PyRange* xrange_41(PyInt* low_43, PyInt* high_45)
 {
-return __add__int__(x_39, y_41);
+return __xrange__(low_43, high_45);
 }
-} __add___37;
+} xrange_41;
 
-struct __sub__45_local {
-PyInt* __sub__(PyInt* x_47, PyInt* y_49)
+struct len48_local {
+PyInt* len_48(PyRange* r_50)
 {
-return __sub__int__(x_47, y_49);
+return __len__range__(r_50);
 }
-} __sub___45;
+} len_48;
 
-struct __mul__53_local {
-PyInt* __mul__(PyInt* x_55, PyInt* y_57)
+struct __add__54_local {
+PyInt* __add__(PyInt* x_56, PyInt* y_58)
 {
-return __mul__int__(x_55, y_57);
+return __add__int__(x_56, y_58);
 }
-} __mul___53;
+} __add___54;
 
-struct __floordiv__61_local {
-PyInt* __floordiv__(PyInt* x_63, PyInt* y_65)
+struct __sub__62_local {
+PyInt* __sub__(PyInt* x_64, PyInt* y_66)
 {
-return __floordiv__int__(x_63, y_65);
+return __sub__int__(x_64, y_66);
 }
-} __floordiv___61;
+} __sub___62;
 
-struct __mod__69_local {
-PyInt* __mod__(PyInt* x_71, PyInt* y_73)
+struct __mul__70_local {
+PyInt* __mul__(PyInt* x_72, PyInt* y_74)
 {
-return __mod__int__(x_71, y_73);
+return __mul__int__(x_72, y_74);
 }
-} __mod___69;
+} __mul___70;
 
-struct __pow__77_local {
-PyInt* __pow__(PyInt* x_79, PyInt* y_81)
+struct __floordiv__78_local {
+PyInt* __floordiv__(PyInt* x_80, PyInt* y_82)
 {
-return __pow__int__(x_79, y_81);
+return __floordiv__int__(x_80, y_82);
 }
-} __pow___77;
+} __floordiv___78;
 
-struct __neg__84_local {
-PyInt* __neg__(PyInt* x_86)
+struct __mod__86_local {
+PyInt* __mod__(PyInt* x_88, PyInt* y_90)
 {
-return __neg__int__(x_86);
+return __mod__int__(x_88, y_90);
 }
-} __neg___84;
+} __mod___86;
 
-struct __pos__89_local {
-PyInt* __pos__(PyInt* x_91)
+struct __pow__94_local {
+PyInt* __pow__(PyInt* x_96, PyInt* y_98)
 {
-return __pos__int__(x_91);
+return __pow__int__(x_96, y_98);
 }
-} __pos___89;
+} __pow___94;
 
-struct __lt__95_local {
-PyBool* __lt__(PyInt* x_97, PyInt* y_99)
+struct __neg__101_local {
+PyInt* __neg__(PyInt* x_103)
 {
-return __lt__int__(x_97, y_99);
+return __neg__int__(x_103);
 }
-} __lt___95;
+} __neg___101;
 
-struct __gt__103_local {
-PyBool* __gt__(PyInt* x_105, PyInt* y_107)
+struct __pos__106_local {
+PyInt* __pos__(PyInt* x_108)
 {
-return __gt__int__(x_105, y_107);
+return __pos__int__(x_108);
 }
-} __gt___103;
+} __pos___106;
 
-struct __le__111_local {
-PyBool* __le__(PyInt* x_113, PyInt* y_115)
+struct __lt__112_local {
+PyBool* __lt__(PyInt* x_114, PyInt* y_116)
 {
-return __le__int__(x_113, y_115);
+return __lt__int__(x_114, y_116);
 }
-} __le___111;
+} __lt___112;
 
-struct __ge__119_local {
-PyBool* __ge__(PyInt* x_121, PyInt* y_123)
+struct __gt__120_local {
+PyBool* __gt__(PyInt* x_122, PyInt* y_124)
 {
-return __ge__int__(x_121, y_123);
+return __gt__int__(x_122, y_124);
 }
-} __ge___119;
+} __gt___120;
 
-struct __eq__127_local {
-PyBool* __eq__(PyInt* x_129, PyInt* y_131)
+struct __le__128_local {
+PyBool* __le__(PyInt* x_130, PyInt* y_132)
 {
-return __eq__int__(x_129, y_131);
+return __le__int__(x_130, y_132);
 }
-} __eq___127;
+} __le___128;
 
-struct __ne__135_local {
-PyBool* __ne__(PyInt* x_137, PyInt* y_139)
+struct __ge__136_local {
+PyBool* __ge__(PyInt* x_138, PyInt* y_140)
 {
-return __ne__int__(x_137, y_139);
+return __ge__int__(x_138, y_140);
 }
-} __ne___135;
+} __ge___136;
 
-struct toint142_local {
-PyInt* toint_142(PyStr* x_144)
+struct __eq__144_local {
+PyBool* __eq__(PyInt* x_146, PyInt* y_148)
 {
-return __toint__str__(x_144);
+return __eq__int__(x_146, y_148);
 }
-} toint_142;
+} __eq___144;
 
-struct __add__148_local {
-PyStr* __add__(PyStr* x_150, PyStr* y_152)
+struct __ne__152_local {
+PyBool* __ne__(PyInt* x_154, PyInt* y_156)
 {
-return __add__str__(x_150, y_152);
+return __ne__int__(x_154, y_156);
 }
-} __add___148;
+} __ne___152;
 
-struct __mul__156_local {
-PyStr* __mul__(PyStr* x_158, PyInt* y_160)
+struct toint159_local {
+PyInt* toint_159(PyStr* x_161)
 {
-return __lmul__str__(x_158, y_160);
+return __toint__str__(x_161);
 }
-} __mul___156;
+} toint_159;
 
-struct __mul__164_local {
-PyStr* __mul__(PyInt* x_166, PyStr* y_168)
+struct __add__165_local {
+PyStr* __add__(PyStr* x_167, PyStr* y_169)
 {
-return __rmul__str__(x_166, y_168);
+return __add__str__(x_167, y_169);
 }
-} __mul___164;
+} __add___165;
 
-struct __lt__172_local {
-PyBool* __lt__(PyStr* x_174, PyStr* y_176)
+struct __mul__173_local {
+PyStr* __mul__(PyStr* x_175, PyInt* y_177)
 {
-return __lt__str__(x_174, y_176);
+return __lmul__str__(x_175, y_177);
 }
-} __lt___172;
+} __mul___173;
 
-struct __gt__180_local {
-PyBool* __gt__(PyStr* x_182, PyStr* y_184)
+struct __mul__181_local {
+PyStr* __mul__(PyInt* x_183, PyStr* y_185)
 {
-return __gt__str__(x_182, y_184);
+return __rmul__str__(x_183, y_185);
 }
-} __gt___180;
+} __mul___181;
 
-struct __le__188_local {
-PyBool* __le__(PyStr* x_190, PyStr* y_192)
+struct __lt__189_local {
+PyBool* __lt__(PyStr* x_191, PyStr* y_193)
 {
-return __le__str__(x_190, y_192);
+return __lt__str__(x_191, y_193);
 }
-} __le___188;
+} __lt___189;
 
-struct __ge__196_local {
-PyBool* __ge__(PyStr* x_198, PyStr* y_200)
+struct __gt__197_local {
+PyBool* __gt__(PyStr* x_199, PyStr* y_201)
 {
-return __ge__str__(x_198, y_200);
+return __gt__str__(x_199, y_201);
 }
-} __ge___196;
+} __gt___197;
 
-struct __eq__204_local {
-PyBool* __eq__(PyStr* x_206, PyStr* y_208)
+struct __le__205_local {
+PyBool* __le__(PyStr* x_207, PyStr* y_209)
 {
-return __eq__str__(x_206, y_208);
+return __le__str__(x_207, y_209);
 }
-} __eq___204;
+} __le___205;
 
-struct __ne__212_local {
-PyBool* __ne__(PyStr* x_214, PyStr* y_216)
+struct __ge__213_local {
+PyBool* __ge__(PyStr* x_215, PyStr* y_217)
 {
-return __ne__str__(x_214, y_216);
+return __ge__str__(x_215, y_217);
 }
-} __ne___212;
+} __ge___213;
 
-struct __getitem__220_local {
-PyStr* __getitem__(PyStr* S_222, PyInt* k_224)
+struct __eq__221_local {
+PyBool* __eq__(PyStr* x_223, PyStr* y_225)
 {
-return __getitem__str__(S_222, k_224);
+return __eq__str__(x_223, y_225);
 }
-} __getitem___220;
+} __eq___221;
 
-struct __getslice__229_local {
-PyStr* __getslice__(PyStr* S_231, PyInt* L_233, PyInt* U_235)
+struct __ne__229_local {
+PyBool* __ne__(PyStr* x_231, PyStr* y_233)
 {
-return __getslice__str__(S_231, L_233, U_235);
+return __ne__str__(x_231, y_233);
 }
-} __getslice___229;
+} __ne___229;
 
-struct len238_local {
-PyInt* len_238(PyStr* S_240)
+struct __getitem__237_local {
+PyStr* __getitem__(PyStr* S_239, PyInt* k_241)
 {
-return __len__str__(S_240);
+return __getitem__str__(S_239, k_241);
 }
-} len_238;
+} __getitem___237;
 
-struct tostr243_local {
-PyStr* tostr_243(PyValue x_245)
+struct __getslice__246_local {
+PyStr* __getslice__(PyStr* S_248, PyInt* L_250, PyInt* U_252)
 {
-return __tostr__(x_245);
+return __getslice__str__(S_248, L_250, U_252);
 }
-} tostr_243;
+} __getslice___246;
 
-struct __getitem__249_local {
-PyValue __getitem__(PyList* S_251, PyInt* k_253)
+struct len255_local {
+PyInt* len_255(PyStr* S_257)
 {
-return __getitem__list__(S_251, k_253);
+return __len__str__(S_257);
 }
-} __getitem___249;
+} len_255;
 
-struct __getslice__259_local {
-PyList* __getslice__(PyList* S_261, PyInt* L_263, PyInt* U_265)
+struct tostr260_local {
+PyStr* tostr_260(PyValue x_262)
 {
-return __getslice__list__(S_261, L_263, U_265);
+return __tostr__(x_262);
 }
-} __getslice___259;
+} tostr_260;
 
-struct len269_local {
-PyInt* len_269(PyList* S_271)
+struct __getitem__266_local {
+PyValue __getitem__(PyList* S_268, PyInt* k_270)
 {
-return __len__list__(S_271);
+return __getitem__list__(S_268, k_270);
 }
-} len_269;
+} __getitem___266;
 
-struct __getitem__276_local {
-PyValue __getitem__(PyDictInt* D_278, PyInt* x_280)
+struct __getslice__276_local {
+PyList* __getslice__(PyList* S_278, PyInt* L_280, PyInt* U_282)
 {
-return __getitem__dict__(D_278, x_280);
+return __getslice__list__(S_278, L_280, U_282);
 }
-} __getitem___276;
+} __getslice___276;
 
-struct __getitem__285_local {
-PyValue __getitem__(PyDictBool* D_287, PyBool* x_289)
+struct __setitem__288_local {
+PyValue __setitem__(PyList* S_290, PyInt* k_292, PyValue val_294)
 {
-return __getitem__dict__(D_287, x_289);
+return __setitem__list__(S_290, k_292, val_294);
 }
-} __getitem___285;
+} __setitem___288;
 
-struct __getitem__294_local {
-PyValue __getitem__(PyDictStr* D_296, PyStr* x_298)
+struct len298_local {
+PyInt* len_298(PyList* S_300)
 {
-return __getitem__dict__(D_296, x_298);
+return __len__list__(S_300);
 }
-} __getitem___294;
+} len_298;
 
-struct len302_local {
-PyInt* len_302(PyDictInt* D_304)
+struct __getitem__305_local {
+PyValue __getitem__(PyDictInt* D_307, PyInt* x_309)
 {
-return __len__dict__(D_304);
+return __getitem__dict__(D_307, x_309);
 }
-} len_302;
+} __getitem___305;
 
-struct len308_local {
-PyInt* len_308(PyDictBool* D_310)
+struct __getitem__314_local {
+PyValue __getitem__(PyDictBool* D_316, PyBool* x_318)
 {
-return __len__dict__(D_310);
+return __getitem__dict__(D_316, x_318);
 }
-} len_308;
+} __getitem___314;
 
-struct len314_local {
-PyInt* len_314(PyDictStr* D_316)
+struct __getitem__323_local {
+PyValue __getitem__(PyDictStr* D_325, PyStr* x_327)
 {
-return __len__dict__(D_316);
+return __getitem__dict__(D_325, x_327);
 }
-} len_314;
+} __getitem___323;
 
-struct __in__321_local {
-PyBool* __in__(PyInt* x_323, PyDictInt* D_325)
+struct len331_local {
+PyInt* len_331(PyDictInt* D_333)
 {
-return __contains__dict__(x_323, D_325);
+return __len__dict__(D_333);
 }
-} __in___321;
+} len_331;
 
-struct __in__330_local {
-PyBool* __in__(PyBool* x_332, PyDictBool* D_334)
+struct len337_local {
+PyInt* len_337(PyDictBool* D_339)
 {
-return __contains__dict__(x_332, D_334);
+return __len__dict__(D_339);
 }
-} __in___330;
+} len_337;
 
-struct __in__339_local {
-PyBool* __in__(PyStr* x_341, PyDictStr* D_343)
+struct len343_local {
+PyInt* len_343(PyDictStr* D_345)
 {
-return __contains__dict__(x_341, D_343);
+return __len__dict__(D_345);
 }
-} __in___339;
+} len_343;
 
-struct __notin__348_local {
-PyBool* __notin__(PyInt* x_350, PyDictInt* D_352)
+struct __in__350_local {
+PyBool* __in__(PyInt* x_352, PyDictInt* D_354)
 {
-return __notcontains__dict__(x_350, D_352);
+return __contains__dict__(x_352, D_354);
 }
-} __notin___348;
+} __in___350;
 
-struct __notin__357_local {
-PyBool* __notin__(PyBool* x_359, PyDictBool* D_361)
+struct __in__359_local {
+PyBool* __in__(PyBool* x_361, PyDictBool* D_363)
 {
-return __notcontains__dict__(x_359, D_361);
+return __contains__dict__(x_361, D_363);
 }
-} __notin___357;
+} __in___359;
 
-struct __notin__366_local {
-PyBool* __notin__(PyStr* x_368, PyDictStr* D_370)
+struct __in__368_local {
+PyBool* __in__(PyStr* x_370, PyDictStr* D_372)
 {
-return __notcontains__dict__(x_368, D_370);
+return __contains__dict__(x_370, D_372);
 }
-} __notin___366;
+} __in___368;
 
+struct __notin__377_local {
+PyBool* __notin__(PyInt* x_379, PyDictInt* D_381)
+{
+return __notcontains__dict__(x_379, D_381);
+}
+} __notin___377;
+
+struct __notin__386_local {
+PyBool* __notin__(PyBool* x_388, PyDictBool* D_390)
+{
+return __notcontains__dict__(x_388, D_390);
+}
+} __notin___386;
+
+struct __notin__395_local {
+PyBool* __notin__(PyStr* x_397, PyDictStr* D_399)
+{
+return __notcontains__dict__(x_397, D_399);
+}
+} __notin___395;
+
+struct __is__404_local {
+PyBool* __is__(PyValue x_406, PyValue y_408)
+{
+return __is_bool__(x_406, y_408);
+}
+} __is___404;
+
+struct __isnot__412_local {
+PyBool* __isnot__(PyValue x_414, PyValue y_416)
+{
+return __isnot_bool__(x_414, y_416);
+}
+} __isnot___412;
+
+PyInt* x_418;
+struct f421_local {
+PyInt* f_421()
+{
+PyInt* x_423 = __cons_int__ (6);
+return x_423;
+}
+} f_421;
+
+PyList* a_427;
+;
+PyInt* b_433;
+;
 void
 __main__()
 {
-PyList* a_373 = __cons_list__(4, __cons_int__ (1), __cons_int__ (2), __cons_int__ (3), __cons_int__ (4));
+x_418 = __cons_int__ (5);
+__print__(1, f_421.f_421());
+__newline__();
+a_427 = __cons_list__(2, __cons_int__ (1), __cons_int__ (2));
+__print__(1, a_427);
+__newline__();
+a_427 = __cons_list__(4, __cons_int__ (2), __cons_int__ (3), __cons_int__ (4), __cons_int__ (5));
+__print__(1, a_427);
+__newline__();
+b_433 = __cons_int__ (4);
+__print__(1, b_433);
+__newline__();
+b_433 = __cons_int__ (7);
+__print__(1, b_433);
+__newline__();
 
 }

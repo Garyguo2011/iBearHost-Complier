@@ -106,8 +106,12 @@ AST::codeGenInternalFunc()
 {
     PASSDOWN(this, codeGenInternalFunc(), 0);
 }
+void
+AST::codeGenVarDecl()
+{
+    PASSDOWN(this, codeGenVarDecl(), 0);
+}
 
-/** Convert class name to proper py type name */
 string
 AST::convertAsPyType(Type_Ptr TP)
 {

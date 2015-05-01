@@ -13,6 +13,8 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
+vector<string> names;
+
 /***** PRINT *****/
 
 class Print_AST : public AST_Tree {
@@ -124,11 +126,12 @@ protected:
                 }
             }
             cout << ");" << endl;
-        } else if (child(arity()-1)->oper()->syntax() != RETURN) {
-            cout << "return NULL;";
-        } else {
+        }else {
             for (unsigned int i = 3; i < arity(); i++) {
                 child(i)->codeGen();
+            }
+            if (child(arity()-1)->oper()->syntax() != RETURN) {
+                cout << "return NULL;" << endl;
             }
         }
         cout << "}" << endl;
@@ -266,9 +269,28 @@ protected:
         // cerr << "child 1 arity :" << child(1)->arity() << "\n";
         // getType()->print(cerr, 4);
         // cerr << ", as type\n";
+        if (child(0)->oper()->syntax() == SUBSCRIPT_ASSIGN){
+            child(0)->child(0)->codeGen();
+            cout << "_" << child(0)->child(0)->getDecl()->getIndex() << ".";
+            child(0)->child(0)->codeGen();
+            cout << "(";
+            child(0)->child(1)->codeGen();
+            cout << ",";
+            child(0)->child(2)->codeGen();
+            cout << ",";
+            child(1)->codeGen();
+            cout << ");";
+        } 
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
-                cout << convertAsPyType(getType()) << " ";
+                stringstream ss;
+                ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+                string temp;
+                ss >> temp;
+                if (find(names.begin(), names.end(), temp) == names.end()) {
+                    names.push_back (temp);
+                    cout << convertAsPyType(getType()) << " ";
+                }
                 child(0)->codeGen();
                 cout << " = ";
                 child(1)->codeGen();
@@ -279,13 +301,52 @@ protected:
         } else {
             for (unsigned int i = 1; i < getType()->arity(); i++) {
                 if (child(0)->child(i-1)->getDecl()->assignable()) {
-                    cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                    stringstream ss;
+                    ss << child(0)->child(i-1)->as_string()
+                       << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                    string temp;
+                    ss >> temp;
+
+                    if (find(names.begin(), names.end(), temp) == names.end()) {
+                        names.push_back (temp);
+                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        // child(0)->child(i-1)->codeGen();
+                    }
+
                     child(0)->child(i-1)->codeGen();
                     cout << " = ";
                     child(1)->child(i-1)->codeGen();
                     cout << ";\n";
                 } else {
                     fatal("This ID can't be assigned.");
+                }
+            }
+        }
+    }
+
+    void codeGenVarDecl() {
+        if (child(0)->arity() == 0) {
+            stringstream ss;
+            ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+            string temp;
+            ss >> temp;
+            if (find(names.begin(), names.end(), temp) == names.end()) {
+                names.push_back (temp);
+                cout << convertAsPyType(getType()) << " ";
+                child(0)->codeGen();
+            }
+        } else {
+            for (unsigned int i = 1; i < getType()->arity(); i++) {
+                stringstream ss;
+                ss << child(0)->child(i-1)->as_string()
+                   << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                string temp;
+                ss >> temp;
+
+                if (find(names.begin(), names.end(), temp) == names.end()) {
+                    names.push_back (temp);
+                    cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                    child(0)->child(i-1)->codeGen();
                 }
             }
         }
@@ -335,6 +396,20 @@ class For_AST : public AST_Tree {
 protected:
 
     NODE_CONSTRUCTORS (For_AST, AST_Tree);
+
+    void codeGen ()
+    {
+        cout << "for (";
+        child(0)->codeGen();
+        cout << ") {" << endl;
+        child(1)->codeGen();
+        cout << "}" << endl;
+        if (arity() > 2) {
+            // cout << "else {" << endl;
+            child(2)->codeGen();
+            // cout << "}" << endl;
+        }
+    }
 
 };
 
@@ -412,9 +487,9 @@ protected:
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {
-            cout << "else {" << endl;
+            // cout << "else {" << endl;
             child(2)->codeGen();
-            cout << "}" << endl;
+            // cout << "}" << endl;
         }
     }
 
