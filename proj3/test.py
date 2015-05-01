@@ -30,6 +30,7 @@
 # 	return x
 # a, b = 1, 2
 # print f(a, b)
+# x = 2
 # print x != 2
 # if x == 0:
 # 	print 0
@@ -41,6 +42,9 @@
 # 	print 3
 # print True
 # print False
+class Hello:
+	pass
+
 # a = 1
 # b = 2
 # def f(a):
@@ -75,19 +79,18 @@
 # def f():
 # 	return x
 # print f()
-x = 5
-def f():
-	x = 6
-	return x
-print f()
+# x = 5
+# def f():
+# 	x = 6
+# 	return x
+# print f()
 
-a = [1, 2]
-print a
-a = [2, 3, 4, 5]
-print a
-b = 4
-print b
-b = 7
-print b
-
+# a = [1, 2]
+# print a
+# a = [2, 3, 4, 5]
+# print a
+# b = 4
+# print b
+# b = 7
+# print b
 
