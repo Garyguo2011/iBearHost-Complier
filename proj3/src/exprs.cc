@@ -347,7 +347,7 @@ protected:
     /** Generate code for attribute reference*/
     void codeGen() {
         child(0)->codeGen();
-        cout << "."
+        cout << ".";
         child(1)->codeGen();
     }
 
