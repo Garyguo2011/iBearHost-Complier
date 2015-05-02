@@ -67,6 +67,9 @@ protected:
             }
         } end_for;
         cout << endl;
+        if (child(arity()-1)->oper()->syntax() == PRINT) {
+            cout << "__newline__();" << endl;
+        }
         cout << "}" << endl;
     }
 

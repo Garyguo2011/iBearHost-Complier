@@ -118,6 +118,12 @@ AST::codeGenInit(AST_Ptr class_id)
     PASSDOWN(this, codeGenInit(class_id), 0);
 }
 
+void
+AST::codeGenRecursiveCall(AST_Ptr func_id)
+{
+    PASSDOWN(this, codeGenRecursiveCall(func_id), 0);
+}
+
 string
 AST::convertAsPyType(Type_Ptr TP)
 {

@@ -168,6 +168,24 @@ protected:
         cout << ")";
     }
 
+    void codeGenRecursiveCall(AST_Ptr func_id) {
+        std::string func_name = func_id->as_string().c_str();
+        std::string call_name = child(0)->as_string().c_str();
+        if (func_name.compare(call_name) != 0) {
+            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        }
+        child(0)->codeGen();
+        cout<< "(";
+        for (unsigned int i = 1; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1)
+            {
+                cout << ", ";   
+            }
+        }
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (Call_AST, CALL);
@@ -230,6 +248,32 @@ protected:
         cout << ")";
     }
 
+    void codeGenRecursiveCall(AST_Ptr func_id) {
+        std::string func_name = func_id->as_string().c_str();
+        std::string call_name = child(0)->as_string().c_str();
+        if (func_name.compare(call_name) != 0) {
+            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        }
+        child(0)->codeGen();
+        cout << "(";
+        if (child(1)->oper()->syntax() == CALL
+                || child(1)->oper()->syntax() == BINOP
+                || child(1)->oper()->syntax() == UNOP) {
+                child(1)->codeGenRecursiveCall(func_id);
+        } else {
+            child(1)->codeGen();
+        }
+        cout << ", ";
+        if (child(2)->oper()->syntax() == CALL
+                || child(2)->oper()->syntax() == BINOP
+                || child(2)->oper()->syntax() == UNOP) {
+                child(2)->codeGenRecursiveCall(func_id);
+        } else {
+            child(2)->codeGen();
+        }
+        cout << ")";
+    }
+
 };    
 
 NODE_FACTORY (Binop_AST, BINOP);
@@ -245,7 +289,7 @@ protected:
     void codeGen() {
         cout << "(";
         if (child(1)->oper()->syntax() == LEFT_COMPARE){
-            cout << "__eval_bool__";
+            cout << "(PyBool*) __and__";
             cout << "(";
             cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
             child(0)->codeGen();
@@ -254,9 +298,9 @@ protected:
             cout << ", ";
             child(2)->codeGen();
             cout << ")";
-            cout << ")";
-            cout << " && ";
+            cout << ",";
             child(1)->codeGen();
+            cout << ")";
         } else {
             cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
             child(0)->codeGen();
@@ -282,8 +326,9 @@ protected:
 
     NODE_CONSTRUCTORS (LeftCompare_AST, Binop_AST);
     void codeGen() {
+        cout << "(";
         if (child(1)->oper()->syntax() == LEFT_COMPARE){
-            cout << "__eval_bool__";
+            cout << "(PyBool*) __and__";
             cout << "(";
             cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
             child(0)->codeGen();
@@ -292,11 +337,10 @@ protected:
             cout << ", ";
             child(2)->codeGen();
             cout << ")";
-            cout << ")";
-            cout << " && ";
+            cout << ",";
             child(1)->codeGen();
+            cout << ")";
         } else {
-            cout << "(";
             cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
             child(0)->codeGen();
             cout << "(";
@@ -304,8 +348,8 @@ protected:
             cout << ", ";
             child(2)->codeGen();
             cout << ")";
-            cout << ")";
         }
+        cout << ")";
     }
 
 };
@@ -323,6 +367,24 @@ class Unop_AST : public Callable {
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();
+        cout << ")";
+    }
+
+    void codeGenRecursiveCall(AST_Ptr func_id) {
+        std::string func_name = func_id->as_string().c_str();
+        std::string call_name = child(0)->as_string().c_str();
+        if (func_name.compare(call_name) != 0) {
+            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        }
+        child(0)->codeGen();
+        cout << "(";
+        if (child(1)->oper()->syntax() == CALL
+                || child(1)->oper()->syntax() == BINOP
+                || child(1)->oper()->syntax() == UNOP) {
+                child(1)->codeGenRecursiveCall(func_id);
+        } else {
+            child(1)->codeGen();
+        }
         cout << ")";
     }
 
@@ -603,6 +665,16 @@ protected:
 
     NODE_CONSTRUCTORS (And_AST, BalancedExpr);
 
+    void codeGen () {
+        cout << "(";
+        cout << convertAsPyType(getType()) << ") ";
+        cout << "__and__(";
+        child(0)->codeGen();
+        cout << ", ";
+        child(1)->codeGen();
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (And_AST, AND);
@@ -614,6 +686,16 @@ class Or_AST : public BalancedExpr {
 protected:
 
     NODE_CONSTRUCTORS (Or_AST, BalancedExpr);
+
+    void codeGen () {
+        cout << "(";
+        cout << convertAsPyType(getType()) << ") ";
+        cout << "__or__(";
+        child(0)->codeGen();
+        cout << ", ";
+        child(1)->codeGen();
+        cout << ")";
+    }
 
 };
 

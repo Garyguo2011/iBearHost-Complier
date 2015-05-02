@@ -164,17 +164,17 @@ def __setitem__(S::list of $a, k::int, val::$a)::$a:
 def len(S::list of $a)::int:
     native "__len__list__"
 
-# # Replaces sys.argv
-# def argv()::list of str:
-#     native "__argv__"
+# Replaces sys.argv
+def argv()::list of str:
+    native "__argv__"
 
-# # Type file
+# Type file
 
-# def readline()::str:
-#     native "__readline__"
+def readline()::str:
+    native "__readline__"
 
-# def read()::str:
-#     native "__read__"
+def read()::str:
+    native "__read__"
 
 # Type dict
 

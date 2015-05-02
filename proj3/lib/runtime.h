@@ -14,6 +14,7 @@
 #include <cstdarg>
 #include <string>
 #include <cstdlib>
+#include <cstdio>
 
 using namespace std;
 
@@ -50,6 +51,7 @@ public:
     virtual const char* typeName ();
     virtual string toStr();
     virtual int getSize();
+    virtual string strFormat(PyValue val);
 
     /** Conversion functions */
     virtual PyStr* asStr ();
@@ -125,9 +127,11 @@ public:
     const char* typeName ();
     int getSize();
     string toStr();
-    PyValue get(int index);
+    PyInt* get(int index);
+    PyInt* first();
 private:
-    vector<PyValue> items;
+    vector<PyInt*> items;
+    PyInt* _first;
 };
 
 class PyList : public PyObject {
@@ -292,13 +296,15 @@ extern PyBool* __truth__ (PyValue v0);
 
 /* Communication with environment. */
 
-extern PyValue __argv__ ();
-extern PyValue __read__ ();
-extern PyValue __readline__ ();
+extern PyList* __argv__ ();
+extern PyStr* __read__ ();
+extern PyStr* __readline__ ();
 
 
 /***** Other runtime support. *****/
 
+/** figure out whether to print a space.*/
+extern void __printspace__();
 /** Print V on cout. */
 extern void __print__(int count, ...);
 /** Print a newline on cout. */
@@ -447,6 +453,27 @@ static inline int
 __eval_bool__(PyValue val)
 {
     return val->asBool()->getValue();
+}
+
+static inline PyValue
+__and__(PyValue val0, PyValue val1)
+{
+    int v0 = __eval_bool__(__truth__(val0));
+    if (v0 == 0) {
+        return val0;
+    }
+    return val1;
+}
+
+static inline PyValue
+__or__(PyValue val0, PyValue val1)
+{
+    int v0 = __eval_bool__(__truth__(val0));
+    if (v0 == 1) {
+        return val0;
+    }
+    return val1;
+    
 }
 
 #endif
