@@ -68,7 +68,7 @@ Decl::Decl (const gcstring& name, Decl* container, Environ* members)
         
 /* Print THIS on OUT. */ 
 void 
-Decl::print (ostream& out) const
+Decl::print (ostream& out, const DeclSet& used) const
 {
     out << "(" << declTypeName () << " " << getIndex () 
 	<< " " << getName () << " ";
@@ -76,15 +76,15 @@ Decl::print (ostream& out) const
     printPosition (out);
     printType (out);
     printTypeParams (out);
-    printMembersList (out);
+    printMembersList (out, used);
     out << ")";
     out.flush ();
 }
 
 void
-Decl::print () const
+Decl::print (const DeclSet& used) const
 {
-    print (cout);
+    print (cout, used);
 }
 
 void
@@ -105,12 +105,13 @@ Decl::printType (ostream& out) const {
 }
 
 void
-Decl::printMembersList (ostream& out) const {
+Decl::printMembersList (ostream& out, const DeclSet& used) const {
     if (_members != NULL) {
 	out << " (index_list";
 	const gcvector<Decl*>& members = getEnviron ()->get_members ();
 	for (size_t i = 0; i < members.size (); i += 1)
-	    out << " " << members[i]->getIndex ();
+	    if (used.count (members[i]) > 0) 
+		out << " " << members[i]->getIndex ();
 	out << ")";
     }
 }
@@ -739,7 +740,7 @@ outputDecls (ostream& out, const DeclSet& used)
     for (size_t i = 0; i < allDecls.size (); i += 1) {
         Decl* d = allDecls[i];
         if (used.count (d) > 0) {
-            allDecls[i]->print (out);
+            allDecls[i]->print (out, used);
             out << endl;
         }
     }

@@ -222,6 +222,6 @@ DB(Type* x)
 void
 DB(Decl* d)
 {
-    d->print(cerr);
+    d->print(cerr, DeclSet());
 }
     

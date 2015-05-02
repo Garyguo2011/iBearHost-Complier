@@ -98,10 +98,10 @@ public:
     const gcstring& getName () const { return _name; }
 
     /** Print THIS on OUT. */
-    virtual void print(std::ostream& out) const;
+    virtual void print(std::ostream& out, const DeclSet& used) const;
 
     /** Print THIS on the standard output. */
-    virtual void print () const;
+    virtual void print (const DeclSet& used) const;
 
     /** Get my container (null if none). */
     virtual Decl* getContainer () const { return _container; }
@@ -235,7 +235,7 @@ protected:
 
     /** Print my index list of members or local definitions on OUT,
      *  if applicable, and otherwise do nothing. */
-    virtual void printMembersList (std::ostream& out) const;
+    virtual void printMembersList (std::ostream& out, const DeclSet& used) const;
 
 protected:
     bool _frozen;
