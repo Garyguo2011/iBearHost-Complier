@@ -128,11 +128,14 @@ protected:
             }
             cout << ");" << endl;
         }else {
-            for (unsigned int i = 3; i < arity(); i++) {
+            for (unsigned int i = 3; i < arity()-1; i++) {
                 child(i)->codeGen();
             }
             if (child(arity()-1)->oper()->syntax() != RETURN) {
+                child(arity()-1)->codeGen();
                 cout << "return NULL;" << endl;
+            } else {
+                child(arity()-1)->codeGenRecursiveCall(getId());
             }
         }
         cout << "}" << endl;
@@ -348,6 +351,7 @@ protected:
             child(1)->codeGen();
             cout << ");";
         } 
+
         if (child(0)->arity() == 0) {
             if (child(0)->getDecl()->assignable()) {
                 stringstream ss;
@@ -514,6 +518,20 @@ protected:
         cout << "return ";
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
+        }
+        cout << ";" << endl;
+    }
+
+    void codeGenRecursiveCall(AST_Ptr func_id) {
+        cout << "return ";
+        for (unsigned int i = 0; i < arity(); i++) {
+            if (child(i)->oper()->syntax() == CALL
+                || child(i)->oper()->syntax() == BINOP
+                || child(i)->oper()->syntax() == UNOP) {
+                child(i)->codeGenRecursiveCall(func_id);
+            } else {
+                child(i)->codeGen();
+            }
         }
         cout << ";" << endl;
     }

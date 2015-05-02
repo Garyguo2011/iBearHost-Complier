@@ -124,5 +124,17 @@
 # obj = Hello(9)
 # print obj.a
 
-print readline()
+# def factorial(n):
+# 	if n <= 1:
+# 		return 1
+# 	return n * factorial(n-1)
+# print factorial(5)
+
+def make_adder(x):
+	def adder(y):
+		return y
+	return adder
+a = make_adder(5)
+print a(10)
+
 

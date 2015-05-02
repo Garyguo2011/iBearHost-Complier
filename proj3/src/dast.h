@@ -113,6 +113,8 @@ public:
 
     virtual void codeGenInit(AST_Ptr class_id);
 
+    virtual void codeGenRecursiveCall(AST_Ptr func_id);
+
     virtual string convertAsPyType(Type_Ptr TP);
 
 protected:
