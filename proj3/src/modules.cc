@@ -62,7 +62,11 @@ protected:
              * if it makes up a whole statement
              */
             if (c->oper()->syntax() == CALL ||
-                c->oper()->syntax() == CALL1) {
+                c->oper()->syntax() == CALL1 ||
+                c->oper()->syntax() == AND ||
+                c->oper()->syntax() == OR ||
+                c->oper()->syntax() == BINOP ||
+                c->oper()->syntax() == UNOP) {
                 cout << ";" << endl;
             }
         } end_for;
