@@ -147,6 +147,8 @@ public:
     string toStr();
     PyValue setItem(PyInt* position, PyValue val);
     PyValue get(int index);
+    vector<PyValue> getList();
+    PyValue setSlice(PyInt* a, PyInt* b, PyList* val);
 
 private:
     vector<PyValue> items;
