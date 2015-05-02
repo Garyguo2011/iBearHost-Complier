@@ -11,6 +11,7 @@
 #include "dast.h"
 #include "dast-parser.hh"
 
+
 using namespace std;
 
 static GCINIT _gcdummy;
@@ -79,6 +80,14 @@ protected:
 
     long value;
 
+    void codeGen ()
+    {
+        const int temp = this->intValue();
+        cout << "__cons_int__ ("
+             << temp
+             << ")";
+    }
+
 };
 
 TOKEN_FACTORY(Int_Token, INT_LITERAL);
@@ -111,6 +120,15 @@ protected:
     bool isType () {
         Decl* me = getDecl ();
         return (me != NULL && me->isType ());
+    }
+
+    void codeGen() {
+        const char* temp = as_string().c_str();
+        cout << temp;
+        if (temp[0] != '_') {
+            cout << "_" << getDecl()->getIndex();
+        }
+        cout << "";
     }
 
 private:
@@ -174,6 +192,25 @@ private:
     static const String_Token raw_factory;
 
     gcstring literal_text;
+
+    void codeGen ()
+    {
+        cout << "__cons_str__ (\"";
+        for (size_t i = 0; i < literal_text.size (); i += 1) {
+            char c = literal_text[i];
+            if (c < 32 || c == '\\' || c == '"') {
+                cout << "\\" << oct << setw (3) << setfill('0') << (int) c
+                    << setfill (' ') << dec;
+            } else
+                cout << c;
+        }
+        cout << "\")";
+    }
+
+    void codeGenNative() {
+        cout << string_text();
+    }
+
 };
 
 TOKEN_FACTORY(String_Token, STRING_LITERAL);

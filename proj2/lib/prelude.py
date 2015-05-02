@@ -1,11 +1,11 @@
-# The standard prelude.
+# # The standard prelude.
 
-# NOTE: You may want to phase this in gently, with just a portion of the
-#       definitions at first, to keep the sizes of your trees under control
-#       during development.
+# # NOTE: You may want to phase this in gently, with just a portion of the
+# #       definitions at first, to keep the sizes of your trees under control
+# #       during development.
 
-# The builtin classes have no __init__ method, and so cannot be allocated
-# directly.  Instances are created by other constructs.
+# # The builtin classes have no __init__ method, and so cannot be allocated
+# # directly.  Instances are created by other constructs.
 
 class str:
     pass
@@ -38,16 +38,16 @@ class tuple3 of [$T1, $T2, $T3]:
     pass
 
 
-# Type bool
+# # Type bool
 
-# truth replaces bool(...) in regular Python.  truth(x) is True iff x is a
-# true value, according to the Python spec.
+# # truth replaces bool(...) in regular Python.  truth(x) is True iff x is a
+# # true value, according to the Python spec.
 
 def truth(x)::bool:
     native "__truth__"
 
 def __not__(x)::bool:
-    native "__not__"
+    native "__not_bool__"
 
 # Type range
 
@@ -158,8 +158,8 @@ def __getslice__(S::list of $a, L::int, U::int)::list of $a:
 def __setitem__(S::list of $a, k::int, val::$a)::$a:
     native "__setitem__list__"
 
-def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
-    native "__setslice__list__"
+# def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
+#     native "__setslice__list__"
 
 def len(S::list of $a)::int:
     native "__len__list__"
@@ -187,14 +187,14 @@ def __getitem__(D::dict of [bool, $b], x::bool)::$b:
 def __getitem__(D::dict of [str, $b], x::str)::$b:
     native "__getitem__dict__"
 
-def __setitem__(S::dict of [int, $b], k::int, val::$b)::$b:
-    native "__setitem__dict__"
+# def __setitem__(S::dict of [int, $b], k::int, val::$b)::$b:
+#     native "__setitem__dict__"
 
-def __setitem__(S::dict of [bool, $b], k::bool, val::$b)::$b:
-    native "__setitem__dict__"
+# def __setitem__(S::dict of [bool, $b], k::bool, val::$b)::$b:
+#     native "__setitem__dict__"
 
-def __setitem__(S::dict of [str, $b], k::str, val::$b)::$b:
-    native "__setitem__dict__"
+# def __setitem__(S::dict of [str, $b], k::str, val::$b)::$b:
+#     native "__setitem__dict__"
 
 def len(D::dict of [int, $b])::int:
     native "__len__dict__"
@@ -224,11 +224,11 @@ def __notin__(x::str, D::dict of [str, $b])::bool:
     native "__notcontains__dict__"
 
 
-# General
+# # General
 
 def __is__(x, y)::bool:
-    native "__is__"
+    native "__is_bool__"
 
 def __isnot__(x, y)::bool:
-    native "__isnot__"
+    native "__isnot_bool__"
 

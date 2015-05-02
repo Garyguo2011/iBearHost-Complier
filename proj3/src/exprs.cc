@@ -55,6 +55,10 @@ protected:
         return noneType;
     }
 
+    void codeGen() {
+        cout << "__cons_none__()";
+    }
+
 };
 
 NODE_FACTORY(None_AST, NONE);
@@ -73,6 +77,13 @@ protected:
 
     }
 
+    void codeGen () {
+        cout << "__cons_bool__ ("
+             << 1
+             << ")";
+        // cout << true;
+    }
+
 };
 
 NODE_FACTORY(True_AST, TRUE);
@@ -87,6 +98,13 @@ protected:
         if (boolType == NULL)
             boolType = boolDecl->asType ();
         return boolType;
+    }
+
+    void codeGen () {
+        cout << "__cons_bool__ ("
+             << 0
+             << ")";
+        // cout << false;
     }
 
 };
@@ -135,6 +153,39 @@ protected:
 
     NODE_CONSTRUCTORS (Call_AST, Callable);
 
+    void codeGen() {
+        // Don't know whether add semi-colon or not
+        cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        child(0)->codeGen();
+        cout<< "(";
+        for (unsigned int i = 1; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1)
+            {
+                cout << ", ";   
+            }
+        }
+        cout << ")";
+    }
+
+    void codeGenRecursiveCall(AST_Ptr func_id) {
+        std::string func_name = func_id->as_string().c_str();
+        std::string call_name = child(0)->as_string().c_str();
+        if (func_name.compare(call_name) != 0) {
+            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        }
+        child(0)->codeGen();
+        cout<< "(";
+        for (unsigned int i = 1; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1)
+            {
+                cout << ", ";   
+            }
+        }
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (Call_AST, CALL);
@@ -146,6 +197,23 @@ class Call1_AST : public Call_AST {
 protected:
 
     NODE_CONSTRUCTORS (Call1_AST, Call_AST);
+
+    void codeGen() {
+        // getType()->print(cerr, 4);
+        // cerr << ", type!\n";
+        // child(1)->getType()->print(cerr, 3);
+        // cerr << ", child 1 type!\n";
+        cout << "new ";
+        getType()->child(0)->codeGen();
+        cout << "(";
+        for (unsigned int i = 2; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
 
 };
 
@@ -169,6 +237,42 @@ class Binop_AST : public Callable {
 protected:
 
     NODE_CONSTRUCTORS (Binop_AST, Callable);
+
+    void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ")";
+    }
+
+    void codeGenRecursiveCall(AST_Ptr func_id) {
+        std::string func_name = func_id->as_string().c_str();
+        std::string call_name = child(0)->as_string().c_str();
+        if (func_name.compare(call_name) != 0) {
+            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        }
+        child(0)->codeGen();
+        cout << "(";
+        if (child(1)->oper()->syntax() == CALL
+                || child(1)->oper()->syntax() == BINOP
+                || child(1)->oper()->syntax() == UNOP) {
+                child(1)->codeGenRecursiveCall(func_id);
+        } else {
+            child(1)->codeGen();
+        }
+        cout << ", ";
+        if (child(2)->oper()->syntax() == CALL
+                || child(2)->oper()->syntax() == BINOP
+                || child(2)->oper()->syntax() == UNOP) {
+                child(2)->codeGenRecursiveCall(func_id);
+        } else {
+            child(2)->codeGen();
+        }
+        cout << ")";
+    }
 
 };    
 
@@ -205,6 +309,32 @@ class Unop_AST : public Callable {
 
     NODE_CONSTRUCTORS (Unop_AST, Callable);
 
+    void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ")";
+    }
+
+    void codeGenRecursiveCall(AST_Ptr func_id) {
+        std::string func_name = func_id->as_string().c_str();
+        std::string call_name = child(0)->as_string().c_str();
+        if (func_name.compare(call_name) != 0) {
+            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        }
+        child(0)->codeGen();
+        cout << "(";
+        if (child(1)->oper()->syntax() == CALL
+                || child(1)->oper()->syntax() == BINOP
+                || child(1)->oper()->syntax() == UNOP) {
+                child(1)->codeGenRecursiveCall(func_id);
+        } else {
+            child(1)->codeGen();
+        }
+        cout << ")";
+    }
+
 };    
 
 NODE_FACTORY (Unop_AST, UNOP);
@@ -217,6 +347,17 @@ class Subscription_AST : public Callable {
 protected:
 
     NODE_CONSTRUCTORS (Subscription_AST, Callable);
+
+    void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ")";
+
+    }
 
 };
 
@@ -239,6 +380,18 @@ class Slicing_AST : public Callable {
 protected:
 
     NODE_CONSTRUCTORS (Slicing_AST, Callable);
+
+    void codeGen() {
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ", ";
+        child(3)->codeGen();
+        cout << ")";
+    }
 
 };
 
@@ -270,6 +423,19 @@ protected:
         return getId ()->getDecl ();
     }
 
+    /** Generate code for attribute reference*/
+    void codeGen() {
+        const char* instance_name = child(0)->as_string().c_str();
+        if (((std::string)instance_name).compare("self") == 0) {
+            //cout << "this";
+        }
+        else {
+            child(0)->codeGen();
+            cout << ".";
+        }
+        child(1)->codeGen();
+    }
+
 };
 
 NODE_FACTORY (AttributeRef_AST, ATTRIBUTEREF);
@@ -281,6 +447,35 @@ class Tuple_AST : public Typed_Tree {
 protected:
 
     NODE_CONSTRUCTORS (Tuple_AST, Typed_Tree);
+
+    void codeGen() {
+        switch (arity()) {
+            case 0:
+                cout << "__cons_tuple0__()";
+                break;
+            case 1:
+                cout << "__cons_tuple1__(";
+                child(0)->codeGen();
+                cout << ")";
+                break;
+            case 2:
+                cout << "__cons_tuple2__(";
+                child(0)->codeGen();
+                cout << ", ";
+                child(1)->codeGen();
+                cout << ")";
+                break;
+            case 3:
+                cout << "__cons_tuple3__(";
+                child(0)->codeGen();
+                cout << ", ";
+                child(1)->codeGen();
+                cout << ", ";
+                child(2)->codeGen();
+                cout << ")";
+                break;
+        }
+    }
 
 };
 
@@ -307,6 +502,21 @@ protected:
 
     NODE_CONSTRUCTORS (ListDisplay_AST, Typed_Tree);
 
+    void codeGen() {
+        cout << "__cons_list__("
+             << arity();
+        if (arity() != 0) {
+            cout << ", ";
+        }
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (ListDisplay_AST, LIST_DISPLAY);
@@ -320,9 +530,45 @@ protected:
 
     NODE_CONSTRUCTORS (DictDisplay_AST, Typed_Tree);
 
+    void codeGen() {
+        // getType()->print(cerr, 4);
+        // cerr << "\n";
+        // cerr << getType()->arity() << ", size\n";
+        const char* temp = getType()->child(1)->child(0)->as_string().c_str();
+        cout << "__cons_dict";
+        cout << temp;
+        cout << "__("
+            << arity() << ", ";
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
 };
 
 NODE_FACTORY (DictDisplay_AST, DICT_DISPLAY);
+
+class Pair_AST : public Typed_Tree {
+protected:
+
+    NODE_CONSTRUCTORS (Pair_AST, Typed_Tree);
+
+    void codeGen() {
+        cout << "__cons_pair__(";
+        for (unsigned int i = 0; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
+};
+
+NODE_FACTORY (Pair_AST, PAIR);
 
 
 /** A class of expression in which its subexpressions must agree as to
@@ -342,6 +588,17 @@ protected:
 
     NODE_CONSTRUCTORS (IfExpr_AST, BalancedExpr);
 
+    void codeGen()
+    {
+        cout << "__eval_bool__(";
+            child(0)->codeGen();
+        cout << ") ? ";
+            child(1)->codeGen();
+        cout << " : ";
+            child(2)->codeGen();
+        cout << ";";
+    }
+
 };              
 
 
@@ -355,6 +612,16 @@ protected:
 
     NODE_CONSTRUCTORS (And_AST, BalancedExpr);
 
+    void codeGen () {
+        cout << "(";
+        cout << convertAsPyType(getType()) << ") ";
+        cout << "__and__(";
+        child(0)->codeGen();
+        cout << ", ";
+        child(1)->codeGen();
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (And_AST, AND);
@@ -366,6 +633,16 @@ class Or_AST : public BalancedExpr {
 protected:
 
     NODE_CONSTRUCTORS (Or_AST, BalancedExpr);
+
+    void codeGen () {
+        cout << "(";
+        cout << convertAsPyType(getType()) << ") ";
+        cout << "__or__(";
+        child(0)->codeGen();
+        cout << ", ";
+        child(1)->codeGen();
+        cout << ")";
+    }
 
 };
 
@@ -419,6 +696,16 @@ protected:
 
     Type_Ptr getType () {
         return child (1)->asType ();
+    }
+
+    void codeGen() {
+        // To be implemented. Right now assuming undefined type_var to be void at this time.
+        // const char* temp = getType()->child(0)->as_string().c_str();
+        std::string name = getId()->as_string().c_str();
+        if (name.compare("self") != 0) {
+            cout << convertAsPyType(getType());
+            cout << " " << getId()->as_string() << "_" << getDecl()->getIndex();
+        }
     }
 
 };

@@ -14,6 +14,10 @@
 #include <string>
 #include <iostream>
 #include "horn-common.h"
+#include <algorithm>
+#include <sstream>
+
+#include "../lib/runtime.h"
 
 class AST;
 class AST_Token;
@@ -100,6 +104,18 @@ public:
 
     /** Do code generation for me. */
     virtual void codeGen ();
+
+    virtual void codeGenNative();
+
+    virtual void codeGenInternalFunc();
+
+    virtual void codeGenVarDecl();
+
+    virtual void codeGenInit(AST_Ptr class_id);
+
+    virtual void codeGenRecursiveCall(AST_Ptr func_id);
+
+    virtual string convertAsPyType(Type_Ptr TP);
 
 protected:
 

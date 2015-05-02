@@ -15,6 +15,8 @@ static GCINIT _gcdummy;
 
 Decl* mainModule;
 
+// vector<string> names;
+
 /*****   MODULE    *****/
 
 /** A module, representing a complete source file. */
@@ -27,13 +29,52 @@ protected:
 
     // FIXME: Dummy implementation.
     void codeGen () {
-        cout << "#include \"runtime.h\"" << endl 
-             << "void" << endl
+        cout << "#include \"runtime.h\"" << endl;
+
+        /** Generate code for class definitions*/
+        for_each_child(c, this) {
+            if (c->oper()->syntax() == CLASS) {
+                c->codeGen();
+            }
+        } end_for;
+
+        /** Generate code for function definitions*/
+        for_each_child(c, this) {
+            if (c->oper()->syntax() == DEF) {
+                c->codeGen();
+            } else if (c->oper()->syntax() == ASSIGN) {
+                c->codeGenVarDecl();
+                cout << ";" << endl;
+            }
+        } end_for;
+
+        /** Generate code for main function*/
+        cout << "void" << endl
              << "__main__()" << endl
-             << "{" << endl
-             << "    __print__ (__cons_str__ (\"Hello, world!\"));" << endl
-             << "    __newline__ ();" << endl
-             << "}" << endl;
+             << "{" << endl;
+        for_each_child_var(c, this) {
+            if (c->oper()->syntax() != DEF 
+                && c->oper()->syntax() != CLASS) {
+                c->codeGen();
+            }
+             /** 
+             * Kludge to add semicolon after function call
+             * if it makes up a whole statement
+             */
+            if (c->oper()->syntax() == CALL ||
+                c->oper()->syntax() == CALL1 ||
+                c->oper()->syntax() == AND ||
+                c->oper()->syntax() == OR ||
+                c->oper()->syntax() == BINOP ||
+                c->oper()->syntax() == UNOP) {
+                cout << ";" << endl;
+            }
+        } end_for;
+        cout << endl;
+        if (child(arity()-1)->oper()->syntax() == PRINT) {
+            cout << "__newline__();" << endl;
+        }
+        cout << "}" << endl;
     }
 
     NODE_CONSTRUCTORS (Module_AST, AST_Tree);
