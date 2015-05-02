@@ -1,3 +1,10 @@
-print (1 < 2) and (2 < 3) and (3 < 4)
-print 1 < 5 < 3 < 4
+def f():
+	def k():
+		x = 1
+		return x
+	return k()
 
+def g():
+	def h():
+		return x
+	return h()

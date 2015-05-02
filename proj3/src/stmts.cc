@@ -14,6 +14,7 @@ using namespace std;
 static GCINIT _gcdummy;
 
 vector<string> names;
+vector<string> names_local;
 
 /***** PRINT *****/
 
@@ -152,7 +153,6 @@ protected:
     //     cout<< getId()->as_string() << "_" << getId()->getDecl()->getIndex() << ";" << endl;
 
     // }
-
 };
 
 NODE_FACTORY (Def_AST, DEF);
@@ -230,6 +230,18 @@ protected:
     /** Join code of each formal with commas */
     void codeGen() {
         for (unsigned int i = 0; i < arity(); i++) {
+            stringstream ss;
+            ss << child(i)->child(0)->as_string() << "_" << child(i)->child(0)->getDecl()->getIndex();
+            string temp;
+            ss >> temp;
+            // if (find(names.begin(), names.end(), temp) == names.end()) {
+            //     names.push_back (temp);
+            //     // cout << convertAsPyType(child(i)->getType()) << " ";
+            // } 
+            if (find(names_local.begin(), names_local.end(), temp) == names_local.end()) {
+                names_local.push_back (temp);
+                // cout << convertAsPyType(child(i)->getType()) << " ";
+            }
             child(i)->codeGen();
             if (i < arity()-1
                 && ((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
@@ -372,9 +384,20 @@ protected:
             ss << child(0)->child(0)->as_string() << "_" << child(0)->child(0)->getDecl()->getIndex();
             string temp;
             ss >> temp;
+            int i0_0 = 0;
+            int i0_1 = 0;
             if (find(names.begin(), names.end(), temp) == names.end()) {
                 names.push_back (temp);
-                cout << convertAsPyType(child(0)->getType()) << " ";
+                // cout << convertAsPyType(child(0)->getType()) << " ";
+                i0_0++;
+            }
+            if (find(names_local.begin(), names_local.end(), temp) == names_local.end()) {
+                names_local.push_back (temp);
+                // cout << convertAsPyType(child(0)->getType()) << " ";
+                i0_1++;
+            }
+            if (i0_0 && i0_1) {
+                cout << convertAsPyType(child(0)->getType()) << " ";;
             }
             child(0)->child(0)->codeGen();
             cout << " = ";
@@ -387,8 +410,19 @@ protected:
                     ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
                     string temp;
                     ss >> temp;
+                    int i1_0 = 0;
+                    int i1_1 = 0;
                     if (find(names.begin(), names.end(), temp) == names.end()) {
                         names.push_back (temp);
+                        // cout << convertAsPyType(getType()) << " ";
+                        i1_0++;
+                    }
+                    if (find(names_local.begin(), names_local.end(), temp) == names_local.end()) {
+                        names_local.push_back (temp);
+                        // cout << convertAsPyType(getType()) << " ";
+                        i1_1++;
+                    }
+                    if (i1_0 && i1_1) {
                         cout << convertAsPyType(getType()) << " ";
                     }
                     child(0)->codeGen();
@@ -405,8 +439,19 @@ protected:
                         ss << child(0)->child(i-1)->child(0)->as_string() << "_" << child(0)->child(i-1)->child(0)->getDecl()->getIndex();
                         string temp;
                         ss >> temp;
+                        int i2_0 = 0;
+                        int i2_1 = 0;
                         if (find(names.begin(), names.end(), temp) == names.end()) {
                             names.push_back (temp);
+                            // cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                            i2_0++;
+                        }
+                        if (find(names_local.begin(), names_local.end(), temp) == names_local.end()) {
+                            names_local.push_back (temp);
+                            // cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                            i2_1++;
+                        }
+                        if (i2_0 && i2_1) {
                             cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
                         }
                         child(0)->child(i-1)->child(0)->codeGen();
@@ -422,10 +467,23 @@ protected:
                             string temp;
                             ss >> temp;
 
+                            int i3_0 = 0;
+                            int i3_1 = 0;
+
                             if (find(names.begin(), names.end(), temp) == names.end()) {
                                 names.push_back (temp);
-                                cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                                // cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                                i3_0++;
+                            }
+                            if (find(names_local.begin(), names_local.end(), temp) == names_local.end()) {
+                                names_local.push_back (temp);
+                                // cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
                                 // child(0)->child(i-1)->codeGen();
+                                i3_1++;
+                            }
+
+                            if (i3_0 == 1 && i3_1 == 1) {
+                                cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
                             }
 
                             child(0)->child(i-1)->codeGen();
