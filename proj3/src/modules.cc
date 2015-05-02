@@ -66,7 +66,8 @@ protected:
                 c->oper()->syntax() == AND ||
                 c->oper()->syntax() == OR ||
                 c->oper()->syntax() == BINOP ||
-                c->oper()->syntax() == UNOP) {
+                c->oper()->syntax() == UNOP ||
+                c->oper()->syntax() == IF_EXPR) {
                 cout << ";" << endl;
             }
         } end_for;
