@@ -1,2 +1,1 @@
-print 1 not in {1: 2}
-
+print (1 < 2)

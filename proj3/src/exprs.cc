@@ -242,6 +242,33 @@ protected:
 
     NODE_CONSTRUCTORS (Compare_AST, Binop_AST);
 
+    void codeGen() {
+        cout << "(";
+        if (child(1)->oper()->syntax() == LEFT_COMPARE){
+            cout << "__eval_bool__";
+            cout << "(";
+            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+            child(0)->codeGen();
+            cout << "(";
+            child(1)->child(2)->codeGen();
+            cout << ", ";
+            child(2)->codeGen();
+            cout << ")";
+            cout << ")";
+            cout << " && ";
+            child(1)->codeGen();
+        } else {
+            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+            child(0)->codeGen();
+            cout << "(";
+            child(1)->codeGen();
+            cout << ", ";
+            child(2)->codeGen();
+            cout << ")";
+        }
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (Compare_AST, COMPARE);
@@ -254,6 +281,32 @@ class LeftCompare_AST : public Binop_AST {
 protected:
 
     NODE_CONSTRUCTORS (LeftCompare_AST, Binop_AST);
+    void codeGen() {
+        if (child(1)->oper()->syntax() == LEFT_COMPARE){
+            cout << "__eval_bool__";
+            cout << "(";
+            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+            child(0)->codeGen();
+            cout << "(";
+            child(1)->child(2)->codeGen();
+            cout << ", ";
+            child(2)->codeGen();
+            cout << ")";
+            cout << ")";
+            cout << " && ";
+            child(1)->codeGen();
+        } else {
+            cout << "(";
+            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+            child(0)->codeGen();
+            cout << "(";
+            child(1)->codeGen();
+            cout << ", ";
+            child(2)->codeGen();
+            cout << ")";
+            cout << ")";
+        }
+    }
 
 };
 
