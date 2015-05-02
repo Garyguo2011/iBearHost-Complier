@@ -147,6 +147,8 @@ public:
     string toStr();
     PyValue setItem(PyInt* position, PyValue val);
     PyValue get(int index);
+    vector<PyValue> getList();
+    PyValue setSlice(PyInt* a, PyInt* b, PyList* val);
 
 private:
     vector<PyValue> items;
@@ -279,8 +281,8 @@ extern PyValue __getitem__list__ (PyList* v0, PyInt* v1);
 extern PyList* __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2);
 extern PyInt* __len__list__ (PyList* v0);
 extern PyValue __setitem__list__ (PyList* v0, PyInt* v1, PyValue v2);
-extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
-                                   PyValue v3);
+extern PyList* __setslice__list__ (PyList* v0, PyInt* v1, PyInt* v2,
+                                   PyList* v3);
 
 /* Ranges */
 

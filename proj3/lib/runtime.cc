@@ -390,6 +390,37 @@ PyList::setItem(PyInt* position, PyValue val)
     return PyNone;
 }
 
+vector<PyValue>
+PyList::getList()
+{
+    return items;
+}
+
+PyValue
+PyList::setSlice(PyInt* a, PyInt* b, PyList* val)
+{
+    std::vector<PyValue>::iterator first;
+    std::vector<PyValue>::iterator last;
+    std::vector<PyValue> valList = val->getList();
+
+    if (a->getValue() < items.size()) {
+        // remove all element between index a and b
+        first = items.begin() + a->getValue();
+        if (b->getValue() <= items.size()) {
+            last = items.begin() + b->getValue();
+        } else {
+            last = items.end();
+        }
+        items.erase (first, last);
+        items.insert(first, valList.begin(), valList.end());
+    } else {
+        // directly push to the end of list
+        for (std::vector<PyValue>::iterator it=valList.begin(); it!=valList.end(); ++it) {
+            items.push_back(*it);    
+        }
+    }
+}
+
 PyValue
 PyList::get(int index)
 {
@@ -992,10 +1023,16 @@ __setitem__list__ (PyList* v0, PyInt* v1, PyValue v2)
 {
     // return NULL;  // REPLACE WITH BODY
     v0->asList()->setItem(v1, v2);
+    return v2;
 }
 
-extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
-                                   PyValue v3);
+
+PyList*
+__setslice__list__ (PyList* v0, PyInt* v1, PyInt* v2, PyList* v3)
+{
+    v0->setSlice(v1, v2, v3);
+    return v3; 
+}
 
 /* Ranges */
 
