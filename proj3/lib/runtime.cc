@@ -992,10 +992,15 @@ __setitem__list__ (PyList* v0, PyInt* v1, PyValue v2)
 {
     // return NULL;  // REPLACE WITH BODY
     v0->asList()->setItem(v1, v2);
+    return v2;
 }
 
-extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
-                                   PyValue v3);
+
+PyList*
+__setslice__list__ (PyList* v0, PyInt* v1, PyInt* v2, PyList* v3)
+{
+    return NULL;
+}
 
 /* Ranges */
 

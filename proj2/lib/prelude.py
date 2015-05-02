@@ -158,8 +158,8 @@ def __getslice__(S::list of $a, L::int, U::int)::list of $a:
 def __setitem__(S::list of $a, k::int, val::$a)::$a:
     native "__setitem__list__"
 
-# def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
-#     native "__setslice__list__"
+def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
+    native "__setslice__list__"
 
 def len(S::list of $a)::int:
     native "__len__list__"
