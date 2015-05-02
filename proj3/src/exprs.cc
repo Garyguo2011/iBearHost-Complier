@@ -154,8 +154,9 @@ protected:
     NODE_CONSTRUCTORS (Call_AST, Callable);
 
     void codeGen() {
-        // Don't know whether add semi-colon or not
-        cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        if (child(0)->oper()->syntax() != ATTRIBUTEREF) {
+            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+        }
         child(0)->codeGen();
         cout<< "(";
         for (unsigned int i = 1; i < arity(); i++) {
@@ -204,7 +205,7 @@ protected:
         // child(1)->getType()->print(cerr, 3);
         // cerr << ", child 1 type!\n";
         cout << "new ";
-        getType()->child(0)->codeGen();
+        cout << (std::string)getType()->child(0)->as_string().c_str();
         cout << "(";
         for (unsigned int i = 2; i < arity(); i++) {
             child(i)->codeGen();
@@ -479,12 +480,9 @@ protected:
     /** Generate code for attribute reference*/
     void codeGen() {
         const char* instance_name = child(0)->as_string().c_str();
-        if (((std::string)instance_name).compare("self") == 0) {
-            //cout << "this";
-        }
-        else {
+        if (((std::string)instance_name).compare("self") != 0) {
             child(0)->codeGen();
-            cout << ".";
+            cout << "->";
         }
         child(1)->codeGen();
     }
