@@ -351,9 +351,94 @@ protected:
             child(1)->codeGen();
             cout << ");";
         } 
+        if (child(0)->oper()->syntax() == TYPED_ID && arity() == 2) {
+            stringstream ss;
+            ss << child(0)->child(0)->as_string() << "_" << child(0)->child(0)->getDecl()->getIndex();
+            string temp;
+            ss >> temp;
+            if (find(names.begin(), names.end(), temp) == names.end()) {
+                names.push_back (temp);
+                cout << convertAsPyType(child(0)->getType()) << " ";
+            }
+            child(0)->child(0)->codeGen();
+            cout << " = ";
+            child(1)->codeGen();
+            cout << ";\n";
+        } else {
+            if (child(0)->arity() == 0) {
+                if (child(0)->getDecl()->assignable()) {
+                    stringstream ss;
+                    ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+                    string temp;
+                    ss >> temp;
+                    if (find(names.begin(), names.end(), temp) == names.end()) {
+                        names.push_back (temp);
+                        cout << convertAsPyType(getType()) << " ";
+                    }
+                    child(0)->codeGen();
+                    cout << " = ";
+                    child(1)->codeGen();
+                    cout << ";\n";
+                } else {
+                    fatal("This ID can't be assigned.");
+                }
+            } else {
+                for (unsigned int i = 1; i < getType()->arity(); i++) {
+                    if (child(0)->child(i-1)->oper()->syntax() == TYPED_ID) {
+                        stringstream ss;
+                        ss << child(0)->child(i-1)->child(0)->as_string() << "_" << child(0)->child(i-1)->child(0)->getDecl()->getIndex();
+                        string temp;
+                        ss >> temp;
+                        if (find(names.begin(), names.end(), temp) == names.end()) {
+                            names.push_back (temp);
+                            cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        }
+                        child(0)->child(i-1)->child(0)->codeGen();
+                        cout << " = ";
+                        child(1)->child(i-1)->codeGen();
+                        cout << ";" << endl;
+                    }
+                    else {
+                        if (child(0)->child(i-1)->getDecl()->assignable()) {
+                            stringstream ss;
+                            ss << child(0)->child(i-1)->as_string()
+                               << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                            string temp;
+                            ss >> temp;
 
-        if (child(0)->arity() == 0) {
-            if (child(0)->getDecl()->assignable()) {
+                            if (find(names.begin(), names.end(), temp) == names.end()) {
+                                names.push_back (temp);
+                                cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                                // child(0)->child(i-1)->codeGen();
+                            }
+
+                            child(0)->child(i-1)->codeGen();
+                            cout << " = ";
+                            child(1)->child(i-1)->codeGen();
+                            cout << ";\n";
+                        } else {
+                            fatal("This ID can't be assigned.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void codeGenVarDecl() {
+        if (child(0)->oper()->syntax() == TYPED_ID && arity() == 2) {
+            stringstream ss;
+            ss << child(0)->child(0)->as_string() << "_" << child(0)->child(0)->getDecl()->getIndex();
+            string temp;
+            ss >> temp;
+            if (find(names.begin(), names.end(), temp) == names.end()) {
+                names.push_back (temp);
+                cout << convertAsPyType(child(0)->getType()) << " ";
+                child(0)->child(0)->codeGen();
+            }
+
+        } else {
+            if (child(0)->arity() == 0) {
                 stringstream ss;
                 ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
                 string temp;
@@ -361,63 +446,35 @@ protected:
                 if (find(names.begin(), names.end(), temp) == names.end()) {
                     names.push_back (temp);
                     cout << convertAsPyType(getType()) << " ";
+                    child(0)->codeGen();
                 }
-                child(0)->codeGen();
-                cout << " = ";
-                child(1)->codeGen();
-                cout << ";\n";
             } else {
-                fatal("This ID can't be assigned.");
-            }
-        } else {
-            for (unsigned int i = 1; i < getType()->arity(); i++) {
-                if (child(0)->child(i-1)->getDecl()->assignable()) {
-                    stringstream ss;
-                    ss << child(0)->child(i-1)->as_string()
-                       << "_" << child(0)->child(i-1)->getDecl()->getIndex();
-                    string temp;
-                    ss >> temp;
+                for (unsigned int i = 1; i < getType()->arity(); i++) {
+                    if (child(0)->child(i-1)->oper()->syntax() == TYPED_ID) {
+                        stringstream ss;
+                        ss << child(0)->child(i-1)->child(0)->as_string() << "_" << child(0)->child(i-1)->child(0)->getDecl()->getIndex();
+                        string temp;
+                        ss >> temp;
+                        if (find(names.begin(), names.end(), temp) == names.end()) {
+                            names.push_back (temp);
+                            cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                            child(0)->child(i-1)->child(0)->codeGen();
+                        }
+                        cout << ";" << endl;
+                    } else {
+                        stringstream ss;
+                        ss << child(0)->child(i-1)->as_string()
+                           << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                        string temp;
+                        ss >> temp;
 
-                    if (find(names.begin(), names.end(), temp) == names.end()) {
-                        names.push_back (temp);
-                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
-                        // child(0)->child(i-1)->codeGen();
+                        if (find(names.begin(), names.end(), temp) == names.end()) {
+                            names.push_back (temp);
+                            cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                            child(0)->child(i-1)->codeGen();
+                        }
+                        cout << ";" << endl;
                     }
-
-                    child(0)->child(i-1)->codeGen();
-                    cout << " = ";
-                    child(1)->child(i-1)->codeGen();
-                    cout << ";\n";
-                } else {
-                    fatal("This ID can't be assigned.");
-                }
-            }
-        }
-    }
-
-    void codeGenVarDecl() {
-        if (child(0)->arity() == 0) {
-            stringstream ss;
-            ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
-            string temp;
-            ss >> temp;
-            if (find(names.begin(), names.end(), temp) == names.end()) {
-                names.push_back (temp);
-                cout << convertAsPyType(getType()) << " ";
-                child(0)->codeGen();
-            }
-        } else {
-            for (unsigned int i = 1; i < getType()->arity(); i++) {
-                stringstream ss;
-                ss << child(0)->child(i-1)->as_string()
-                   << "_" << child(0)->child(i-1)->getDecl()->getIndex();
-                string temp;
-                ss >> temp;
-
-                if (find(names.begin(), names.end(), temp) == names.end()) {
-                    names.push_back (temp);
-                    cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
-                    child(0)->child(i-1)->codeGen();
                 }
             }
         }

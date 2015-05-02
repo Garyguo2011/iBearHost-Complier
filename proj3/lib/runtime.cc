@@ -51,6 +51,17 @@ PyObject::typeName ()
     return "?";
 }
 
+string
+PyObject::strFormat(PyValue val)
+{
+    std::string temp = val->typeName();
+    string result = "";
+    if (temp.compare("str") == 0) {
+        result += "\'";
+    }
+    return result;
+}
+
 PyStr*
 PyObject::asStr () {
     fatal ("invalid internal type conversion");
@@ -263,6 +274,7 @@ PyBool::getValue() {
 
 PyRange::PyRange (PyInt* from , PyInt* to)
 {
+    _first = from;
     for (int i = from->getValue(); i < to->getValue(); i++) {
         items.push_back(new PyInt(i));
     }
@@ -284,14 +296,17 @@ string
 PyRange::toStr()
 {
     string str = "";
-    str += "[";
-    for (int i = 0 ; i < items.size(); i++) {
-        str += items[i]->toStr();
-        if (i < items.size()-1) {
-            str += ", ";
-        }
+    str += "xrange(";
+    str += first()->toStr();
+    str += ", ";
+    if (getSize() == 0) {
+        str += first()->toStr();
+    } else {
+        stringstream ss;
+        ss << items[getSize()-1]->getValue()+1;
+        str +=  ss.str();
     }
-    str += "]";
+    str += ")";
     return str;
 }
 
@@ -301,10 +316,16 @@ PyRange::getSize()
     return (int) items.size();
 }
 
-PyValue
+PyInt*
 PyRange::get(int index)
 {
     return items[index];
+}
+
+PyInt*
+PyRange::first()
+{
+    return _first;
 }
 
 /* Lists */
@@ -340,7 +361,9 @@ PyList::toStr ()
     string str = "";
     str += "[";
     for (int i = 0 ; i < items.size(); i++) {
+        str += PyObject::strFormat(items[i]);
         str += items[i]->toStr();
+        str += PyObject::strFormat(items[i]);
         if (i < items.size()-1) {
             str += ", ";
         }
@@ -427,11 +450,15 @@ PyDict::toStr ()
     string str = "";
     int i = 0;
     str += "{";
-    for (map<PyValue, PyValue>::iterator it=items.begin(); 
-        it!=items.end(); ++it) {
+    for (map<PyValue, PyValue>::reverse_iterator it=items.rbegin(); 
+        it!=items.rend(); ++it) {
+        str += PyObject::strFormat(it->first);
         str += it->first->toStr();
+        str += PyObject::strFormat(it->first);
         str += ": ";
+        str += PyObject::strFormat(it->second);
         str += it->second->toStr();
+        str += PyObject::strFormat(it->second);
         if (i != items.size() - 1) {
             str += ", ";
         }
@@ -532,7 +559,9 @@ PyTuple1::toStr()
 {
     string str = "";
     str += "(";
+    str += PyObject::strFormat(_vals[0]);
     str += _vals[0]->toStr();
+    str += PyObject::strFormat(_vals[0]);
     str += ",";
     str +=")";
     return str;
@@ -561,9 +590,13 @@ PyTuple2::toStr()
 {
     string str = "";
     str += "(";
+    str += PyObject::strFormat(_vals[0]);
     str += _vals[0]->toStr();
+    str += PyObject::strFormat(_vals[0]);
     str += ", ";
+    str += PyObject::strFormat(_vals[1]);
     str += _vals[1]->toStr();
+    str += PyObject::strFormat(_vals[1]);
     str +=")";
     return str;
 }
@@ -592,11 +625,17 @@ PyTuple3::toStr()
 {
     string str = "";
     str += "(";
+    str += PyObject::strFormat(_vals[0]);
     str += _vals[0]->toStr();
+    str += PyObject::strFormat(_vals[0]);
     str += ", ";
+    str += PyObject::strFormat(_vals[1]);
     str += _vals[1]->toStr();
+    str += PyObject::strFormat(_vals[1]);
     str += ", ";
+    str += PyObject::strFormat(_vals[2]);
     str += _vals[2]->toStr();
+    str += PyObject::strFormat(_vals[2]);
     str +=")";
     return str;
 }
@@ -778,7 +817,7 @@ __getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2)
     if (temp2 > size) {
         temp2 = size;
     }
-    return new PyStr(v0->getValue().substr(temp1, temp2));
+    return new PyStr(v0->getValue().substr(temp1, temp2-temp1));
 }
 
 PyBool*
@@ -1017,13 +1056,18 @@ __not_bool__ (PyValue v0)
             i = 1;
         }
     } else if (v0->typeName() == "int") {
-        if (v0->asInt()->getValue() == 1){
+        if (v0->asInt()->getValue() != 0){
             i = 0;
         } else {
             i = 1;
         }
     } else {
-        i = 0;
+        if (v0->getSize() == 0){
+            i = 1;
+        } else {
+            i = 0;    
+        }
+        
     }
     return toPyBool(i);
 }
@@ -1039,13 +1083,18 @@ __truth__ (PyValue v0)
             i = 0;
         }
     } else if (v0->typeName() == "int") {
-        if (v0->asInt()->getValue() == 1){
+        if (v0->asInt()->getValue() != 0){
             i = 1;
         } else {
             i = 0;
         }
     } else {
-        i = 1;
+        if (v0->getSize() == 0){
+            i = 0;
+        } else {
+            i = 1;    
+        }
+        
     }
     return toPyBool(i);
 }
@@ -1088,23 +1137,27 @@ __readline__ ()
 
 static bool atStart;
 
+void __printspace__()
+{
+    if (!atStart) {
+        cout << " ";
+    }
+}
 void
 __print__ (int count, ...)
 {
- //    if (!atStart) 
-	// cout << " ";
+    // if (!atStart) 
+	   // cout << " ";
     // if (count == 0) {
     //     cout << "";
     // }
     va_list args;
     va_start(args, count);
-    // atStart = false;
     for (int i = 0; i < count; i ++) {
         PyValue temp = va_arg(args, PyValue);
-        temp->print(cout);   
-        if (i < count-1) {
-            cout << " ";
-        }
+        __printspace__();
+        temp->print(cout);
+        atStart = false;
     }
     va_end(args);
 }

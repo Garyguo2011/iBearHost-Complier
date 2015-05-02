@@ -130,11 +130,27 @@
 # 	return n * factorial(n-1)
 # print factorial(5)
 
-def make_adder(x):
-	def adder(y):
-		return y
-	return adder
-a = make_adder(5)
-print a(10)
+# def make_adder(x):
+# 	def adder(y):
+# 		return y
+# 	return adder
+# a = make_adder(5)
+# print a(10)
+
+# x = "hi" if True else "bye"
+# y = x if False else "why?"
+# print x, y
+
+x = 1 and 2
+y = 1 and x and 3
+z = 1 and x and y
+
+a = "hi" and "sigh"
+print x, y, z, a
+
+
+
+
+
 
 

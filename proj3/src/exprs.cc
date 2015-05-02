@@ -612,6 +612,16 @@ protected:
 
     NODE_CONSTRUCTORS (And_AST, BalancedExpr);
 
+    void codeGen () {
+        cout << "(";
+        cout << convertAsPyType(getType()) << ") ";
+        cout << "__and__(";
+        child(0)->codeGen();
+        cout << ", ";
+        child(1)->codeGen();
+        cout << ")";
+    }
+
 };
 
 NODE_FACTORY (And_AST, AND);
@@ -623,6 +633,16 @@ class Or_AST : public BalancedExpr {
 protected:
 
     NODE_CONSTRUCTORS (Or_AST, BalancedExpr);
+
+    void codeGen () {
+        cout << "(";
+        cout << convertAsPyType(getType()) << ") ";
+        cout << "__or__(";
+        child(0)->codeGen();
+        cout << ", ";
+        child(1)->codeGen();
+        cout << ")";
+    }
 
 };
 

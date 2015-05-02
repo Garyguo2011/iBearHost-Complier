@@ -104,9 +104,9 @@ for f in tests:
     elif not Execute(executable, Contents(inp)) or Stderr:
         msg = "FAIL (execution error)"
     elif std and std != Stdout:
-        print '---------compare---------'
+        print '---------*.std---------'
         print std
-        print '---------and-----------'
+        print '---------my output-----------'
         print Stdout
         msg = "FAIL (wrong output)"
     Remove(executable)
