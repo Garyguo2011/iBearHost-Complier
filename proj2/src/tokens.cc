@@ -213,6 +213,8 @@ protected:
         if (numDecls () > 0) {
             used.insert (getDecl ());
         }
+        if (_type != NULL)
+            _type->findUsedDecls (used);
     }    
 
 private:

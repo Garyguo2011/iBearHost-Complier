@@ -390,6 +390,37 @@ PyList::setItem(PyInt* position, PyValue val)
     return PyNone;
 }
 
+vector<PyValue>
+PyList::getList()
+{
+    return items;
+}
+
+PyValue
+PyList::setSlice(PyInt* a, PyInt* b, PyList* val)
+{
+    std::vector<PyValue>::iterator first;
+    std::vector<PyValue>::iterator last;
+    std::vector<PyValue> valList = val->getList();
+
+    if (a->getValue() < items.size()) {
+        // remove all element between index a and b
+        first = items.begin() + a->getValue();
+        if (b->getValue() <= items.size()) {
+            last = items.begin() + b->getValue();
+        } else {
+            last = items.end();
+        }
+        items.erase (first, last);
+        items.insert(first, valList.begin(), valList.end());
+    } else {
+        // directly push to the end of list
+        for (std::vector<PyValue>::iterator it=valList.begin(); it!=valList.end(); ++it) {
+            items.push_back(*it);    
+        }
+    }
+}
+
 PyValue
 PyList::get(int index)
 {
@@ -476,6 +507,19 @@ PyDictInt::typeName ()
     return "dictInt";
 }
 
+PyValue
+PyDictInt::setItem(PyInt* key, PyValue val)
+{
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            items[it->first] = val;
+            return val;
+        }
+    }
+    items[(PyValue)key] = val;
+    return val;
+}
+
 /* PyDictStr */
 
 const char*
@@ -484,12 +528,38 @@ PyDictStr::typeName ()
     return "dictStr";
 }
 
+PyValue
+PyDictStr::setItem(PyStr* key, PyValue val)
+{
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            items[it->first] = val;
+            return val;
+        }
+    }
+    items[(PyValue)key] = val;
+    return val;
+}
+
 /* PyDictBool */
 
 const char*
 PyDictBool::typeName ()
 {
     return "dictBool";
+}
+
+PyValue
+PyDictBool::setItem(PyBool* key, PyValue val)
+{
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            items[it->first] = val;
+            return val;
+        }
+    }
+    items[(PyValue)key] = val;
+    return val;
 }
 
 /* Pair */
@@ -915,9 +985,25 @@ __len__dict__ (PyDict* v0)
 }
 
 PyValue
-__setitem__dict__ (PyValue v0, PyValue v1, PyValue v2)
+__setitem__dict__ (PyDictInt* v0, PyInt* v1, PyValue v2)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    v0->setItem(v1, v2);
+    return v2;
+}
+
+PyValue
+__setitem__dict__ (PyDictBool* v0, PyBool* v1, PyValue v2)
+{
+    v0->setItem(v1, v2);
+    return v2;
+}
+
+PyValue
+__setitem__dict__ (PyDictStr* v0, PyStr* v1, PyValue v2)
+{
+    v0->setItem(v1, v2);
+    return v2;
 }
 
 PyBool*
@@ -992,10 +1078,16 @@ __setitem__list__ (PyList* v0, PyInt* v1, PyValue v2)
 {
     // return NULL;  // REPLACE WITH BODY
     v0->asList()->setItem(v1, v2);
+    return v2;
 }
 
-extern PyValue __setslice__list__ (PyValue v0, PyValue v1, PyValue v2,
-                                   PyValue v3);
+
+PyList*
+__setslice__list__ (PyList* v0, PyInt* v1, PyInt* v2, PyList* v3)
+{
+    v0->setSlice(v1, v2, v3);
+    return v3; 
+}
 
 /* Ranges */
 

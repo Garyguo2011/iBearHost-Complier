@@ -349,9 +349,25 @@ protected:
             child(0)->child(2)->codeGen();
             cout << ",";
             child(1)->codeGen();
-            cout << ");";
-        } 
-        if (child(0)->oper()->syntax() == TYPED_ID && arity() == 2) {
+            cout << ");\n";
+        } else if (child(0)->oper()->syntax() == SLICE_ASSIGN) {
+            // def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
+            child(0)->child(0)->codeGen();
+            cout << "_" << child(0)->child(0)->getDecl()->getIndex() << ".";
+            child(0)->child(0)->codeGen();     //__setslice__
+            cout << "(";
+            child(0)->child(1)->codeGen();     // S::list of $a
+            cout << ",";
+            child(0)->child(2)->codeGen();     // a::int
+            cout << ",";
+            child(0)->child(3)->codeGen();     // b::int
+            cout << ",";
+            child(1)->codeGen();               // val::list of $a
+            cout << ");\n";
+        // } else if () {
+            // def __setitem__(S::dict of [int, $b], k::int, val::$b)::$b:
+
+        } else if (child(0)->oper()->syntax() == TYPED_ID && arity() == 2) {
             stringstream ss;
             ss << child(0)->child(0)->as_string() << "_" << child(0)->child(0)->getDecl()->getIndex();
             string temp;
