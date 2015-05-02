@@ -615,8 +615,10 @@ protected:
         cout << temp << "++";
         cout << ") {" << endl;
 
-        cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
-        cout << " ";
+        if (child(0)->oper()->syntax() != TYPED_ID) {
+            cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
+            cout << " ";
+        }
         child(0)->codeGen();
         cout << " = ";
         cout << "(" << AST::convertAsPyType(child(0)->getDecl()->getType ()) << ") ";

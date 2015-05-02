@@ -399,28 +399,18 @@ return __isnot_bool__(x_470, y_472);
 } __isnot___468;
 
 PyInt* a_474;
-struct f478_local {
-PyInt* f_478(PyInt* x_480)
-{
-struct g482_local {
-PyInt* g_482()
-{
-return __cons_int__ (6);
-}
-} g_482;
-
-PyInt* x_480 = __cons_int__ (9);
-return x_480;
-}
-} f_478;
-
-PyInt* t_485;
+PyStr* b_477;
+PyList* c_480;
 void
 __main__()
 {
-a_474 = __cons_int__ (4);
-t_485 = f_478.f_478(a_474);
-__print__(1, t_485);
+a_474 = __cons_int__ (1);
+b_477 = __cons_str__ ("lala");
+c_480 = __cons_list__(5, __cons_int__ (1), __cons_int__ (2), __cons_int__ (3), __cons_int__ (4), __cons_int__ (5));
+for (int index_484 = 0; index_484 < c_480->getSize(); index_484++) {
+PyInt* PyInt* i_484 = (PyInt*) c_480->get(index_484);
+__print__(1, i_484);
 __newline__();
+}
 
 }
