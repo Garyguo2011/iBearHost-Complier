@@ -175,23 +175,26 @@ public:
     int getSize();
     PyBool* contains(PyValue key);
 
-private:
+protected:
     map<PyValue, PyValue> items;
 };
 
 class PyDictInt : public PyDict {
 public:
     const char* typeName ();
+    PyValue setItem(PyInt* key, PyValue val);
 };
 
 class PyDictStr : public PyDict {
 public:
     const char* typeName ();
+    PyValue setItem(PyStr* key, PyValue val);
 };
 
 class PyDictBool : public PyDict {
 public:
     const char* typeName ();
+    PyValue setItem(PyBool* key, PyValue val);
 };
 
 class PyTuple0 : public PyObject {
@@ -272,7 +275,9 @@ extern PyStr* __tostr__ (PyValue v0);
 extern PyBool* __contains__dict__ (PyValue v0, PyDict* v1);
 extern PyValue __getitem__dict__ (PyDict* v0, PyValue v1);
 extern PyInt* __len__dict__ (PyDict* v0);
-extern PyValue __setitem__dict__ (PyValue v0, PyValue v1, PyValue v2);
+extern PyValue __setitem__dict__ (PyDictInt* v0, PyInt* v1, PyValue v2);
+extern PyValue __setitem__dict__ (PyDictBool* v0, PyBool* v1, PyValue v2);
+extern PyValue __setitem__dict__ (PyDictStr* v0, PyStr* v1, PyValue v2);
 extern PyBool* __notcontains__dict__ (PyValue v0, PyDict* v1);
 
 /* Lists */

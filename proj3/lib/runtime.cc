@@ -507,6 +507,19 @@ PyDictInt::typeName ()
     return "dictInt";
 }
 
+PyValue
+PyDictInt::setItem(PyInt* key, PyValue val)
+{
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            items[it->first] = val;
+            return val;
+        }
+    }
+    items[(PyValue)key] = val;
+    return val;
+}
+
 /* PyDictStr */
 
 const char*
@@ -515,12 +528,38 @@ PyDictStr::typeName ()
     return "dictStr";
 }
 
+PyValue
+PyDictStr::setItem(PyStr* key, PyValue val)
+{
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            items[it->first] = val;
+            return val;
+        }
+    }
+    items[(PyValue)key] = val;
+    return val;
+}
+
 /* PyDictBool */
 
 const char*
 PyDictBool::typeName ()
 {
     return "dictBool";
+}
+
+PyValue
+PyDictBool::setItem(PyBool* key, PyValue val)
+{
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            items[it->first] = val;
+            return val;
+        }
+    }
+    items[(PyValue)key] = val;
+    return val;
 }
 
 /* Pair */
@@ -946,9 +985,25 @@ __len__dict__ (PyDict* v0)
 }
 
 PyValue
-__setitem__dict__ (PyValue v0, PyValue v1, PyValue v2)
+__setitem__dict__ (PyDictInt* v0, PyInt* v1, PyValue v2)
 {
-    return NULL;  // REPLACE WITH BODY
+    // return NULL;  // REPLACE WITH BODY
+    v0->setItem(v1, v2);
+    return v2;
+}
+
+PyValue
+__setitem__dict__ (PyDictBool* v0, PyBool* v1, PyValue v2)
+{
+    v0->setItem(v1, v2);
+    return v2;
+}
+
+PyValue
+__setitem__dict__ (PyDictStr* v0, PyStr* v1, PyValue v2)
+{
+    v0->setItem(v1, v2);
+    return v2;
 }
 
 PyBool*

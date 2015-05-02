@@ -187,14 +187,14 @@ def __getitem__(D::dict of [bool, $b], x::bool)::$b:
 def __getitem__(D::dict of [str, $b], x::str)::$b:
     native "__getitem__dict__"
 
-# def __setitem__(S::dict of [int, $b], k::int, val::$b)::$b:
-#     native "__setitem__dict__"
+def __setitem__(S::dict of [int, $b], k::int, val::$b)::$b:
+    native "__setitem__dict__"
 
-# def __setitem__(S::dict of [bool, $b], k::bool, val::$b)::$b:
-#     native "__setitem__dict__"
+def __setitem__(S::dict of [bool, $b], k::bool, val::$b)::$b:
+    native "__setitem__dict__"
 
-# def __setitem__(S::dict of [str, $b], k::str, val::$b)::$b:
-#     native "__setitem__dict__"
+def __setitem__(S::dict of [str, $b], k::str, val::$b)::$b:
+    native "__setitem__dict__"
 
 def len(D::dict of [int, $b])::int:
     native "__len__dict__"
