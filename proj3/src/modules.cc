@@ -61,15 +61,7 @@ protected:
              * Kludge to add semicolon after function call
              * if it makes up a whole statement
              */
-            if (c->oper()->syntax() == CALL ||
-                c->oper()->syntax() == CALL1 ||
-                c->oper()->syntax() == AND ||
-                c->oper()->syntax() == OR ||
-                c->oper()->syntax() == BINOP ||
-                c->oper()->syntax() == UNOP ||
-                c->oper()->syntax() == IF_EXPR) {
-                cout << ";" << endl;
-            }
+            c->codeGenSemicolonForCall();
         } end_for;
         cout << endl;
         if (child(arity()-1)->oper()->syntax() == PRINT) {

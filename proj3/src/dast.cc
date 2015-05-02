@@ -124,6 +124,20 @@ AST::codeGenRecursiveCall(AST_Ptr func_id)
     PASSDOWN(this, codeGenRecursiveCall(func_id), 0);
 }
 
+void
+AST::codeGenSemicolonForCall()
+{
+    if (oper()->syntax() == CALL ||
+        oper()->syntax() == CALL1 ||
+        oper()->syntax() == AND ||
+        oper()->syntax() == OR ||
+        oper()->syntax() == BINOP ||
+        oper()->syntax() == UNOP ||
+        oper()->syntax() == IF_EXPR) {
+        cout << ";" << endl;
+    }
+}
+
 string
 AST::convertAsPyType(Type_Ptr TP)
 {
@@ -173,6 +187,17 @@ AST::convertAsPyType(Type_Ptr TP)
         temp = "PyValue";
     }
     return temp;
+}
+
+AST_Ptr
+AST::getAst(int child, int depth)
+{
+    AST_Ptr result = this;
+    while (depth > 0) {
+        result = result->child(child);
+        depth--;
+    }
+    return result;
 }
 
 /* Definitions of methods in base class AST_Tree. */
