@@ -171,8 +171,7 @@ protected:
     void codeGen() {
         cout << convertAsPyType((Type_Ptr) child(2));
         cout << " ";
-        std::string method_name = (std::string)(getId()->as_string().c_str());
-        cout << method_name << " ";
+        getId()->codeGen();
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
@@ -300,18 +299,26 @@ protected:
             cout << "class ";
             cout << class_name;
             cout << " {" << endl;
+            cout << "public :" << endl;
+            /** First generate all variable initializations*/
             for (unsigned int i = 2; i < arity(); i++) {
                 AST_Ptr c = child(i);
                 if (c->oper()->syntax() == ASSIGN) {
                     c->codeGenVarDecl();
                     cout << ";" << endl;
                 }
-                else if (c->oper()->syntax() == METHOD 
-                    && ((std::string) c->child(0)->as_string().c_str()).compare("__init__") == 0) {
-                    c->codeGenInit(getId());
-                }
-                else {
-                    c->codeGen();
+            }
+
+            /** Then generate all method code */
+            for (unsigned int i = 2; i < arity(); i++) {
+                AST_Ptr c = child(i);
+                if (c->oper()->syntax() == METHOD) {
+                    if (((std::string) c->child(0)->as_string().c_str()).compare("__init__") == 0) {
+                        c->codeGenInit(getId());
+                    }
+                    else {
+                        c->codeGen();
+                    }
                 }
             }
             cout << "};" << endl;
@@ -403,7 +410,13 @@ protected:
             cout << " = ";
             child(1)->codeGen();
             cout << ";\n";
-        } else {
+        } else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
+            child(0)->codeGen();
+            cout << " = ";
+            child(1)->codeGen();
+            cout << ";" << endl;
+        }
+        else {
             if (child(0)->arity() == 0) {
                 if (child(0)->getDecl()->assignable()) {
                     stringstream ss;

@@ -165,7 +165,11 @@ AST::convertAsPyType(Type_Ptr TP)
     }
     else if (((std::string) temp).compare("tuple3") == 0) {
         temp = "PyTuple3*";
-    } else {
+    } 
+    else if (TP->oper()->syntax() == TYPE) {
+        temp = (((std::string)temp) + "*").c_str();
+    }
+    else {
         temp = "PyValue";
     }
     return temp;
