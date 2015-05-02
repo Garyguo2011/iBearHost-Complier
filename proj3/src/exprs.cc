@@ -649,7 +649,7 @@ protected:
             child(1)->codeGen();
         cout << " : ";
             child(2)->codeGen();
-        cout << ";";
+        // cout << ";";
     }
 
 };              
