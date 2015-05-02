@@ -370,10 +370,18 @@ return __isnot_bool__(x_419, y_421);
 }
 } __isnot___417;
 
+PyInt* x_423;
+PyInt* y_427;
+PyInt* z_432;
+PyStr* a_437;
 void
 __main__()
 {
-__print__(1, __and__(__and__(__cons_bool__ (1), __cons_bool__ (1)), __cons_bool__ (1)));
-__newline__();
+x_423 = (PyInt*) __and__(__cons_int__ (1), __cons_int__ (2));
+y_427 = (PyInt*) __and__((PyInt*) __and__(__cons_int__ (1), x_423), __cons_int__ (3));
+z_432 = (PyInt*) __and__((PyInt*) __and__(__cons_int__ (1), x_423), y_427);
+a_437 = (PyStr*) __and__(__cons_str__ ("hi"), __cons_str__ ("sigh"));
+__print__(4, x_423, y_427, z_432, a_437)
+__newline__()
 
 }
