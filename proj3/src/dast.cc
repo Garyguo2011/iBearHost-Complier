@@ -135,7 +135,9 @@ AST::codeGenSemicolonForCall()
         oper()->syntax() == UNOP ||
         oper()->syntax() == IF_EXPR ||
         oper()->syntax() == STRING_LITERAL ||
-        oper()->syntax() == INT_LITERAL) {
+        oper()->syntax() == INT_LITERAL ||
+        oper()->syntax() == TUPLE ||
+        oper()->syntax() == LIST_DISPLAY) {
         cout << ";" << endl;
     }
 }

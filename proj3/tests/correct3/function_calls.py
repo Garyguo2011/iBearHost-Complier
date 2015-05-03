@@ -4,10 +4,10 @@ hello()
 def foo(x):
 	print x
 foo(1)
-def bar(x, y):
+def bar(x::int, y::int):
 	return x+y
 print bar(1,1)
-def foobar(x,y):
+def foobar(x::int,y::int):
 	z = x + y
 	return z
 print foobar(1,2)
