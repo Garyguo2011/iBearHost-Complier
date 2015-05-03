@@ -386,8 +386,10 @@ private:
             forFunctions[2] = makeFuncDecl (FOR_FUNCTION, mainModule, rangeSeq);
         }
         sequence = make_id (FOR_FUNCTION, child (1)->loc ());
-        for (size_t i = 0; i < sizeof(forFunctions) / sizeof(Decl*); i += 1)
+        for (size_t i = 0; i < sizeof(forFunctions) / sizeof(Decl*); i += 1) {
             sequence->addDecl (forFunctions[i]);
+            forFunctions[i]->setFrozen (false);
+        }
     }
 
     /** Artificial identifier used to define the legal sequences for 
