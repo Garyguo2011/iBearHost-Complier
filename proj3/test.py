@@ -1,15 +1,6 @@
-# a :: int = 1
-# b :: str = "lala"
-# c :: list of [int] = [1,2,3,4,5]
-# for i::int in c:
-# 	print i
-
-# d :: list of [str] = ['a', 'b', 'c']
-# for el in d:
-# 	print el
-def f():
-	1
-	return 1
-print f()
-x , y = 1, 2
-print x, y
+def make_adder(x::int):
+	def adder(y::int):
+		return x + y
+	return adder
+a = make_adder(5)
+print a(10)
