@@ -115,7 +115,11 @@ public:
 
     virtual void codeGenRecursiveCall(AST_Ptr func_id);
 
+    virtual void codeGenSemicolonForCall();
+
     virtual string convertAsPyType(Type_Ptr TP);
+
+    virtual AST_Ptr getAst(int child, int depth);
 
 protected:
 
