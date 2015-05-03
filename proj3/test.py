@@ -1,12 +1,7 @@
-for i in [1, 2, 3]:
-	print i
-else:
-	print -i
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n-2) + fib(n-1)
 
-while i > 1:
-	a = i
-	print a
-	i = i - 1
-else:
-	print -a
-
+for i in xrange(0, 7):
+	print fib(i)

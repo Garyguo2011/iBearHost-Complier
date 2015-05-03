@@ -26,10 +26,3 @@ for i in L:
         continue
     print i
 
-L = ((1, 2), (3, 4), (5, 6))
-for i, j in L:
-    print j, i, j+i
-for (i, j) in L:
-    print j, i, j+i
-print "hello"
-

@@ -645,15 +645,16 @@ protected:
 
         stringstream ss0;
         ss0 << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
-        cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
-        cout << " ";
-        names.push_back(ss0.str());
-        if (child(0)->oper()->syntax() != TYPED_ID) {
-            child(0)->codeGen();
-        } else {
-            child(0)->child(0)->codeGen();
+        if (add_to_names(ss0.str())) {
+            cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
+            cout << " ";
+            if (child(0)->oper()->syntax() != TYPED_ID) {
+                child(0)->codeGen();
+            } else {
+                child(0)->child(0)->codeGen();
+            }
+            cout << ";" << endl;
         }
-        cout << ";" << endl;
 
         stringstream ss;
         ss << "index_";
@@ -709,7 +710,6 @@ protected:
                 ss << child(i)->as_string() << "_" << child(i)->getDecl()->getIndex();
                 string temp;
                 ss >> temp;
-                cerr << "number of func: " << names_func.size() << "\n";
                 if (find(names_func.begin(), names_func.end(), temp) != names_func.end()) {
                     cout << "(";
                     child(i)->codeGen();

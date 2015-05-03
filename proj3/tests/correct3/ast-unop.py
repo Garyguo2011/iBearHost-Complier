@@ -7,5 +7,5 @@ print a
 a::int = -a
 print a
 
-a::int = not True
-print a
+b::bool = not True
+print b
