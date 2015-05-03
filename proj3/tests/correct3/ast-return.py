@@ -4,4 +4,4 @@ print f()
 
 def g():
 	return
-print (g()==None)
+print (f()==1)
