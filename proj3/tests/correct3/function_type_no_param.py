@@ -1,4 +1,4 @@
-def f()::Int:
+def f()::int:
 	return 1
-g::()->Int = f;
+g = f;
 print g()

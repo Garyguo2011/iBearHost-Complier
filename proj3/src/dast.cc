@@ -133,7 +133,9 @@ AST::codeGenSemicolonForCall()
         oper()->syntax() == OR ||
         oper()->syntax() == BINOP ||
         oper()->syntax() == UNOP ||
-        oper()->syntax() == IF_EXPR) {
+        oper()->syntax() == IF_EXPR ||
+        oper()->syntax() == STRING_LITERAL ||
+        oper()->syntax() == INT_LITERAL) {
         cout << ";" << endl;
     }
 }
