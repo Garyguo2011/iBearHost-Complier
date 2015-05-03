@@ -403,7 +403,10 @@ protected:
     NODE_CONSTRUCTORS (Subscription_AST, Callable);
 
     void codeGen() {
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+        stringstream ss;
+        ss << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex();
+        cout << "(" << AST::convertAsPyType(getType()) << ") ";
+        cout << ss.str() << ".";
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();

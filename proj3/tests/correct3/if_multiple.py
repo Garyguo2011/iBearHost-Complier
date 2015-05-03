@@ -1,6 +1,6 @@
-if 0:
+if truth(0):
 	print 0
-elif 1:
+elif truth(1):
 	print 1
 else:
 	print 2
