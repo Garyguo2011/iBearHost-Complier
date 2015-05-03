@@ -1,0 +1,9 @@
+if True:
+	print 1
+   	print 2
+if True:
+   print 3
+   if True:
+	          print 4
+	          print 5
+   print 6

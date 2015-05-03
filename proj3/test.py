@@ -1,6 +1,6 @@
-def foo (x::int):
-  def bar (y::str):
-    print y
-  print x
-  bar("hi")
-foo(5)
+def make_adder(x):
+	def adder(y):
+		return y
+	return adder
+a = make_adder(5)
+print a(10)
