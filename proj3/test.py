@@ -1,5 +1,15 @@
-a = [1, 2, 3]
-b = [4, 5, 6, 7, 8, 9]
-for a[0] in b:
-	print a
+# a :: int = 1
+# b :: str = "lala"
+# c :: list of [int] = [1,2,3,4,5]
+# for i::int in c:
+# 	print i
 
+# d :: list of [str] = ['a', 'b', 'c']
+# for el in d:
+# 	print el
+def f():
+	1
+	return 1
+print f()
+x , y = 1, 2
+print x, y
