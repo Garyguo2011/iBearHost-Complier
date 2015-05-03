@@ -413,7 +413,7 @@ __gt__str__ (PyValue v0, PyValue v1)
 PyValue
 __le__str__ (PyValue v0, PyValue v1)
 {
-    return __le__str__ (v1, v0);
+    return __ge__str__ (v1, v0);
 }
 
 PyValue
