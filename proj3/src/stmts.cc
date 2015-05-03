@@ -204,11 +204,19 @@ protected:
 
 
     /** codeGen for __init__ */
-    void codeGenInit(AST_Ptr class_id) {
+    void codeGenInit(AST_Ptr myclass) {
+        AST_Ptr class_id = myclass->getId();
         cout << (std::string) (class_id->as_string().c_str());
         cout << " (";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
+        /** Initialize all instance variables in constructor*/
+        for (unsigned int i = 2; i < myclass->arity(); i++) {
+            AST_Ptr c = myclass->child(i);
+            if (c->oper()->syntax() == ASSIGN) {
+                c->codeGen();
+            }
+        }
         for (unsigned int i = 3; i < arity(); i++) {
             child(i)->codeGen();
         }
@@ -316,7 +324,7 @@ protected:
                 AST_Ptr c = child(i);
                 if (c->oper()->syntax() == METHOD) {
                     if (((std::string) c->child(0)->as_string().c_str()).compare("__init__") == 0) {
-                        c->codeGenInit(getId());
+                        c->codeGenInit(this);
                     }
                     else {
                         c->codeGen();
