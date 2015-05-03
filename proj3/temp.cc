@@ -398,26 +398,30 @@ return __isnot_bool__(x_472, y_474);
 }
 } __isnot___470;
 
-struct f_476_local  : public PyObject {
-PyInt* f_476()
+struct f_477_local  : public PyObject {
+PyInt* f_477(PyInt* n_479)
 {
-return __cons_int__ (1);
+static PyInt* i_481 = __cons_int__ (0);
+static PyInt* t_483 = __cons_int__ (3);
+while (__eval_bool__((__lt___113.__lt__(i_481, n_479)))) {
+if (__eval_bool__(((PyBool*) __and__(__le___129.__le__(__mod___87.__mod__(i_481, __cons_int__ (7)), __cons_int__ (2)),(__lt___113.__lt__(__cons_int__ (1), __mod___87.__mod__(i_481, __cons_int__ (7)))))))) {
+__print__(1, i_481);
 }
-} f_476;
-
-struct g_479_local  : public PyObject {
-PyValue g_479()
-{
-return __cons_none__();
+i_481 = __add___55.__add__(i_481, __cons_int__ (1));
 }
-} g_479;
+PyInt* s_485 = __add___55.__add__(i_481, __cons_int__ (2));
+t_483 = __add___55.__add__(t_483, __pow___95.__pow__(s_485, __cons_int__ (2)));
+__print__(4, __cons_str__ ("s ="), s_485, __cons_str__ ("t ="), t_483);
+__newline__();
+i_481 = __add___55.__add__(i_481, __cons_int__ (1));
+return i_481;
+}
+} f_477;
 
 void
 __main__()
 {
-__print__(1, f_476.f_476());
-__newline__();
-__print__(1, (__eq___145.__eq__(f_476.f_476(), __cons_int__ (1))));
+__print__(1, f_477.f_477(__cons_int__ (5)));
 __newline__();
 
 }
