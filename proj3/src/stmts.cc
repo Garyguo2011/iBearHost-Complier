@@ -19,6 +19,9 @@ vector<string> names;
 vector<string> names_local;
 vector<string> names_func;
 
+int has_returned;
+int has_else;
+
 /** Bookkeeping for names*/
 /** If name is new add to names, same with local*/
 bool add_to_names(string temp) {
@@ -141,6 +144,7 @@ protected:
      * local variables from outer scope
      */
     void codeGen() {
+        has_returned = 0;
         stringstream ss0;
         ss0 << getId()->as_string() << "_" << getId()->getDecl()->getIndex();
         names_func.push_back(ss0.str());
@@ -191,12 +195,16 @@ protected:
                     c->codeGenSemicolonForCall();
                 } 
             }
+
             if (child(arity()-1)->oper()->syntax() != RETURN) {
                 if (child(arity()-1)->oper()->syntax() != ASSIGN) {
                     child(arity()-1)->codeGen();
                     child(arity()-1)->codeGenSemicolonForCall();
                 }
-                cout << "return __cons_str__(\"None\");" << endl;
+                if (has_returned == 0 || has_else == 0) {
+                    cout << "return __cons_str__(\"None\");" << endl;
+                }
+                
             } else {
                 child(arity()-1)->codeGenRecursiveCall(this);
             }
@@ -553,6 +561,7 @@ protected:
             if (add_to_names(temp)) {
                 cout << convertAsPyType(child(0)->getType()) << " ";
                 child(0)->child(0)->codeGen();
+                cout << ";" << endl;
             }
 
         } else {
@@ -564,6 +573,7 @@ protected:
                 if (add_to_names(temp)) {
                     cout << convertAsPyType(getType()) << " ";
                     child(0)->codeGen();
+                    cout << ";" << endl;
                 }
             } else {
                 for (unsigned int i = 1; i < getType()->arity(); i++) {
@@ -575,8 +585,8 @@ protected:
                         if (add_to_names(temp)) {
                             cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
                             child(0)->child(i-1)->child(0)->codeGen();
+                            cout << ";" << endl;
                         }
-                        cout << ";" << endl;
                     } else {
                         stringstream ss;
                         ss << child(0)->child(i-1)->as_string()
@@ -587,8 +597,8 @@ protected:
                         if (add_to_names(temp)) {
                             cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
                             child(0)->child(i-1)->codeGen();
+                            cout << ";" << endl;
                         }
-                        cout << ";" << endl;
                     }
                 }
             }
@@ -726,6 +736,7 @@ protected:
             }
         }
         cout << ";" << endl;
+        has_returned = 1;
     }
 
     void codeGenRecursiveCall(AST_Ptr func_id) {
@@ -813,9 +824,9 @@ protected:
 
     void codeGen ()
     {
+        has_else = 0;
         for_each_child(c, this->child(1)) {
             c->codeGenVarDecl();
-            cout << ";" << endl;
         } end_for;
         cout << "while (__eval_bool__(";
         child(0)->codeGen();
@@ -825,6 +836,7 @@ protected:
         if (arity() > 2) {
             // cout << "else {" << endl;
             child(2)->codeGen();
+            has_else = 1;
             // cout << "}" << endl;
         }
     }

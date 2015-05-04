@@ -204,6 +204,7 @@ AST::getAst(int child, int depth)
     return result;
 }
 
+
 /* Definitions of methods in base class AST_Tree. */
 
 void
