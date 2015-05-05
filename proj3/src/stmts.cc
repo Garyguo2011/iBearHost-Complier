@@ -136,7 +136,7 @@ protected:
 
     NODE_CONSTRUCTORS (Def_AST, AST_Tree);
 
-    Decl* getDecl (int k = 0) {
+    Decl* getDecl () {
         return child (0)->getDecl ();
     }
 
@@ -452,7 +452,7 @@ protected:
 
     NODE_CONSTRUCTORS (Class_AST, AST_Tree);
 
-    Decl* getDecl (int k = 0) {
+    Decl* getDecl () {
         return child (0)->getDecl ();
     }
 

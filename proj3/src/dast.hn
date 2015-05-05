@@ -271,9 +271,9 @@ decl :
             }
     | "(" "instancedecl" index ID decl_ref type ")"
             { if (pass == 1) 
-                  addDecl (makeVarDecl (intValue($index),
-                                        $ID.value ()->as_string (),
-                                        getDecl ($decl_ref)));
+                  addDecl (makeInstanceDecl (intValue($index),
+                                             $ID.value ()->as_string (),
+                                             getDecl ($decl_ref)));
               else {
                   Decl* decl = getDecl ($index);
                   decl->setType ($type.value ()->asType ());
