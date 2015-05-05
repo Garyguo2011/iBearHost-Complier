@@ -1,7 +1,7 @@
 L = [ ( "chicken", "chick"), ( "goose", "gosling"), ( "duck", "duckling"),
       ( "cow", "calf"), ( "horse", "colt") ]
 
-D = {}
+D::dict of [str, str] = {}
 for animal, child in L:
     D[animal] = child
 
