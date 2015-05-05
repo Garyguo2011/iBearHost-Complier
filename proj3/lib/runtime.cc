@@ -456,21 +456,21 @@ PyDict::get(PyValue key)
     for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
         if (it->first->toStr().compare(key->toStr()) == 0) {
             return it->second;
-        }
-        
+        }     
     }
+    fatal ("Can Not find Key!");
     return PyNone;
 }
 
 PyBool*
 PyDict::contains(PyValue key)
 {
-    if (get(key)->toStr() != "None")
-    {
-        return new PyBool(1);
-    } else {
-        return new PyBool(0);
+    for (std::map<PyValue, PyValue>::iterator it=items.begin(); it!=items.end(); ++it) {
+        if (it->first->toStr().compare(key->toStr()) == 0) {
+            return new PyBool(1);
+        }     
     }
+    return new PyBool(0);
 }
 
 int
