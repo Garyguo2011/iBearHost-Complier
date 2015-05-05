@@ -51,6 +51,12 @@ PyObject::typeName ()
     return "?";
 }
 
+PyValue
+PyObject::get(int index)
+{
+    return PyNone;
+}
+
 string
 PyObject::strFormat(PyValue val)
 {
