@@ -20,8 +20,11 @@ vector<string> names_local;
 vector<string> names_func;
 vector<string> names_params;
 int nested;
+string func_name;
 
 int has_returned;
+int has_else;
+
 
 /** Bookkeeping for names*/
 /** If name is new add to names, same with local*/
@@ -151,6 +154,7 @@ protected:
         stringstream ss0;
         ss0 << getId()->as_string() << "_" << getId()->getDecl()->getIndex();
         names_func.push_back(ss0.str());
+        func_name = ss0.str();
 
         /** Mark that we are in the current function*/
         ss0 >> current_function;
@@ -179,19 +183,6 @@ protected:
                 cout << name << " = " << name << "_param;" << endl;
             } end_for;
         }
-        
-        // /** Declare every single params from outer scope via lambda expression for further use. */
-        // for (unsigned int i = 0; i < names_params.size(); i++) {
-        //     std::string s = names_params[i];
-        //     int index = s.find(" ");
-        //     std::string type = s.substr(0, index);
-        //     std::string name = s.substr(index+1, s.size());
-        //     std::string origin_type = AST::convertBackFromPyType(type);
-        //     cout << name << " = " << name << "_param;" << endl;
-        //     // cout << origin_type << " " << name << "_origin"<< " = [=]()->" << origin_type << "{"
-        //     //      << "return " << name << "_origin" << "; }();" << endl;
-        //     // cout << s << " = " << "__cons_" << origin_type << "__(" << name << "_origin);" << endl;
-        // }
 
         
         /** Case of native function
@@ -619,7 +610,13 @@ protected:
                             }
                             getAst(1, i0)->child(0)->child(i-1)->child(0)->codeGen();
                             cout << " = ";
-                            getAst(1, depth)->child(1)->child(i-1)->codeGen();
+                            if (getAst(1, depth)->child(1)->arity() == 0) {
+                                cout << "(" << convertAsPyType((Type_Ptr) getAst(1, i0)->getType()->child(1)) << ") ";
+                                getAst(1, depth)->child(1)->codeGen();
+                                cout << "->get(" << i-1 << ")";
+                            } else {
+                                getAst(1, depth)->child(1)->child(i-1)->codeGen();
+                            }
                             cout << ";" << endl;
                         }
                         else {
@@ -636,7 +633,13 @@ protected:
 
                                 getAst(1, i0)->child(0)->child(i-1)->codeGen();
                                 cout << " = ";
-                                getAst(1, depth)->child(1)->child(i-1)->codeGen();
+                                if (getAst(1, depth)->child(1)->arity() == 0) {
+                                    cout << "(" << convertAsPyType((Type_Ptr) getAst(1, i0)->getType()->child(1)) << ") ";
+                                    getAst(1, depth)->child(1)->codeGen();
+                                    cout << "->get(" << i-1 << ")";
+                                } else {
+                                    getAst(1, depth)->child(1)->child(i-1)->codeGen();
+                                }
                                 cout << ";" << endl;
                             } else {
                                 fatal("This ID can't be assigned.");
@@ -646,6 +649,11 @@ protected:
                 }
             }
         }
+        // if (getAst(1, depth)->child(1)->arity() == 0) {
+        //     cout << " = ";
+        //     getAst(1, depth)->child(1)->codeGen();
+        //     cout << ";" << endl;
+        // }
     }
 
     void codeGenVarDecl() {
@@ -759,6 +767,7 @@ protected:
     NODE_CONSTRUCTORS (Break_AST, AST_Tree);
 
     void codeGen() {
+        cout << "count_loop += 1;" << endl;
         cout << "break;";
     }
 
@@ -807,6 +816,8 @@ protected:
             cout << ";" << endl;
         }
 
+        cout << "count_loop = 0;" << endl;
+
         stringstream ss;
         ss << "index_";
         ss << child(0)->getDecl()->getIndex();
@@ -834,10 +845,16 @@ protected:
 
         cout << "}" << endl;
         if (arity() > 3) {
-            // cout << "else {" << endl;
+            cout << "if (count_loop == 0) {" << endl;
             child(3)->codeGen();
-            // cout << "}" << endl;
+            cout << "}" << endl;
+            for_each_child(c, child(3)) {
+                if (c->oper()->syntax() == RETURN) {
+                    c->codeGen();
+                }
+            } end_for;
         }
+        cout << "count_loop = 0;" << endl;
     }
 
 };
@@ -894,6 +911,7 @@ protected:
     
     void codeGen ()
     {
+        has_else = 0;
         cout << "if (__eval_bool__(";
         child(0)->codeGen();
         cout << ")) {" << endl;
@@ -909,6 +927,7 @@ protected:
                 has_returned = 0;
             } else {
                 cout << "else {" << endl;
+                has_else = 1;
                 child(2)->codeGen();
                 cout << "}" << endl;
             }
@@ -930,6 +949,10 @@ protected:
 
     void codeGen ()
     {
+
+        cout << "count_loop = 0;" << endl;
+        has_else = 0;
+
         for_each_child(c, this->child(1)) {
             c->codeGenVarDecl();
         } end_for;
@@ -939,12 +962,133 @@ protected:
         child(1)->codeGen();
         cout << "}" << endl;
         if (arity() > 2) {
-            // cout << "else {" << endl;
+            cout << "if (count_loop == 0) {" << endl;
             child(2)->codeGen();
-            // cout << "}" << endl;
+
+            //has_else = 1;
+            cout << "}" << endl;
+            for_each_child(c, child(2)) {
+                if (c->oper()->syntax() == RETURN) {
+                    c->codeGen();
+                }
+            } end_for;
         }
+        cout << "count_loop = 0;" << endl;
     }
 
 };
 
 NODE_FACTORY (While_AST, WHILE);
+
+// /*****   CALLS    *****/
+
+// /** The supertype of "callable" things, including ordinary calls,
+//  *  binary operators, unary operators, subscriptions, and slices. */
+
+// class Callable : public Typed_Tree {
+// protected:
+
+//     NODE_BASE_CONSTRUCTORS (Callable, Typed_Tree);
+    
+//     /** Returns the expression representing the quantity that is
+//      *  called to evaluate this expression. */
+//     virtual AST_Ptr calledExpr () {
+//         return child (0);
+//     }
+
+//     /** Returns the number of actual parameters in this call. */
+//     virtual int numActuals () {
+//         return arity () - 1;
+//     }
+
+//     /** Return the Kth actual parameter in this call. */
+//     virtual AST_Ptr actualParam (int k) {
+//         return child (k + 1);
+//     }
+
+//     /** Set the Kth actual parameter in this call to EXPR. */
+//     virtual void setActual (int k, AST_Ptr expr) {
+//         replace (k + 1, expr);
+//     }
+
+// public:
+
+// };
+
+// /** A function call. */
+// class Call_AST : public Callable {
+// protected:
+
+//     NODE_CONSTRUCTORS (Call_AST, Callable);
+
+//     void codeGen() {
+//         stringstream ss;
+//         ss << child(0)->as_string().c_str()<< "_" << child(0)->getDecl()->getIndex();
+//         std::string call_name = ss.str();
+        
+//         if (child(0)->oper()->syntax() != ATTRIBUTEREF
+//             && func_name.compare(call_name) != 0) {
+//             cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+//         }
+//         child(0)->codeGen();
+//         cout<< "(";
+//         for (unsigned int i = 1; i < arity(); i++) {
+//             child(i)->codeGen();
+//             if (i < arity()-1)
+//             {
+//                 cout << ", ";   
+//             }
+//         }
+//         cout << ")";
+//     }
+
+//     void codeGenRecursiveCall(AST_Ptr func_id) {
+//         std::string func_name0 = func_id->as_string().c_str();
+//         std::string call_name = child(0)->as_string().c_str();
+//         if (func_name0.compare(call_name) != 0) {
+//             cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+//         }
+//         child(0)->codeGen();
+//         cout<< "(";
+//         for (unsigned int i = 1; i < arity(); i++) {
+//             child(i)->codeGenRecursiveCall(func_id);
+//             if (i < arity()-1)
+//             {
+//                 cout << ", ";   
+//             }
+//         }
+//         cout << ")";
+//     }
+
+// };
+
+// NODE_FACTORY (Call_AST, CALL);
+
+// /***** CALL1 *****/
+
+// /** __init__(new T, ...)      */
+// class Call1_AST : public Call_AST {
+// protected:
+
+//     NODE_CONSTRUCTORS (Call1_AST, Call_AST);
+
+//     void codeGen() {
+//         // getType()->print(cerr, 4);
+//         // cerr << ", type!\n";
+//         // child(1)->getType()->print(cerr, 3);
+//         // cerr << ", child 1 type!\n";
+//         cout << "new ";
+//         cout << (std::string)getType()->child(0)->as_string().c_str();
+//         cout << "(";
+//         for (unsigned int i = 2; i < arity(); i++) {
+//             child(i)->codeGen();
+//             if (i < arity()-1) {
+//                 cout << ", ";
+//             }
+//         }
+//         cout << ")";
+//     }
+
+// };
+
+// NODE_FACTORY (Call1_AST, CALL1);
