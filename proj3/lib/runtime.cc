@@ -386,7 +386,11 @@ PyList::getItem(PyInt* val)
 PyValue
 PyList::setItem(PyInt* position, PyValue val)
 {
-    items[position->getValue()] = val;
+    int i = position->getValue();
+    if (i < 0) {
+        i = getSize() + i;
+    }
+    items[i] = val;
     return PyNone;
 }
 
