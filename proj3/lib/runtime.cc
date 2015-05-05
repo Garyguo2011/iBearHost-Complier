@@ -1184,6 +1184,8 @@ __truth__ (PyValue v0)
         } else {
             i = 0;
         }
+    } else if (v0->typeName() == "<None>") {
+        i = 0;
     } else {
         if (v0->getSize() == 0){
             i = 0;
