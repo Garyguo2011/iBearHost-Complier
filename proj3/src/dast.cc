@@ -13,6 +13,8 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
+string current_function = "";
+
 /* Definitions of methods in base class AST. */
 
 void
@@ -116,12 +118,6 @@ void
 AST::codeGenInit(AST_Ptr class_id)
 {
     PASSDOWN(this, codeGenInit(class_id), 0);
-}
-
-void
-AST::codeGenRecursiveCall(AST_Ptr func_id)
-{
-    PASSDOWN(this, codeGenRecursiveCall(func_id), 0);
 }
 
 void
@@ -312,6 +308,12 @@ bool user_defined(AST_Ptr cls)
         class_name.compare("tuple2") != 0 &&
         class_name.compare("tuple3") != 0
         );
+}
+
+void printFrame(Decl* frame) {
+    if (frame->getName().compare("__main__") != 0) {
+        cout << frame->getName() << "_" << frame->getIndex() << ".";
+    }
 }
 
 AST_Ptr
