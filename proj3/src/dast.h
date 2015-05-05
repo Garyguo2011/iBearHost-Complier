@@ -119,7 +119,11 @@ public:
 
     virtual void codeGenVarDeclRegardless();
 
+    virtual void codeGenParams();
+
     virtual string convertAsPyType(Type_Ptr TP);
+    
+    virtual string convertBackFromPyType(string type);
 
     virtual AST_Ptr getAst(int child, int depth);
 

@@ -34,7 +34,14 @@ protected:
         /** Generate code for class definitions*/
         for_each_child(c, this) {
             if (c->oper()->syntax() == CLASS) {
+                c->codeGenParams();
                 c->codeGen();
+            }
+        } end_for;
+
+        for_each_child(c, this) {
+            if (c->oper()->syntax() != CLASS) {
+                c->codeGenParams();
             }
         } end_for;
 

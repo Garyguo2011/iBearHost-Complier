@@ -148,6 +148,12 @@ AST::codeGenSemicolonForCall()
     }
 }
 
+void
+AST::codeGenParams()
+{
+    PASSDOWN(this, codeGenParams(), 0);
+}
+
 string
 AST::convertAsPyType(Type_Ptr TP)
 {
@@ -169,12 +175,12 @@ AST::convertAsPyType(Type_Ptr TP)
     }
     else if (((std::string) temp).compare("dict") == 0) {
         temp = "PyDict*";
-        if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("int") == 0)
+        if (((std::string) TP->child(1)->child(0)->as_string().c_str()).compare("int") == 0)
         {
             temp = "PyDictInt*";
-        } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("str") == 0) {
+        } else if (((std::string) TP->child(1)->child(0)->as_string().c_str()).compare("str") == 0) {
             temp = "PyDictStr*";
-        } else if (((std::string) getType()->child(1)->child(0)->as_string().c_str()).compare("bool") == 0) {
+        } else if (((std::string) TP->child(1)->child(0)->as_string().c_str()).compare("bool") == 0) {
             temp = "PyDictBool*";
         }
     }
@@ -197,6 +203,49 @@ AST::convertAsPyType(Type_Ptr TP)
         temp = "PyValue";
     }
     return temp;
+}
+string
+AST::convertBackFromPyType(string type) {
+    if (type.compare("PyStr*")==0) {
+        return "str";
+    }
+    if (type.compare("PyInt*")==0) {
+        return "int";
+    }
+    if (type.compare("PyBool*")==0) {
+        return "bool";
+    }
+    if (type.compare("PyRange*")==0) {
+        return "range";
+    }
+    if (type.compare("PyList*")==0) {
+        return "list";
+    }
+    if (type.compare("PyDict*")==0) {
+        return "dict";
+    }
+    if (type.compare("PyDictInt*")==0) {
+        return "dictint";
+    }
+    if (type.compare("PyDictBool*")==0) {
+        return "dictbool";
+    }
+    if (type.compare("PyDictStr*")==0) {
+        return "dictstr";
+    }
+    if (type.compare("PyTuple0")==0) {
+        return "tuple0";
+    }
+    if (type.compare("PyTuple1")==0) {
+        return "tuple1";
+    }
+    if (type.compare("PyTuple2")==0) {
+        return "tuple2";
+    }
+    if (type.compare("PyTuple3")==0) {
+        return "tuple3";
+    }
+    return type;
 }
 
 AST_Ptr

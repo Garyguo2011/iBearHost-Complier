@@ -397,6 +397,9 @@ __cons_pair__(PyValue val0, PyValue val1)
 static inline PyDict*
 __cons_dict__ (int count, ...)
 {
+    if (count == 0) {
+        return new PyDict();
+    }
     va_list args;
     va_start(args, count);
     PyDict* dict = new PyDict();
@@ -411,6 +414,9 @@ __cons_dict__ (int count, ...)
 static inline PyDictInt*
 __cons_dictint__ (int count, ...)
 {
+    if (count == 0) {
+        return new PyDictInt();
+    }
     va_list args;
     va_start(args, count);
     PyDictInt* dict = new PyDictInt();
@@ -425,6 +431,9 @@ __cons_dictint__ (int count, ...)
 static inline PyDictStr*
 __cons_dictstr__ (int count, ...)
 {
+    if (count == 0) {
+        return new PyDictStr();
+    }
     va_list args;
     va_start(args, count);
     PyDictStr* dict = new PyDictStr();
@@ -439,6 +448,9 @@ __cons_dictstr__ (int count, ...)
 static inline PyDictBool*
 __cons_dictbool__ (int count, ...)
 {
+    if (count == 0) {
+        return new PyDictBool();
+    }
     va_list args;
     va_start(args, count);
     PyDictBool* dict = new PyDictBool();

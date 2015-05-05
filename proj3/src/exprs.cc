@@ -178,7 +178,7 @@ protected:
         child(0)->codeGen();
         cout<< "(";
         for (unsigned int i = 1; i < arity(); i++) {
-            child(i)->codeGen();
+            child(i)->codeGenRecursiveCall(func_id);
             if (i < arity()-1)
             {
                 cout << ", ";   
@@ -264,6 +264,9 @@ protected:
         } else {
             child(1)->codeGen();
         }
+        if (child(1)->oper()->syntax() == ID) {
+            cout << "_param";
+        }
         cout << ", ";
         if (child(2)->oper()->syntax() == CALL
                 || child(2)->oper()->syntax() == BINOP
@@ -271,6 +274,9 @@ protected:
                 child(2)->codeGenRecursiveCall(func_id);
         } else {
             child(2)->codeGen();
+        }
+        if (child(2)->oper()->syntax() == ID) {
+            cout << "_param";
         }
         cout << ")";
     }
@@ -592,7 +598,10 @@ protected:
         cout << "__cons_dict";
         cout << temp;
         cout << "__("
-            << arity() << ", ";
+            << arity();
+        if (arity() != 0) {
+            cout << ", ";
+        }
         for (unsigned int i = 0; i < arity(); i++) {
             child(i)->codeGen();
             if (i < arity()-1) {
@@ -760,6 +769,16 @@ protected:
             cout << convertAsPyType(getType());
             cout << " " << getId()->as_string() << "_" << getDecl()->getIndex();
         }
+    }
+
+    void codeGenVarDecl() {
+        stringstream ss;
+        ss << getId()->as_string() << "_" << getDecl()->getIndex();
+        string temp;
+        ss >> temp;
+        cout << convertAsPyType(getType()) << " ";
+        getId()->codeGen();
+        cout << ";" << endl;
     }
 
 };
