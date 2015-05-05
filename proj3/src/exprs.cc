@@ -147,6 +147,7 @@ public:
 
 };
 
+
 // /** A function call. */
 // class Call_AST : public Callable {
 // protected:
@@ -222,6 +223,66 @@ public:
 
 // NODE_FACTORY (Call1_AST, CALL1);
 
+/** A function call. */
+class Call_AST : public Callable {
+protected:
+
+    NODE_CONSTRUCTORS (Call_AST, Callable);
+
+    void codeGen() {
+        std::string call_name; 
+        stringstream ss0;
+        ss0 << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+        ss0 >> call_name;
+        if (child(0)->oper()->syntax() != ATTRIBUTEREF &&
+            call_name.compare(current_function) != 0) {
+            printFrame(child(0)->getDecl());
+        }
+        child(0)->codeGen();
+        cout<< "(";
+        for (unsigned int i = 1; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1)
+            {
+                cout << ", ";   
+            }
+        }
+        cout << ")";
+    }
+
+};
+
+NODE_FACTORY (Call_AST, CALL);
+
+/***** CALL1 *****/
+
+/** __init__(new T, ...)      */
+class Call1_AST : public Call_AST {
+protected:
+
+    NODE_CONSTRUCTORS (Call1_AST, Call_AST);
+
+    void codeGen() {
+        // getType()->print(cerr, 4);
+        // cerr << ", type!\n";
+        // child(1)->getType()->print(cerr, 3);
+        // cerr << ", child 1 type!\n";
+        cout << "new ";
+        cout << (std::string)getType()->child(0)->as_string().c_str();
+        cout << "(";
+        for (unsigned int i = 2; i < arity(); i++) {
+            child(i)->codeGen();
+            if (i < arity()-1) {
+                cout << ", ";
+            }
+        }
+        cout << ")";
+    }
+
+};
+
+NODE_FACTORY (Call1_AST, CALL1);
+
 /***** NEW *****/
 
 /**  new T     */
@@ -250,39 +311,6 @@ protected:
         child(2)->codeGen();
         cout << ")";
     }
-
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        std::string func_name = func_id->as_string().c_str();
-        std::string call_name = child(0)->as_string().c_str();
-        if (func_name.compare(call_name) != 0) {
-            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-        }
-        child(0)->codeGen();
-        cout << "(";
-        if (child(1)->oper()->syntax() == CALL
-                || child(1)->oper()->syntax() == BINOP
-                || child(1)->oper()->syntax() == UNOP) {
-                child(1)->codeGenRecursiveCall(func_id);
-        } else {
-            child(1)->codeGen();
-        }
-        if (child(1)->oper()->syntax() == ID) {
-            cout << "_param";
-        }
-        cout << ", ";
-        if (child(2)->oper()->syntax() == CALL
-                || child(2)->oper()->syntax() == BINOP
-                || child(2)->oper()->syntax() == UNOP) {
-                child(2)->codeGenRecursiveCall(func_id);
-        } else {
-            child(2)->codeGen();
-        }
-        if (child(2)->oper()->syntax() == ID) {
-            cout << "_param";
-        }
-        cout << ")";
-    }
-
 };    
 
 NODE_FACTORY (Binop_AST, BINOP);
@@ -376,24 +404,6 @@ class Unop_AST : public Callable {
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();
-        cout << ")";
-    }
-
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        std::string func_name = func_id->as_string().c_str();
-        std::string call_name = child(0)->as_string().c_str();
-        if (func_name.compare(call_name) != 0) {
-            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-        }
-        child(0)->codeGen();
-        cout << "(";
-        if (child(1)->oper()->syntax() == CALL
-                || child(1)->oper()->syntax() == BINOP
-                || child(1)->oper()->syntax() == UNOP) {
-                child(1)->codeGenRecursiveCall(func_id);
-        } else {
-            child(1)->codeGen();
-        }
         cout << ")";
     }
 

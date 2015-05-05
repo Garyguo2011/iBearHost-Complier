@@ -113,8 +113,6 @@ public:
 
     virtual void codeGenInit(AST_Ptr class_id);
 
-    virtual void codeGenRecursiveCall(AST_Ptr func_id);
-
     virtual void codeGenSemicolonForCall();
 
     virtual void codeGenVarDeclRegardless();
@@ -439,8 +437,14 @@ Class::Method Formals {                                                      \
          _node_->replace(_i_, _node_->child(_i_)->CALL);                     \
    }
 
+/** Current function body that we're in */
+extern string current_function;
+
 /** Check whether a class is user defined or not*/
 extern bool user_defined(AST_Ptr cls); 
+
+/** Print all nested frames for environment of a function call */
+extern void printFrame(Decl* frame);
 
 /** Create an "id" node for the identifier TEXT, giving LOC as its
  *  location. TEXT must be a permanent string (that is, it must not
