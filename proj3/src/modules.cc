@@ -31,6 +31,8 @@ protected:
     void codeGen () {
         cout << "#include \"runtime.h\"" << endl;
 
+        cout << "int count_loop; //For keep tracking else stmt belongs to loop." << endl;
+
         /** Generate code for class definitions*/
         for_each_child(c, this) {
             if (c->oper()->syntax() == CLASS) {
@@ -39,11 +41,13 @@ protected:
             }
         } end_for;
 
+
         for_each_child(c, this) {
             if (c->oper()->syntax() != CLASS) {
                 c->codeGenParams();
             }
         } end_for;
+
 
         /** Generate code for function definitions*/
         for_each_child(c, this) {
@@ -55,14 +59,15 @@ protected:
             }
         } end_for;
 
+
         /** Generate code for main function*/
         cout << "void" << endl
              << "__main__()" << endl
              << "{" << endl;
 
         for_each_child_var(c, this) {
-            std::string class_name = (std::string)(c->child(0)->as_string().c_str());
             if (c->oper()->syntax() == CLASS) {
+                // std::string class_name = (std::string)(c->child(0)->as_string().c_str());
                 if (user_defined(c)) {
                     for (unsigned int i = 2; i < c->arity(); i++) {
                         AST_Ptr ch = c->child(i);

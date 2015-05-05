@@ -1,4 +1,5 @@
 #include "runtime.h"
+int count_loop; //For keep tracking else stmt belongs to loop.
 PyValue x_33;
 PyValue x_38;
 PyInt* low_44;
@@ -622,10 +623,12 @@ void
 __main__()
 {
 PyInt* i_488;
+count_loop = 0;
 for (int index_488 = 0; index_488 < xrange_42.xrange_42(__cons_int__ (0), __cons_int__ (7))->getSize(); index_488++) {
 i_488 = (PyInt*) xrange_42.xrange_42(__cons_int__ (0), __cons_int__ (7))->get(index_488);
 __print__(1, fib_477.fib_477(i_488));
 __newline__();
 }
+count_loop = 0;
 
 }
