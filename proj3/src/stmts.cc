@@ -22,7 +22,6 @@ vector<string> names_params;
 int nested;
 
 int has_returned;
-int has_else;
 
 /** Bookkeeping for names*/
 /** If name is new add to names, same with local*/
@@ -147,10 +146,14 @@ protected:
      * local variables from outer scope
      */
     void codeGen() {
+        
         has_returned = 0;
         stringstream ss0;
         ss0 << getId()->as_string() << "_" << getId()->getDecl()->getIndex();
         names_func.push_back(ss0.str());
+
+        /** Mark that we are in the current function*/
+        ss0 >> current_function;
 
         cout << "struct " << ss0.str() << "_local ";
         cout << " : public PyObject {" << endl;
@@ -238,12 +241,12 @@ protected:
                     child(arity()-1)->codeGen();
                     child(arity()-1)->codeGenSemicolonForCall();
                 }
-                if (has_returned == 0 || has_else == 0) {
-                    cout << "return __cons_str__(\"None\");" << endl;
+                if (has_returned == 0) {
+                    cout << "return PyNone;" << endl;
                 }
                 
             } else {
-                child(arity()-1)->codeGenRecursiveCall(this);
+                child(arity()-1)->codeGen();
             }
         }
         cout << "}" << endl;
@@ -252,6 +255,7 @@ protected:
         cout << "\n";
         names_params.clear();
         nested = 0;
+        current_function = "";
     }
 
     // void codeGenInternalFunc() {
@@ -469,17 +473,7 @@ protected:
     void codeGen() {
         std::string class_name = (std::string)(child(0)->as_string().c_str());
         /** Only generate code if not predefined class */
-        if (class_name.compare("str") != 0 &&
-            class_name.compare("int") != 0 &&
-            class_name.compare("bool") != 0 &&
-            class_name.compare("range") != 0 &&
-            class_name.compare("dict") != 0 &&
-            class_name.compare("list") != 0 &&
-            class_name.compare("tuple0") != 0 &&
-            class_name.compare("tuple1") != 0 &&
-            class_name.compare("tuple2") != 0 &&
-            class_name.compare("tuple3") != 0
-            ) {
+        if (user_defined(this)) {
             cout << "class ";
             cout << class_name;
             cout << " : public PyObject {" << endl;
@@ -707,6 +701,51 @@ protected:
         }
     }
 
+    void codeGenVarDeclRegardless() {
+        if (child(0)->oper()->syntax() == TYPED_ID && arity() == 2) {
+            stringstream ss;
+            ss << child(0)->child(0)->as_string() << "_" << child(0)->child(0)->getDecl()->getIndex();
+            string temp;
+            ss >> temp;
+            cout << convertAsPyType(child(0)->getType()) << " ";
+            child(0)->child(0)->codeGen();
+            cout << ";" << endl;
+
+        } else {
+            if (child(0)->arity() == 0) {
+                stringstream ss;
+                ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+                string temp;
+                ss >> temp;
+                cout << convertAsPyType(getType()) << " ";
+                child(0)->codeGen();
+                cout << ";" << endl;
+            } else {
+                for (unsigned int i = 1; i < getType()->arity(); i++) {
+                    if (child(0)->child(i-1)->oper()->syntax() == TYPED_ID) {
+                        stringstream ss;
+                        ss << child(0)->child(i-1)->child(0)->as_string() << "_" << child(0)->child(i-1)->child(0)->getDecl()->getIndex();
+                        string temp;
+                        ss >> temp;
+                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        child(0)->child(i-1)->child(0)->codeGen();
+                        cout << ";" << endl;
+                    } else {
+                        stringstream ss;
+                        ss << child(0)->child(i-1)->as_string()
+                           << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                        string temp;
+                        ss >> temp;
+
+                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        child(0)->child(i-1)->codeGen();
+                        cout << ";" << endl;
+                    }
+                }
+            }
+        }
+    }
+
 };
 
 NODE_FACTORY (Assign_AST, ASSIGN);
@@ -840,43 +879,6 @@ protected:
         cout << ";" << endl;
         has_returned = 1;
     }
-
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        // func_id->print(cerr, 4);
-        // cerr << "\n************************************\n";
-        cout << "return ";
-        for (unsigned int i = 0; i < arity(); i++) {
-            if (child(i)->oper()->syntax() == CALL
-                || child(i)->oper()->syntax() == BINOP
-                || child(i)->oper()->syntax() == UNOP) {
-                child(i)->codeGenRecursiveCall(func_id->getId());
-            } else if (child(i)->oper()->syntax() == ID) {
-                stringstream ss;
-                ss << child(i)->as_string() << "_" << child(i)->getDecl()->getIndex();
-                string temp;
-                ss >> temp;
-                // cerr << "number of func: " << names_func.size() << "\n";
-                if (find(names_func.begin(), names_func.end(), temp) != names_func.end()) {
-                    // cout << "(";
-                    // child(i)->codeGen();
-                    // cout << "::";
-                    // child(i)->codeGen();
-                    // cout << ") ";
-                    // child(i)->codeGen();
-                    // cout << ".";
-                    child(i)->codeGen();
-                    // cout << "()";
-                } else {
-                    child(i)->codeGen();
-                }
-            }
-            else {
-                child(i)->codeGen();
-            }
-        }
-        cout << ";" << endl;
-    }
-
 };
 
 NODE_FACTORY (Return_AST, RETURN);
@@ -897,12 +899,14 @@ protected:
         cout << ")) {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
+        has_returned = 0;
         if (arity() > 2) {
             if (child(2)->oper()->syntax() == IF) {
                 cout << "else ";
                 // child(2)->print(cerr, 4);
                 // cerr << ",lala \n";
                 child(2)->codeGen();
+                has_returned = 0;
             } else {
                 cout << "else {" << endl;
                 child(2)->codeGen();
@@ -926,7 +930,6 @@ protected:
 
     void codeGen ()
     {
-        has_else = 0;
         for_each_child(c, this->child(1)) {
             c->codeGenVarDecl();
         } end_for;
@@ -938,7 +941,6 @@ protected:
         if (arity() > 2) {
             // cout << "else {" << endl;
             child(2)->codeGen();
-            has_else = 1;
             // cout << "}" << endl;
         }
     }

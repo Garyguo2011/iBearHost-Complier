@@ -49,9 +49,9 @@ protected:
         for_each_child(c, this) {
             if (c->oper()->syntax() == DEF) {
                 c->codeGen();
-            } else if (c->oper()->syntax() == ASSIGN) {
+            } 
+            else if (c->oper()->syntax() == ASSIGN) {
                 c->codeGenVarDecl();
-                cout << ";" << endl;
             }
         } end_for;
 
@@ -59,7 +59,24 @@ protected:
         cout << "void" << endl
              << "__main__()" << endl
              << "{" << endl;
+
         for_each_child_var(c, this) {
+            std::string class_name = (std::string)(c->child(0)->as_string().c_str());
+            if (c->oper()->syntax() == CLASS) {
+                if (user_defined(c)) {
+                    for (unsigned int i = 2; i < c->arity(); i++) {
+                        AST_Ptr ch = c->child(i);
+                        if (ch->oper()->syntax() != METHOD) {
+                            if (ch->oper()->syntax() == ASSIGN) {
+                                ch->codeGenVarDeclRegardless();
+                            }
+                            ch->codeGen();
+                            ch->codeGenSemicolonForCall();
+                        }
+                    }
+                }
+            }
+
             if (c->oper()->syntax() != DEF 
                 && c->oper()->syntax() != CLASS) {
                 c->codeGen();
