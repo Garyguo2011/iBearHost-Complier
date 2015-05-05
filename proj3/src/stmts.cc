@@ -367,17 +367,7 @@ protected:
     void codeGen() {
         std::string class_name = (std::string)(child(0)->as_string().c_str());
         /** Only generate code if not predefined class */
-        if (class_name.compare("str") != 0 &&
-            class_name.compare("int") != 0 &&
-            class_name.compare("bool") != 0 &&
-            class_name.compare("range") != 0 &&
-            class_name.compare("dict") != 0 &&
-            class_name.compare("list") != 0 &&
-            class_name.compare("tuple0") != 0 &&
-            class_name.compare("tuple1") != 0 &&
-            class_name.compare("tuple2") != 0 &&
-            class_name.compare("tuple3") != 0
-            ) {
+        if (user_defined(this)) {
             cout << "class ";
             cout << class_name;
             cout << " : public PyObject {" << endl;
@@ -599,6 +589,51 @@ protected:
                             child(0)->child(i-1)->codeGen();
                             cout << ";" << endl;
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    void codeGenVarDeclRegardless() {
+        if (child(0)->oper()->syntax() == TYPED_ID && arity() == 2) {
+            stringstream ss;
+            ss << child(0)->child(0)->as_string() << "_" << child(0)->child(0)->getDecl()->getIndex();
+            string temp;
+            ss >> temp;
+            cout << convertAsPyType(child(0)->getType()) << " ";
+            child(0)->child(0)->codeGen();
+            cout << ";" << endl;
+
+        } else {
+            if (child(0)->arity() == 0) {
+                stringstream ss;
+                ss << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+                string temp;
+                ss >> temp;
+                cout << convertAsPyType(getType()) << " ";
+                child(0)->codeGen();
+                cout << ";" << endl;
+            } else {
+                for (unsigned int i = 1; i < getType()->arity(); i++) {
+                    if (child(0)->child(i-1)->oper()->syntax() == TYPED_ID) {
+                        stringstream ss;
+                        ss << child(0)->child(i-1)->child(0)->as_string() << "_" << child(0)->child(i-1)->child(0)->getDecl()->getIndex();
+                        string temp;
+                        ss >> temp;
+                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        child(0)->child(i-1)->child(0)->codeGen();
+                        cout << ";" << endl;
+                    } else {
+                        stringstream ss;
+                        ss << child(0)->child(i-1)->as_string()
+                           << "_" << child(0)->child(i-1)->getDecl()->getIndex();
+                        string temp;
+                        ss >> temp;
+
+                        cout << convertAsPyType((Type_Ptr) getType()->child(i)) << " ";
+                        child(0)->child(i-1)->codeGen();
+                        cout << ";" << endl;
                     }
                 }
             }
