@@ -131,9 +131,23 @@ protected:
         cout << "";
     }
 
+public:
+    bool has_function() {
+        return function_decl == NULL;
+    }
+
+    void set_function_decl(Decl* d) {
+        function_decl = d;
+    } 
+
+    Decl* get_function_decl() {
+        return function_decl;
+    }
+
 private:
 
     Decl* _me;
+    Decl* function_decl;
 
 };
 

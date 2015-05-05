@@ -1,9 +1,7 @@
-x = 4
-while truth(x):
-    print x
-    x = x - 1
-    if x < -1:
-        break
-else:
-    print "Done"
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n-2) + fib(n-1)
 
+for i in xrange(0, 7):
+	print fib(i)

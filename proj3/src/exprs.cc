@@ -147,6 +147,7 @@ public:
 
 };
 
+
 // /** A function call. */
 // class Call_AST : public Callable {
 // protected:
@@ -250,39 +251,6 @@ protected:
         child(2)->codeGen();
         cout << ")";
     }
-
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        std::string func_name = func_id->as_string().c_str();
-        std::string call_name = child(0)->as_string().c_str();
-        if (func_name.compare(call_name) != 0) {
-            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-        }
-        child(0)->codeGen();
-        cout << "(";
-        if (child(1)->oper()->syntax() == CALL
-                || child(1)->oper()->syntax() == BINOP
-                || child(1)->oper()->syntax() == UNOP) {
-                child(1)->codeGenRecursiveCall(func_id);
-        } else {
-            child(1)->codeGen();
-        }
-        if (child(1)->oper()->syntax() == ID) {
-            cout << "_param";
-        }
-        cout << ", ";
-        if (child(2)->oper()->syntax() == CALL
-                || child(2)->oper()->syntax() == BINOP
-                || child(2)->oper()->syntax() == UNOP) {
-                child(2)->codeGenRecursiveCall(func_id);
-        } else {
-            child(2)->codeGen();
-        }
-        if (child(2)->oper()->syntax() == ID) {
-            cout << "_param";
-        }
-        cout << ")";
-    }
-
 };    
 
 NODE_FACTORY (Binop_AST, BINOP);
@@ -376,24 +344,6 @@ class Unop_AST : public Callable {
         child(0)->codeGen();
         cout << "(";
         child(1)->codeGen();
-        cout << ")";
-    }
-
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        std::string func_name = func_id->as_string().c_str();
-        std::string call_name = child(0)->as_string().c_str();
-        if (func_name.compare(call_name) != 0) {
-            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-        }
-        child(0)->codeGen();
-        cout << "(";
-        if (child(1)->oper()->syntax() == CALL
-                || child(1)->oper()->syntax() == BINOP
-                || child(1)->oper()->syntax() == UNOP) {
-                child(1)->codeGenRecursiveCall(func_id);
-        } else {
-            child(1)->codeGen();
-        }
         cout << ")";
     }
 

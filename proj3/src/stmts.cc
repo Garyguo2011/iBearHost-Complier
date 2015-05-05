@@ -149,11 +149,15 @@ protected:
      * local variables from outer scope
      */
     void codeGen() {
+        
         has_returned = 0;
         stringstream ss0;
         ss0 << getId()->as_string() << "_" << getId()->getDecl()->getIndex();
         names_func.push_back(ss0.str());
         func_name = ss0.str();
+
+        /** Mark that we are in the current function*/
+        ss0 >> current_function;
 
         cout << "struct " << ss0.str() << "_local ";
         cout << " : public PyObject {" << endl;
@@ -228,12 +232,12 @@ protected:
                     child(arity()-1)->codeGen();
                     child(arity()-1)->codeGenSemicolonForCall();
                 }
-                if (has_returned == 0 || has_else == 0) {
-                    cout << "return __cons_str__(\"None\");" << endl;
+                if (has_returned == 0) {
+                    cout << "return PyNone;" << endl;
                 }
                 
             } else {
-                child(arity()-1)->codeGenRecursiveCall(this);
+                child(arity()-1)->codeGen();
             }
         }
         cout << "}" << endl;
@@ -242,7 +246,10 @@ protected:
         cout << "\n";
         names_params.clear();
         nested = 0;
+
         func_name = "";
+        current_function = "";
+
     }
 
     // void codeGenInternalFunc() {
@@ -892,43 +899,6 @@ protected:
         cout << ";" << endl;
         has_returned = 1;
     }
-
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        // func_id->print(cerr, 4);
-        // cerr << "\n************************************\n";
-        cout << "return ";
-        for (unsigned int i = 0; i < arity(); i++) {
-            if (child(i)->oper()->syntax() == CALL
-                || child(i)->oper()->syntax() == BINOP
-                || child(i)->oper()->syntax() == UNOP) {
-                child(i)->codeGenRecursiveCall(func_id->getId());
-            } else if (child(i)->oper()->syntax() == ID) {
-                stringstream ss;
-                ss << child(i)->as_string() << "_" << child(i)->getDecl()->getIndex();
-                string temp;
-                ss >> temp;
-                // cerr << "number of func: " << names_func.size() << "\n";
-                if (find(names_func.begin(), names_func.end(), temp) != names_func.end()) {
-                    // cout << "(";
-                    // child(i)->codeGen();
-                    // cout << "::";
-                    // child(i)->codeGen();
-                    // cout << ") ";
-                    // child(i)->codeGen();
-                    // cout << ".";
-                    child(i)->codeGen();
-                    // cout << "()";
-                } else {
-                    child(i)->codeGen();
-                }
-            }
-            else {
-                child(i)->codeGen();
-            }
-        }
-        cout << ";" << endl;
-    }
-
 };
 
 NODE_FACTORY (Return_AST, RETURN);
@@ -950,12 +920,14 @@ protected:
         cout << ")) {" << endl;
         child(1)->codeGen();
         cout << "}" << endl;
+        has_returned = 0;
         if (arity() > 2) {
             if (child(2)->oper()->syntax() == IF) {
                 cout << "else ";
                 // child(2)->print(cerr, 4);
                 // cerr << ",lala \n";
                 child(2)->codeGen();
+                has_returned = 0;
             } else {
                 cout << "else {" << endl;
                 has_else = 1;
@@ -1070,23 +1042,23 @@ protected:
         cout << ")";
     }
 
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        std::string func_name0 = func_id->as_string().c_str();
-        std::string call_name = child(0)->as_string().c_str();
-        if (func_name0.compare(call_name) != 0) {
-            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-        }
-        child(0)->codeGen();
-        cout<< "(";
-        for (unsigned int i = 1; i < arity(); i++) {
-            child(i)->codeGenRecursiveCall(func_id);
-            if (i < arity()-1)
-            {
-                cout << ", ";   
-            }
-        }
-        cout << ")";
-    }
+    // void codeGenRecursiveCall(AST_Ptr func_id) {
+    //     std::string func_name0 = func_id->as_string().c_str();
+    //     std::string call_name = child(0)->as_string().c_str();
+    //     if (func_name0.compare(call_name) != 0) {
+    //         cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+    //     }
+    //     child(0)->codeGen();
+    //     cout<< "(";
+    //     for (unsigned int i = 1; i < arity(); i++) {
+    //         child(i)->codeGenRecursiveCall(func_id);
+    //         if (i < arity()-1)
+    //         {
+    //             cout << ", ";   
+    //         }
+    //     }
+    //     cout << ")";
+    // }
 
 };
 
