@@ -125,6 +125,12 @@ AST::codeGenRecursiveCall(AST_Ptr func_id)
 }
 
 void
+AST::codeGenVarDeclRegardless()
+{
+    PASSDOWN(this, codeGenVarDeclRegardless(), 0);
+}
+
+void
 AST::codeGenSemicolonForCall()
 {
     if (oper()->syntax() == CALL ||
@@ -290,6 +296,22 @@ AST_Tree::externalName ()
 
     result = string (name, strlen (name)-1);
     return result.c_str();
+}
+
+bool user_defined(AST_Ptr cls)
+{
+    std::string class_name = (std::string)(cls->child(0)->as_string().c_str());
+    return (class_name.compare("str") != 0 &&
+        class_name.compare("int") != 0 &&
+        class_name.compare("bool") != 0 &&
+        class_name.compare("range") != 0 &&
+        class_name.compare("dict") != 0 &&
+        class_name.compare("list") != 0 &&
+        class_name.compare("tuple0") != 0 &&
+        class_name.compare("tuple1") != 0 &&
+        class_name.compare("tuple2") != 0 &&
+        class_name.compare("tuple3") != 0
+        );
 }
 
 AST_Ptr
