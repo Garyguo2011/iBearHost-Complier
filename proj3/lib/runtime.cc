@@ -1152,9 +1152,6 @@ __not_bool__ (PyValue v0)
             i = 1;
         }
     } else if (v0->typeName() == "int") {
-        cerr << "reach here";
-        cerr << v0->asInt()->getValue() << "\n";
-        cerr << (v0->asInt()->getValue() != 0) << "\n";
         if (v0->asInt()->getValue() != 0){
             i = 0;
         } else {
