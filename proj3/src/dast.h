@@ -117,6 +117,8 @@ public:
 
     virtual void codeGenSemicolonForCall();
 
+    virtual void codeGenVarDeclRegardless();
+
     virtual void codeGenParams();
 
     virtual string convertAsPyType(Type_Ptr TP);
@@ -437,6 +439,8 @@ Class::Method Formals {                                                      \
          _node_->replace(_i_, _node_->child(_i_)->CALL);                     \
    }
 
+/** Check whether a class is user defined or not*/
+extern bool user_defined(AST_Ptr cls); 
 
 /** Create an "id" node for the identifier TEXT, giving LOC as its
  *  location. TEXT must be a permanent string (that is, it must not
