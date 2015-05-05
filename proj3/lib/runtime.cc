@@ -1152,6 +1152,9 @@ __not_bool__ (PyValue v0)
             i = 1;
         }
     } else if (v0->typeName() == "int") {
+        cerr << "reach here";
+        cerr << v0->asInt()->getValue() << "\n";
+        cerr << (v0->asInt()->getValue() != 0) << "\n";
         if (v0->asInt()->getValue() != 0){
             i = 0;
         } else {
@@ -1184,6 +1187,8 @@ __truth__ (PyValue v0)
         } else {
             i = 0;
         }
+    } else if (v0->typeName() == "<None>") {
+        i = 0;
     } else {
         if (v0->getSize() == 0){
             i = 0;
