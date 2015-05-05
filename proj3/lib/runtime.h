@@ -52,6 +52,7 @@ public:
     virtual string toStr();
     virtual int getSize();
     virtual string strFormat(PyValue val);
+    virtual PyValue get(int index);
 
     /** Conversion functions */
     virtual PyStr* asStr ();
