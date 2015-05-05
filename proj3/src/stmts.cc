@@ -18,6 +18,8 @@ vector<string> names;
 /** All local ids used so far */
 vector<string> names_local;
 vector<string> names_func;
+vector<string> names_params;
+int nested;
 
 int has_returned;
 int has_else;
@@ -54,6 +56,7 @@ bool add_to_names_local_peek(string temp) {
     }
     return false;
 }
+
 /***** PRINT *****/
 
 class Print_AST : public AST_Tree {
@@ -157,6 +160,37 @@ protected:
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
+
+        if (child(1)->arity() != 0) {
+            for_each_child(c, child(1)) {
+                stringstream ss_params;
+                ss_params << convertAsPyType(c->getType()) << " " << c->getId()->as_string() << "_" << c->getDecl()->getIndex();
+                // cerr << convertAsPyType(c->getType()) << endl;
+                names_params.push_back(ss_params.str());
+
+                std::string s = ss_params.str();
+                int index = s.find(" ");
+                std::string type = s.substr(0, index);
+                std::string name = s.substr(index+1, s.size());
+                std::string origin_type = AST::convertBackFromPyType(type);
+                cout << name << " = " << name << "_param;" << endl;
+            } end_for;
+        }
+        
+        // /** Declare every single params from outer scope via lambda expression for further use. */
+        // for (unsigned int i = 0; i < names_params.size(); i++) {
+        //     std::string s = names_params[i];
+        //     int index = s.find(" ");
+        //     std::string type = s.substr(0, index);
+        //     std::string name = s.substr(index+1, s.size());
+        //     std::string origin_type = AST::convertBackFromPyType(type);
+        //     cout << name << " = " << name << "_param;" << endl;
+        //     // cout << origin_type << " " << name << "_origin"<< " = [=]()->" << origin_type << "{"
+        //     //      << "return " << name << "_origin" << "; }();" << endl;
+        //     // cout << s << " = " << "__cons_" << origin_type << "__(" << name << "_origin);" << endl;
+        // }
+
+        
         /** Case of native function
          *  Output return followed by native code
          */
@@ -191,9 +225,12 @@ protected:
             for (unsigned int i = 3; i < arity()-1; i++) {
                 AST_Ptr c = child(i);
                 if (c->oper()->syntax() != ASSIGN) {
+                    if (c->oper()->syntax() == DEF) {
+                        nested = 1;
+                    }
                     c->codeGen();
                     c->codeGenSemicolonForCall();
-                } 
+                }
             }
 
             if (child(arity()-1)->oper()->syntax() != RETURN) {
@@ -213,6 +250,8 @@ protected:
         cout << "} ";
         cout << getId()->as_string() << "_" << getId()->getDecl()->getIndex() << ";" << endl;
         cout << "\n";
+        names_params.clear();
+        nested = 0;
     }
 
     // void codeGenInternalFunc() {
@@ -249,6 +288,27 @@ protected:
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
+
+        if (child(1)->arity() != 0) {
+            for_each_child(c, child(1)) {
+                stringstream ss_params;
+                ss_params << convertAsPyType(c->getType()) << " " << c->getId()->as_string() << "_" << c->getDecl()->getIndex();
+                // cerr << convertAsPyType(c->getType()) << endl;
+                names_params.push_back(ss_params.str());
+
+                std::string s = ss_params.str();
+                int index = s.find(" ");
+                std::string type = s.substr(0, index);
+                std::string name = s.substr(index+1, s.size());
+                std::string origin_type = AST::convertBackFromPyType(type);
+
+                if (((std::string) c->getId()->as_string().c_str()).compare("self") != 0) {
+                    cout << name << " = " << name << "_param;" << endl;
+                }
+
+            } end_for;
+        }
+
         /** Case of native function
          *  Output return followed by native code
          */
@@ -282,6 +342,27 @@ protected:
         cout << " (";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
+
+        if (child(1)->arity() != 0) {
+            for_each_child(c, child(1)) {
+                stringstream ss_params;
+                ss_params << convertAsPyType(c->getType()) << " " << c->getId()->as_string() << "_" << c->getDecl()->getIndex();
+                // cerr << convertAsPyType(c->getType()) << endl;
+                names_params.push_back(ss_params.str());
+
+                std::string s = ss_params.str();
+                int index = s.find(" ");
+                std::string type = s.substr(0, index);
+                std::string name = s.substr(index+1, s.size());
+                std::string origin_type = AST::convertBackFromPyType(type);
+
+                if (((std::string) c->getId()->as_string().c_str()).compare("self") != 0) {
+                    cout << name << " = " << name << "_param;" << endl;
+                }
+                
+            } end_for;
+        }
+
         /** Initialize all instance variables in constructor*/
         for (unsigned int i = 2; i < myclass->arity(); i++) {
             AST_Ptr c = myclass->child(i);
@@ -323,10 +404,31 @@ protected:
                 names_local.push_back (temp);
                 // cout << convertAsPyType(child(i)->getType()) << " ";
             }
-            child(i)->codeGen();
+
+            if (((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
+                cout << convertAsPyType(child(i)->getType()) << " ";
+                cout << temp << "_param";
+            } else {
+                child(i)->codeGen();
+            }
             if (i < arity()-1
                 && ((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
                 cout << ", ";
+            }
+        }
+    }
+
+    void codeGenVarDecl() {
+        for (unsigned int i = 0; i < arity(); i++) {
+            cout << "extern ";
+            child(i)->codeGenVarDecl();
+        }
+    }
+
+    void codeGenParams() {
+        for (unsigned int i = 0; i < arity(); i++) {
+            if (((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
+                child(i)->codeGenVarDecl();
             }
         }
     }
