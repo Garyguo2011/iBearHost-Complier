@@ -802,25 +802,45 @@ protected:
 
     void codeGen ()
     {
-
-        stringstream ss0;
-        ss0 << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
-        if (add_to_names(ss0.str())) {
-            cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
-            cout << " ";
-            if (child(0)->oper()->syntax() != TYPED_ID) {
-                child(0)->codeGen();
-            } else {
-                child(0)->child(0)->codeGen();
+        if (child(0)->oper()->syntax() != TARGET_LIST) {
+            stringstream ss0;
+            ss0 << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex();
+            if (add_to_names(ss0.str())) {
+                cout << AST::convertAsPyType(child(0)->getDecl()->getType ());
+                cout << " ";
+                if (child(0)->oper()->syntax() != TYPED_ID) {
+                    child(0)->codeGen();
+                } else {
+                    child(0)->child(0)->codeGen();
+                }
+                cout << ";" << endl;
             }
-            cout << ";" << endl;
+        } else {
+            for (unsigned int i = 0; i < child(0)->arity(); i++) {
+                stringstream ss0;
+                ss0 << child(0)->child(i)->as_string() << "_" << child(0)->child(i)->getDecl()->getIndex();
+                if (add_to_names(ss0.str())) {
+                    cout << AST::convertAsPyType((Type_Ptr) child(0)->getType()->child(i+1));
+                    cout << " ";
+                    if (child(0)->child(i)->oper()->syntax() != TYPED_ID) {
+                        child(0)->child(i)->codeGen();
+                    } else {
+                        child(0)->child(i)->child(0)->codeGen();
+                    }
+                    cout << ";" << endl;
+                }
+            }
         }
 
         cout << "count_loop = 0;" << endl;
 
         stringstream ss;
         ss << "index_";
-        ss << child(0)->getDecl()->getIndex();
+        if (child(0)->oper()->syntax() != TARGET_LIST) {
+            ss << child(0)->getDecl()->getIndex();
+        } else {
+            ss << child(0)->child(0)->getDecl()->getIndex();
+        }
         string temp;
         ss >> temp;
         cout << "for (";
@@ -831,16 +851,27 @@ protected:
         cout << "->getSize(); ";
         cout << temp << "++";
         cout << ") {" << endl;
-
-        if (child(0)->oper()->syntax() == TYPED_ID) {
-            child(0)->child(0)->codeGen();
+        
+        if (child(0)->oper()->syntax() == TARGET_LIST) {
+            for (unsigned int i_pair = 0; i_pair < child(0)->arity(); i_pair++) {
+                child(0)->child(i_pair)->codeGen();
+                cout << " = ";
+                cout << "(" << AST::convertAsPyType((Type_Ptr) child(0)->getType()->child(i_pair+1)) << ") ";
+                child(1)->codeGen();
+                cout << "->get(" << temp << ")->get(" << i_pair << ");" << endl;
+            }
         } else {
-            child(0)->codeGen();
+
+            if (child(0)->oper()->syntax() == TYPED_ID) {
+                child(0)->child(0)->codeGen();
+            } else {
+                child(0)->codeGen();
+            }
+            cout << " = ";
+            cout << "(" << AST::convertAsPyType(child(0)->getDecl()->getType ()) << ") ";
+            child(1)->codeGen();
+            cout << "->get(" << temp << ");" << endl;
         }
-        cout << " = ";
-        cout << "(" << AST::convertAsPyType(child(0)->getDecl()->getType ()) << ") ";
-        child(1)->codeGen();
-        cout << "->get(" << temp << ");" << endl;
         child(2)->codeGen();
 
         cout << "}" << endl;
