@@ -31,6 +31,8 @@ protected:
     void codeGen () {
         cout << "#include \"runtime.h\"" << endl;
 
+        cout << "int count_loop; //For keep tracking else stmt belongs to loop." << endl;
+
         /** Generate code for class definitions*/
         for_each_child(c, this) {
             if (c->oper()->syntax() == CLASS) {

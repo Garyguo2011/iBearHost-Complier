@@ -147,78 +147,80 @@ public:
 
 };
 
-/** A function call. */
-class Call_AST : public Callable {
-protected:
+// /** A function call. */
+// class Call_AST : public Callable {
+// protected:
 
-    NODE_CONSTRUCTORS (Call_AST, Callable);
+//     NODE_CONSTRUCTORS (Call_AST, Callable);
 
-    void codeGen() {
-        if (child(0)->oper()->syntax() != ATTRIBUTEREF) {
-            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-        }
-        child(0)->codeGen();
-        cout<< "(";
-        for (unsigned int i = 1; i < arity(); i++) {
-            child(i)->codeGen();
-            if (i < arity()-1)
-            {
-                cout << ", ";   
-            }
-        }
-        cout << ")";
-    }
+//     void codeGen() {
+//         std::string call_name = child(0)->as_string().c_str();
+//         if (child(0)->oper()->syntax() != ATTRIBUTEREF) {
+//             cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+//         }
+//         child(0)->codeGen();
+//         cout<< "(";
+//         for (unsigned int i = 1; i < arity(); i++) {
+//             child(i)->codeGen();
+//             if (i < arity()-1)
+//             {
+//                 cout << ", ";   
+//             }
+//         }
+//         cout << ")";
+//     }
 
-    void codeGenRecursiveCall(AST_Ptr func_id) {
-        std::string func_name = func_id->as_string().c_str();
-        std::string call_name = child(0)->as_string().c_str();
-        if (func_name.compare(call_name) != 0) {
-            cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-        }
-        child(0)->codeGen();
-        cout<< "(";
-        for (unsigned int i = 1; i < arity(); i++) {
-            child(i)->codeGenRecursiveCall(func_id);
-            if (i < arity()-1)
-            {
-                cout << ", ";   
-            }
-        }
-        cout << ")";
-    }
+//     void codeGenRecursiveCall(AST_Ptr func_id) {
+//         std::string func_name0 = func_id->as_string().c_str();
+//         std::string call_name = child(0)->as_string().c_str();
+//         if (func_name0.compare(call_name) != 0
+//             || child(0)->oper()->syntax() != ATTRIBUTEREF) {
+//             cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
+//         }
+//         child(0)->codeGen();
+//         cout<< "(";
+//         for (unsigned int i = 1; i < arity(); i++) {
+//             child(i)->codeGenRecursiveCall(func_id);
+//             if (i < arity()-1)
+//             {
+//                 cout << ", ";   
+//             }
+//         }
+//         cout << ")";
+//     }
 
-};
+// };
 
-NODE_FACTORY (Call_AST, CALL);
+// NODE_FACTORY (Call_AST, CALL);
 
-/***** CALL1 *****/
+// /***** CALL1 *****/
 
-/** __init__(new T, ...)      */
-class Call1_AST : public Call_AST {
-protected:
+// /** __init__(new T, ...)      */
+// class Call1_AST : public Call_AST {
+// protected:
 
-    NODE_CONSTRUCTORS (Call1_AST, Call_AST);
+//     NODE_CONSTRUCTORS (Call1_AST, Call_AST);
 
-    void codeGen() {
-        // getType()->print(cerr, 4);
-        // cerr << ", type!\n";
-        // child(1)->getType()->print(cerr, 3);
-        // cerr << ", child 1 type!\n";
-        cout << "new ";
-        cout << (std::string)getType()->child(0)->as_string().c_str();
-        cout << "(";
-        for (unsigned int i = 2; i < arity(); i++) {
-            child(i)->codeGen();
-            if (i < arity()-1) {
-                cout << ", ";
-            }
-        }
-        cout << ")";
-    }
+//     void codeGen() {
+//         // getType()->print(cerr, 4);
+//         // cerr << ", type!\n";
+//         // child(1)->getType()->print(cerr, 3);
+//         // cerr << ", child 1 type!\n";
+//         cout << "new ";
+//         cout << (std::string)getType()->child(0)->as_string().c_str();
+//         cout << "(";
+//         for (unsigned int i = 2; i < arity(); i++) {
+//             child(i)->codeGen();
+//             if (i < arity()-1) {
+//                 cout << ", ";
+//             }
+//         }
+//         cout << ")";
+//     }
 
-};
+// };
 
-NODE_FACTORY (Call1_AST, CALL1);
+// NODE_FACTORY (Call1_AST, CALL1);
 
 /***** NEW *****/
 

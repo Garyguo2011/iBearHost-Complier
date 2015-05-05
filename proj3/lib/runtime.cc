@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include "math.h"
+#include <math.h>
 #include <sstream>
 
 using namespace std;
@@ -616,6 +616,12 @@ PyTuple1::PyTuple1 (PyValue val)
     _vals[0] = val;
 }
 
+PyValue
+PyTuple1::get(int index)
+{
+    return _vals[index];
+}
+
 PyTuple1*
 PyTuple1::asTuple1 ()
 {
@@ -645,6 +651,12 @@ PyTuple2::PyTuple2 (PyValue val0, PyValue val1)
 {
     _vals[0] = val0;
     _vals[1] = val1;
+}
+
+PyValue
+PyTuple2::get(int index)
+{
+    return _vals[index];
 }
 
 PyTuple2*
@@ -692,6 +704,12 @@ const char*
 PyTuple3::typeName ()
 {
     return "tuple3";
+}
+
+PyValue
+PyTuple3::get(int index)
+{
+    return _vals[index];
 }
 
 string

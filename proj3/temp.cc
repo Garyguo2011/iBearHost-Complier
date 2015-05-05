@@ -1,4 +1,5 @@
 #include "runtime.h"
+int count_loop; //For keep tracking else stmt belongs to loop.
 PyValue x_33;
 PyValue x_38;
 PyInt* low_44;
@@ -103,7 +104,6 @@ PyValue x_464;
 PyValue y_466;
 PyValue x_472;
 PyValue y_474;
-PyInt* n_479;
 struct truth_31_local  : public PyObject {
 PyBool* truth_31(PyValue x_33_param)
 {
@@ -607,25 +607,27 @@ return __isnot_bool__(x_472, y_474);
 }
 } __isnot___470;
 
-struct fib_477_local  : public PyObject {
-PyInt* fib_477(PyInt* n_479_param)
+struct g_476_local  : public PyObject {
+PyValue g_476()
 {
-n_479 = n_479_param;
-if (__eval_bool__((__lt___113.__lt__(n_479, __cons_int__ (2))))) {
-return n_479;
+PyInt* y_480 = __cons_int__ (4);
+struct h_478_local  : public PyObject {
+PyValue h_478()
+{
+__print__(1, y_480);
+__newline__();
+return __cons_str__("None");
 }
-return __add___55.__add__(fib_477(__sub___63.__sub__(n_479_param, __cons_int__ (2))), fib_477(__sub___63.__sub__(n_479_param, __cons_int__ (1))));
+} h_478;
+
+return __cons_str__("None");
 }
-} fib_477;
+} g_476;
 
 void
 __main__()
 {
-PyInt* i_488;
-for (int index_488 = 0; index_488 < xrange_42.xrange_42(__cons_int__ (0), __cons_int__ (7))->getSize(); index_488++) {
-i_488 = (PyInt*) xrange_42.xrange_42(__cons_int__ (0), __cons_int__ (7))->get(index_488);
-__print__(1, fib_477.fib_477(i_488));
+__print__(1, g_476.g_476());
 __newline__();
-}
 
 }

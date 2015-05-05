@@ -210,6 +210,7 @@ public:
     PyTuple1* asTuple1 ();
     const char* typeName ();
     string toStr();
+    PyValue get(int index);
 private:
     PyValue _vals[1];
 };
@@ -220,6 +221,7 @@ public:
     PyTuple2* asTuple2 ();
     const char* typeName ();
     string toStr();
+    PyValue get(int index);
 private:
     PyValue _vals[2];
 };
@@ -230,6 +232,7 @@ public:
     PyTuple3* asTuple3 ();
     const char* typeName ();
     string toStr();
+    PyValue get(int index);
 private:
     PyValue _vals[3];
 };
