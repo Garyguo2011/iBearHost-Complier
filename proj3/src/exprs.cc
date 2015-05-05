@@ -323,30 +323,51 @@ protected:
 
     NODE_CONSTRUCTORS (Compare_AST, Binop_AST);
 
+    // void codeGen() {
+    //     cout << "(";
+    //     if (child(1)->oper()->syntax() == LEFT_COMPARE){
+    //         cout << "(PyBool*) __and__";
+    //         cout << "(";
+    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+    //         child(0)->codeGen();
+    //         cout << "(";
+    //         child(1)->child(2)->codeGen();
+    //         cout << ", ";
+    //         child(2)->codeGen();
+    //         cout << ")";
+    //         cout << ",";
+    //         child(1)->codeGen();
+    //         cout << ")";
+    //     } else {
+    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+    //         child(0)->codeGen();
+    //         cout << "(";
+    //         child(1)->codeGen();
+    //         cout << ", ";
+    //         child(2)->codeGen();
+    //         cout << ")";
+    //     }
+    //     cout << ")";
+    // }
     void codeGen() {
         cout << "(";
-        if (child(1)->oper()->syntax() == LEFT_COMPARE){
-            cout << "(PyBool*) __and__";
-            cout << "(";
-            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-            child(0)->codeGen();
-            cout << "(";
-            child(1)->child(2)->codeGen();
-            cout << ", ";
-            child(2)->codeGen();
-            cout << ")";
-            cout << ",";
-            child(1)->codeGen();
-            cout << ")";
-        } else {
-            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-            child(0)->codeGen();
-            cout << "(";
-            child(1)->codeGen();
-            cout << ", ";
-            child(2)->codeGen();
-            cout << ")";
-        }
+        // if (child(1)->oper()->syntax() == LEFT_COMPARE){
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+        child(0)->codeGen();
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ")";
+        // } else {
+        //     cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+        //     child(0)->codeGen();
+        //     cout << "(";
+        //     child(1)->codeGen();
+        //     cout << ", ";
+        //     child(2)->codeGen();
+        //     cout << ")";
+        // }
         cout << ")";
     }
 
@@ -362,30 +383,66 @@ class LeftCompare_AST : public Binop_AST {
 protected:
 
     NODE_CONSTRUCTORS (LeftCompare_AST, Binop_AST);
+    // void codeGen() {
+    //     cout << "(";
+    //     if (child(1)->oper()->syntax() == LEFT_COMPARE){
+    //         cout << "(PyBool*) __and__";
+    //         cout << "(";
+    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+    //         child(0)->codeGen();
+    //         cout << "(";
+    //         child(1)->child(2)->codeGen();
+    //         cout << ", ";
+    //         child(2)->codeGen();
+    //         cout << ")";
+    //         cout << ",";
+    //         child(1)->codeGen();
+    //         cout << ")";
+    //     } else {
+    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+    //         child(0)->codeGen();
+    //         cout << "(";
+    //         child(1)->codeGen();
+    //         cout << ", ";
+    //         child(2)->codeGen();
+    //         cout << ")";
+    //     }
+    //     cout << ")";
+    // }
     void codeGen() {
         cout << "(";
-        if (child(1)->oper()->syntax() == LEFT_COMPARE){
-            cout << "(PyBool*) __and__";
-            cout << "(";
-            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-            child(0)->codeGen();
-            cout << "(";
-            child(1)->child(2)->codeGen();
-            cout << ", ";
-            child(2)->codeGen();
-            cout << ")";
-            cout << ",";
-            child(1)->codeGen();
-            cout << ")";
-        } else {
-            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-            child(0)->codeGen();
-            cout << "(";
-            child(1)->codeGen();
-            cout << ", ";
-            child(2)->codeGen();
-            cout << ")";
-        }
+        // if (child(1)->oper()->syntax() == LEFT_COMPARE){
+            // cout << "(PyBool*) __and__";
+            // cout << "(";
+            // cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+            // child(0)->codeGen();
+            // cout << "(";
+            // child(1)->child(2)->codeGen();
+            // cout << ", ";
+            // child(2)->codeGen();
+            // cout << ")";
+            // cout << ",";
+            // child(1)->codeGen();
+            // cout << ")";
+        // } else {
+            // cout << "__eval_bool__";
+            // cout << "(";
+            // cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+            // child(0)->codeGen();
+            // cout << "(";
+            // child(1)->codeGen();
+            // cout << ", ";
+            // child(2)->codeGen();
+            // cout << "))";
+            // cout << " ? __cons_int__ (1) : __cons_int__ (0)";
+        // }
+        child(0)->codeGen();
+        cout << "left__";
+        cout << "(";
+        child(1)->codeGen();
+        cout << ", ";
+        child(2)->codeGen();
+        cout << ")";
         cout << ")";
     }
 

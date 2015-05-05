@@ -1,7 +1,6 @@
-def fib(n):
-    if n < 2:
-        return n
-    return fib(n-2) + fib(n-1)
+def printOnce(x::int)::int:
+	print "Print", x, "once."
+	return x
 
-for i in xrange(0, 7):
-	print fib(i)
+print 1 < printOnce(2) < 3
+
