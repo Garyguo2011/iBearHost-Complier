@@ -1,23 +1,22 @@
-def f(n):
-	i::int = 0
-	t::int = 3
-	while i < n:
-		if 1 < i % 7 <= 2:
-			print i,
-		i = i + 1
-	else:
-		s = i + 2; t = t + s ** 2
-		print "s =", s, "t =", t
-		i = i + 1
-		return i
+class test:
+	def __init__(self):
+		self.one = 1
+		self.two = 2
+		self.true = True
+		self.none = None
+		self.string = 'hello'
 
-print f(5)
-# # print f(3) + f(2)
-# def testa():
-# 	return 2 + 3
-# print testa()
+	def printattr(self):
+		print self.one
+		print self.two
+		print self.true
+		print self.none
+		print self.string
 
-# def testb():
-# 	2 + 3
-# print testb()
-
+x = test()
+print x.one
+print x.two
+print x.true
+print x.none
+print x.string
+x.printattr()
