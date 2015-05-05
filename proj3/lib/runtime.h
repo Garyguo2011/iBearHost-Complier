@@ -499,4 +499,82 @@ __or__(PyValue val0, PyValue val1)
     
 }
 
+static inline PyInt*
+__le__left__(PyInt* val0, PyInt* val1)
+{
+    if (val0->asInt()->getValue() == 88888){
+        return new PyInt(88888);
+    }
+    int v0 = __eval_bool__(__le__int__(val0->asInt(), val1->asInt()));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyInt(88888);
+}
+
+static inline PyInt*
+__ge__left__ (PyInt* val0, PyInt* val1)
+{
+    if (val0->asInt()->getValue() == 88888){
+        return new PyInt(88888);
+    }
+    int v0 = __eval_bool__(__ge__int__(val0->asInt(), val1->asInt()));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyInt(88888);
+}
+
+static inline PyInt*
+__gt__left__ (PyInt* val0, PyInt* val1)
+{
+    if (val0->asInt()->getValue() == 88888){
+        return new PyInt(88888);
+    }
+    int v0 = __eval_bool__(__gt__int__(val0->asInt(), val1->asInt()));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyInt(88888);
+}
+
+static inline PyInt*
+__lt__left__ (PyInt* val0, PyInt* val1)
+{
+    if (val0->asInt()->getValue() == 88888){
+        return new PyInt(88888);
+    }
+    int v0 = __eval_bool__(__lt__int__(val0, val1));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyInt(88888);
+}
+
+static inline PyInt*
+__ne__left__ (PyInt* val0, PyInt* val1)
+{
+    if (val0->asInt()->getValue() == 88888){
+        return new PyInt(88888);
+    }
+    int v0 = __eval_bool__(__ne__int__(val0->asInt(), val1->asInt()));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyInt(88888);
+}
+
+static inline PyInt*
+__eq__left__ (PyInt* val0, PyInt* val1)
+{
+    if (val0->asInt()->getValue() == 88888){
+        return new PyInt(88888);
+    }
+    int v0 = __eval_bool__(__eq__int__(val0->asInt(), val1->asInt()));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyInt(88888);
+}
+
 #endif
