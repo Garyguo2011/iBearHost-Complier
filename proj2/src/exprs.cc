@@ -459,8 +459,11 @@ protected:
             error (this, "no definition of %s in type", name.c_str ());
             id->addDecl (makeUnknownDecl (name, false));
         }
-        for (size_t i = 0; i < defns.size (); i += 1)
+        for (size_t i = 0; i < defns.size (); i += 1) {
+            if (!defns[i]->isMethod ())
+                error (this, "np class variables in this dialect");
             id->addDecl (defns[i]);
+        }
         return id;
     }
 
