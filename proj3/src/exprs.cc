@@ -237,10 +237,17 @@ protected:
         if (child(0)->oper()->syntax() != ATTRIBUTEREF &&
             call_name.compare(current_function) != 0) {
             printFrame(child(0)->getDecl());
+            cout << "function";
         }
-        child(0)->codeGen();
+        else if (child(0)->oper()->syntax() == ATTRIBUTEREF) {
+            child(0)->codeGen();
+        }
+        else {
+            cout << "function";
+        }
         cout<< "(";
         for (unsigned int i = 1; i < arity(); i++) {
+
             child(i)->codeGen();
             if (i < arity()-1)
             {
@@ -303,8 +310,8 @@ protected:
     NODE_CONSTRUCTORS (Binop_AST, Callable);
 
     void codeGen() {
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-        child(0)->codeGen();
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->";
+        cout << "function";
         cout << "(";
         child(1)->codeGen();
         cout << ", ";
@@ -352,8 +359,7 @@ protected:
     void codeGen() {
         cout << "(";
         // if (child(1)->oper()->syntax() == LEFT_COMPARE){
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-        child(0)->codeGen();
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->function";
         cout << "(";
         child(1)->codeGen();
         cout << ", ";
@@ -457,9 +463,8 @@ class Unop_AST : public Callable {
     NODE_CONSTRUCTORS (Unop_AST, Callable);
 
     void codeGen() {
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-        child(0)->codeGen();
-        cout << "(";
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->";
+        cout << "function(";
         child(1)->codeGen();
         cout << ")";
     }
@@ -481,8 +486,7 @@ protected:
         stringstream ss;
         ss << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex();
         cout << "(" << AST::convertAsPyType(getType()) << ") ";
-        cout << ss.str() << ".";
-        child(0)->codeGen();
+        cout << ss.str() << "->function";
         cout << "(";
         child(1)->codeGen();
         cout << ", ";
@@ -514,8 +518,7 @@ protected:
     NODE_CONSTRUCTORS (Slicing_AST, Callable);
 
     void codeGen() {
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-        child(0)->codeGen();
+        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->function";
         cout << "(";
         child(1)->codeGen();
         cout << ", ";

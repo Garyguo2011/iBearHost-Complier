@@ -66,6 +66,13 @@ public:
     virtual PyTuple2* asTuple2 ();
     virtual PyTuple3* asTuple3 ();
     virtual PyPair* asPair ();
+
+    /** Function base cases */
+    virtual PyValue function(PyValue p1);
+    virtual PyValue function(PyValue p1, PyValue p2);
+    virtual PyValue function(PyValue p1, PyValue p2, PyValue p3);
+    virtual PyValue function(PyValue p1, PyValue p2, PyValue p3, PyValue p4);
+    virtual PyValue function(PyValue p1, PyValue p2, PyValue p3, PyValue p4, PyValue p5);
 }; 
 
 /** Represents the None value. There will only be one None object

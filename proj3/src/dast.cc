@@ -13,7 +13,6 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
-string current_function = "";
 
 /* Definitions of methods in base class AST. */
 
@@ -312,7 +311,7 @@ bool user_defined(AST_Ptr cls)
 
 void printFrame(Decl* frame) {
     if (frame->getName().compare("__main__") != 0) {
-        cout << frame->getName() << "_" << frame->getIndex() << ".";
+        cout << frame->getName() << "_" << frame->getIndex() << "->";
     }
 }
 
