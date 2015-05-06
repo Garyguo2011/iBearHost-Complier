@@ -440,11 +440,17 @@ Class::Method Formals {                                                      \
 /** Current function body that we're in */
 extern string current_function;
 
+/** Return type of current function */
+extern string return_type; 
+
 /** Check whether a class is user defined or not*/
 extern bool user_defined(AST_Ptr cls); 
 
 /** Print all nested frames for environment of a function call */
 extern void printFrame(Decl* frame);
+
+/** Check whether a string is already used as an id */
+extern bool add_to_names_func_peek(string temp);
 
 /** Create an "id" node for the identifier TEXT, giving LOC as its
  *  location. TEXT must be a permanent string (that is, it must not

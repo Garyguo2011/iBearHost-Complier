@@ -25,6 +25,9 @@ string func_name;
 int has_returned;
 int has_else;
 
+/** Keep track of name of current function and name of return type when inside function body*/
+string current_function = "";
+string return_type = "";
 
 /** Bookkeeping for names*/
 /** If name is new add to names, same with local*/
@@ -54,6 +57,13 @@ bool add_to_names_peek(string temp) {
 
 bool add_to_names_local_peek(string temp) {
     if (find(names_local.begin(), names_local.end(), temp) == names_local.end()) {
+        return true;
+    }
+    return false;
+}
+
+bool add_to_names_func_peek(string temp) {
+    if (find(names_func.begin(), names_func.end(), temp) == names_func.end()) {
         return true;
     }
     return false;
@@ -158,12 +168,12 @@ protected:
 
         /** Mark that we are in the current function*/
         ss0 >> current_function;
-
-        cout << "struct " << ss0.str() << "_local ";
+        string struct_name = ss0.str() + "_local ";
+        cout << "struct " << struct_name;
         cout << " : public PyObject {" << endl;
-        cout << convertAsPyType((Type_Ptr) child(2));
-        cout << " ";
-        getId()->codeGen();
+        return_type = convertAsPyType((Type_Ptr) child(2));
+        cout << return_type;
+        cout << " function ";
         cout << "(";
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
@@ -180,7 +190,7 @@ protected:
                 std::string type = s.substr(0, index);
                 std::string name = s.substr(index+1, s.size());
                 std::string origin_type = AST::convertBackFromPyType(type);
-                cout << name << " = " << name << "_param;" << endl;
+                cout << name << " = " << "(" << type << ")" << name << "_param;" << endl;
             } end_for;
         }
 
@@ -241,12 +251,16 @@ protected:
             }
         }
         cout << "}" << endl;
-        cout << "} ";
-        cout << getId()->as_string() << "_" << getId()->getDecl()->getIndex() << ";" << endl;
-        cout << "\n";
+        cout << "};" << endl;
+        stringstream struct_inst_name_stream;
+        struct_inst_name_stream << getId()->as_string() << "_" << getId()->getDecl()->getIndex();
+        string struct_inst_name = struct_inst_name_stream.str();
+        cout << endl;
+        cout << struct_name << "* " << struct_inst_name << " = new " << struct_name << "();" << endl;
         names_params.clear();
         nested = 0;
         current_function = "";
+        return_type = "";
     }
 
     // void codeGenInternalFunc() {
@@ -298,7 +312,7 @@ protected:
                 std::string origin_type = AST::convertBackFromPyType(type);
 
                 if (((std::string) c->getId()->as_string().c_str()).compare("self") != 0) {
-                    cout << name << " = " << name << "_param;" << endl;
+                    cout << name << " = (" << type << ")" << name << "_param;" << endl;
                 }
 
             } end_for;
@@ -352,7 +366,7 @@ protected:
                 std::string origin_type = AST::convertBackFromPyType(type);
 
                 if (((std::string) c->getId()->as_string().c_str()).compare("self") != 0) {
-                    cout << name << " = " << name << "_param;" << endl;
+                    cout << name << " = (" << type << ")" << name << "_param;" << endl;
                 }
                 
             } end_for;
@@ -401,7 +415,8 @@ protected:
             }
 
             if (((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
-                cout << convertAsPyType(child(i)->getType()) << " ";
+                //cout << convertAsPyType(child(i)->getType()) << " ";
+                cout << "PyValue ";
                 cout << temp << "_param";
             } else {
                 child(i)->codeGen();
@@ -537,8 +552,7 @@ protected:
         for (int i0 = 0; i0 <= depth; i0++) {
             if (getAst(1, i0)->child(0)->oper()->syntax() == SUBSCRIPT_ASSIGN){
                 getAst(1, i0)->child(0)->child(0)->codeGen();
-                cout << "_" << getAst(1, i0)->child(0)->child(0)->getDecl()->getIndex() << ".";
-                getAst(1, i0)->child(0)->child(0)->codeGen();
+                cout << "_" << getAst(1, i0)->child(0)->child(0)->getDecl()->getIndex() << "->function";
                 cout << "(";
                 getAst(1, i0)->child(0)->child(1)->codeGen();
                 cout << ",";
@@ -549,8 +563,7 @@ protected:
             } else if (getAst(1, i0)->child(0)->oper()->syntax() == SLICE_ASSIGN) {
                 // def __setslice__(S::list of $a, a::int, b::int, val::list of $a)::list of $a:
                 getAst(1, i0)->child(0)->child(0)->codeGen();
-                cout << "_" << getAst(1, i0)->child(0)->child(0)->getDecl()->getIndex() << ".";
-                getAst(1, i0)->child(0)->child(0)->codeGen();     //__setslice__
+                cout << "_" << getAst(1, i0)->child(0)->child(0)->getDecl()->getIndex() << "->function";
                 cout << "(";
                 getAst(1, i0)->child(0)->child(1)->codeGen();     // S::list of $a
                 cout << ",";
@@ -571,6 +584,13 @@ protected:
                 if (add_to_names(temp) && add_to_names_local(temp)) {
                     cout << convertAsPyType(getAst(1, i0)->child(0)->getType()) << " ";
                 }
+                
+                // /** Prefix by * if assigning a function */
+                // Decl* decl = getAst(1, i0)->child(0)->child(0)->getDecl();
+                // if (decl->getType() != NULL && decl->getType()->isFunctionType()) {
+                //     cout << "*";
+                // }
+
                 getAst(1, i0)->child(0)->child(0)->codeGen();
                 cout << " = ";
                 getAst(1, depth)->child(1)->codeGen();
@@ -591,6 +611,11 @@ protected:
                         if (add_to_names(temp) && add_to_names_local(temp)) {
                             cout << convertAsPyType(getType()) << " ";
                         }
+                        // /** Prefix by * if assigning a function */
+                        // Decl* decl = getAst(1, i0)->child(0)->getDecl();
+                        // if (decl->getType() != NULL && decl->getType()->isFunctionType()) {
+                        //     cout << "*";
+                        // }
                         getAst(1, i0)->child(0)->codeGen();
                         cout << " = ";
                         getAst(1, depth)->child(1)->codeGen();
@@ -608,6 +633,11 @@ protected:
                             if (add_to_names(temp) && add_to_names_local(temp)) {
                                 cout << convertAsPyType((Type_Ptr) getAst(1, i0)->getType()->child(i)) << " ";
                             }
+                            // /** Prefix by * if assigning a function */
+                            // Decl* decl = getAst(1, i0)->child(0)->child(i-1)->child(0)->getDecl();
+                            // if (decl->getType() != NULL && decl->getType()->isFunctionType()) {
+                            //     cout << "*";
+                            // }
                             getAst(1, i0)->child(0)->child(i-1)->child(0)->codeGen();
                             cout << " = ";
                             if (getAst(1, depth)->child(1)->arity() == 0) {
@@ -630,6 +660,11 @@ protected:
                                 if (add_to_names(temp) && add_to_names_local(temp)) {
                                     cout << convertAsPyType((Type_Ptr) getAst(1, i0)->getType()->child(i)) << " ";
                                 }
+                                // /** Prefix by * if assigning a function */
+                                // Decl* decl = getAst(1, i0)->child(0)->child(i-1)->getDecl();
+                                // if (decl->getType() != NULL && decl->getType()->isFunctionType()) {
+                                //     cout << "*";
+                                // }
 
                                 getAst(1, i0)->child(0)->child(i-1)->codeGen();
                                 cout << " = ";
@@ -903,23 +938,16 @@ protected:
 
     void codeGen() {
         cout << "return ";
+        if (!return_type.empty()) {
+            cout << "(" << return_type << ")";
+        }
         for (unsigned int i = 0; i < arity(); i++) {
             if (child(i)->oper()->syntax() == ID) {
                 stringstream ss;
                 ss << child(i)->as_string() << "_" << child(i)->getDecl()->getIndex();
                 string temp;
                 ss >> temp;
-                if (find(names_func.begin(), names_func.end(), temp) != names_func.end()) {
-                    cout << "(";
-                    child(i)->codeGen();
-                    cout << ") ";
-                    child(i)->codeGen();
-                    cout << ".";
-                    child(i)->codeGen();
-                    // cout << "()";
-                } else {
-                    child(i)->codeGen();
-                }
+                child(i)->codeGen();
             } else {
                     child(i)->codeGen();
             }

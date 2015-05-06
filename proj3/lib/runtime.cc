@@ -24,7 +24,6 @@ static void fatal(const char* msg)
 }
 
 /***** Methods and Constructors *****/
-
 void
 PyObject::print(ostream& os)
 {
@@ -55,6 +54,36 @@ PyValue
 PyObject::get(int index)
 {
     return PyNone;
+}
+
+PyValue
+PyObject::function(PyValue p1)
+{
+    return NULL;
+}
+
+PyValue
+PyObject::function(PyValue p1, PyValue p2)
+{
+    return NULL;
+}
+
+PyValue
+PyObject::function(PyValue p1, PyValue p2, PyValue p3)
+{
+    return NULL;
+}
+
+PyValue
+PyObject::function(PyValue p1, PyValue p2, PyValue p3, PyValue p4)
+{
+    return NULL;
+}
+
+PyValue
+PyObject::function(PyValue p1, PyValue p2, PyValue p3, PyValue p4, PyValue p5)
+{
+    return NULL;
 }
 
 string
