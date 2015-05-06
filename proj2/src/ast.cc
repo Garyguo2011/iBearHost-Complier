@@ -173,8 +173,9 @@ AST::collectDecls (Decl* enclosing)
 }
 
 void
-AST::collectTypeVarDecls (Decl*)
+AST::collectTypeVarDecls (Decl* enclosing)
 {
+    PASSDOWN (this, collectTypeVarDecls (enclosing), 0);
 }
 
 void
