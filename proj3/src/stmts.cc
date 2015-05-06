@@ -618,7 +618,11 @@ protected:
                         // }
                         getAst(1, i0)->child(0)->codeGen();
                         cout << " = ";
-                        getAst(1, depth)->child(1)->codeGen();
+                        if (getAst(1, depth)->child(1)->oper()->syntax() == NONE) {
+                            cout << "NULL";
+                        } else {
+                            getAst(1, depth)->child(1)->codeGen();
+                        }
                         cout << ";\n";
                     } else {
                         fatal("This ID can't be assigned.");
@@ -644,6 +648,8 @@ protected:
                                 cout << "(" << convertAsPyType((Type_Ptr) getAst(1, i0)->getType()->child(1)) << ") ";
                                 getAst(1, depth)->child(1)->codeGen();
                                 cout << "->get(" << i-1 << ")";
+                            } else if (getAst(1, depth)->child(1)->child(i-1)->oper()->syntax() == NONE) {
+                                cout << "NULL";
                             } else {
                                 getAst(1, depth)->child(1)->child(i-1)->codeGen();
                             }
@@ -672,6 +678,8 @@ protected:
                                     cout << "(" << convertAsPyType((Type_Ptr) getAst(1, i0)->getType()->child(1)) << ") ";
                                     getAst(1, depth)->child(1)->codeGen();
                                     cout << "->get(" << i-1 << ")";
+                                } else if (getAst(1, depth)->child(1)->child(i-1)->oper()->syntax() == NONE) {
+                                    cout << "NULL";
                                 } else {
                                     getAst(1, depth)->child(1)->child(i-1)->codeGen();
                                 }
