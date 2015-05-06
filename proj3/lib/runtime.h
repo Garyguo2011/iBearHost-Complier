@@ -584,4 +584,82 @@ __eq__left__ (PyInt* val0, PyInt* val1)
     return new PyInt(88888);
 }
 
+static inline PyStr*
+__le__left__ (PyStr* val0, PyStr* val1)
+{
+    if (val0->asStr()->getValue() == "88888"){
+        return new PyStr("88888");
+    }
+    int v0 = __eval_bool__(__le__str__(val0, val1));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyStr("88888");
+}
+
+static inline PyStr*
+__gt__left__ (PyStr* val0, PyStr* val1)
+{
+    if (val0->asStr()->getValue() == "88888"){
+        return new PyStr("88888");
+    }
+    int v0 = __eval_bool__(__gt__str__(val0, val1));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyStr("88888");
+}
+
+static inline PyStr*
+__ge__left__ (PyStr* val0, PyStr* val1)
+{
+    if (val0->asStr()->getValue() == "88888"){
+        return new PyStr("88888");
+    }
+    int v0 = __eval_bool__(__ge__str__(val0, val1));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyStr("88888");
+}
+
+static inline PyStr*
+__eq__left__ (PyStr* val0, PyStr* val1)
+{
+    if (val0->asStr()->getValue() == "88888"){
+        return new PyStr("88888");
+    }
+    int v0 = __eval_bool__(__eq__str__(val0, val1));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyStr("88888");
+}
+
+static inline PyStr*
+__ne__left__ (PyStr* val0, PyStr* val1)
+{
+    if (val0->asStr()->getValue() == "88888"){
+        return new PyStr("88888");
+    }
+    int v0 = __eval_bool__(__ne__str__(val0, val1));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyStr("88888");
+}
+
+static inline PyStr*
+__lt__left__ (PyStr* val0, PyStr* val1)
+{
+    if (val0->asStr()->getValue() == "88888"){
+        return new PyStr("88888");
+    }
+    int v0 = __eval_bool__(__lt__str__(val0, val1));
+    if (v0 == 1) {
+        return val1;
+    }
+    return new PyStr("88888");
+}
+
 #endif
