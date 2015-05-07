@@ -30,6 +30,7 @@ protected:
     // FIXME: Dummy implementation.
     void codeGen () {
         cout << "#include \"runtime.h\"" << endl;
+        cout << "#include <math.h>" << endl;
 
         cout << "int count_loop; //For keep tracking else stmt belongs to loop." << endl;
 

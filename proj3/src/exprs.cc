@@ -310,13 +310,57 @@ protected:
     NODE_CONSTRUCTORS (Binop_AST, Callable);
 
     void codeGen() {
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->";
-        cout << "function";
-        cout << "(";
-        child(1)->codeGen();
-        cout << ", ";
-        child(2)->codeGen();
-        cout << ")";
+        if (child(1)->oper()->syntax() == INT_LITERAL && child(1)->oper()->syntax() == INT_LITERAL) {
+            stringstream ss;
+            ss << child(0)->as_string();
+            string temp = ss.str();
+            temp.erase(0, 2);
+            temp.erase(temp.size()-2, 2);
+            if (temp.compare("pow") == 0) {
+                cout << "(";
+                cout << temp << "(";
+                cout << "(";
+                child(1)->codeGen();
+                cout << " - 1) / 2";
+                cout << ", ";
+                cout << "(";
+                child(2)->codeGen();
+                cout << " - 1) / 2";
+                cout << ") * 2 + 1)";
+            } else {
+                cout << "(";
+                cout << "(";
+                child(1)->codeGen();
+                cout << " - 1) / 2";
+                if (temp.compare("add") == 0) {
+                    cout << " + ";
+                }
+                if (temp.compare("sub") == 0) {
+                    cout << " - ";
+                }
+                if (temp.compare("mul") == 0) {
+                    cout << " * ";
+                }
+                if (temp.compare("floordiv") == 0) {
+                    cout << " / ";
+                }
+                if (temp.compare("mod") == 0) {
+                    cout << " % ";
+                }
+                cout << "(";
+                child(2)->codeGen();
+                cout << " - 1) / 2";
+                cout << ") * 2 + 1";
+            }
+        } else {
+            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->";
+            cout << "function";
+            cout << "(";
+            child(1)->codeGen();
+            cout << ", ";
+            child(2)->codeGen();
+            cout << ")";
+        }
     }
 };    
 
@@ -357,24 +401,53 @@ protected:
     //     cout << ")";
     // }
     void codeGen() {
-        cout << "(";
-        // if (child(1)->oper()->syntax() == LEFT_COMPARE){
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->function";
-        cout << "(";
-        child(1)->codeGen();
-        cout << ", ";
-        child(2)->codeGen();
-        cout << ")";
-        // } else {
-        //     cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-        //     child(0)->codeGen();
-        //     cout << "(";
-        //     child(1)->codeGen();
-        //     cout << ", ";
-        //     child(2)->codeGen();
-        //     cout << ")";
-        // }
-        cout << ")";
+        if (child(1)->oper()->syntax() == INT_LITERAL && child(1)->oper()->syntax() == INT_LITERAL) {
+            stringstream ss;
+            ss << child(0)->as_string();
+            string temp = ss.str();
+            temp.erase(0, 2);
+            temp.erase(temp.size()-2, 2);
+
+            child(1)->codeGen();
+            if (temp.compare("gt") == 0) {
+                cout << " > ";
+            }
+            if (temp.compare("lt") == 0) {
+                cout << " < ";
+            }
+            if (temp.compare("le") == 0) {
+                cout << " <= ";
+            }
+            if (temp.compare("ge") == 0) {
+                cout << " >= ";
+            }
+            if (temp.compare("eq") == 0) {
+                cout << " == ";
+            }
+            if (temp.compare("ne") == 0) {
+                cout << " != ";
+            }
+            child(2)->codeGen();
+        } else {
+            cout << "(";
+            // if (child(1)->oper()->syntax() == LEFT_COMPARE){
+            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->function";
+            cout << "(";
+            child(1)->codeGen();
+            cout << ", ";
+            child(2)->codeGen();
+            cout << ")";
+            // } else {
+            //     cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
+            //     child(0)->codeGen();
+            //     cout << "(";
+            //     child(1)->codeGen();
+            //     cout << ", ";
+            //     child(2)->codeGen();
+            //     cout << ")";
+            // }
+            cout << ")";
+        }
     }
 
 };
@@ -463,10 +536,33 @@ class Unop_AST : public Callable {
     NODE_CONSTRUCTORS (Unop_AST, Callable);
 
     void codeGen() {
-        cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->";
-        cout << "function(";
-        child(1)->codeGen();
-        cout << ")";
+        if (child(1)->oper()->syntax() == INT_LITERAL && child(1)->oper()->syntax() == INT_LITERAL) {
+            stringstream ss;
+            ss << child(0)->as_string();
+            string temp = ss.str();
+            temp.erase(0, 2);
+            temp.erase(temp.size()-2, 2);
+
+            if (temp.compare("pos") == 0) {
+                cout << " + ";
+            } else if (temp.compare("neg") == 0) {
+                cout << " - ";
+            } else if (temp.compare("not") == 0) {
+                cout << " ! ";
+            } else {
+                cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->";
+                cout << "function(";
+            }
+            child(1)->codeGen();
+            if (temp.compare("pos") && temp.compare("neg") && temp.compare("not")) {
+                cout << ")";
+            }
+        } else {
+            cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->";
+            cout << "function(";
+            child(1)->codeGen();
+            cout << ")";
+        }
     }
 
 };    
