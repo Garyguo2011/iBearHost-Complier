@@ -340,10 +340,11 @@ protected:
     NODE_CONSTRUCTORS_INIT (For_AST, AST_Tree, sequence (NULL));
 
     void resolveTypes (Decl* context, Unifier& subst, Resolver& resolver) {
-        AST_Tree::resolveTypes (context, subst, resolver);
         sequence->resolveTypes (context, subst, resolver);
         Type_Ptr seqType = sequence->getType ()->binding ()->paramType (0);
         Type_Ptr eltType = sequence->getType ()->binding ()->returnType ();
+        child (0)->resolveTypes (context, subst, resolver, eltType);
+        PASSDOWN (this, resolveTypes (context, subst, resolver), 1);
 
         if (!unify (eltType, child (0)->getType (), subst)
             || !unify (seqType, child (1)->getType (), subst)) {
