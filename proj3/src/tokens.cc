@@ -83,9 +83,11 @@ protected:
     void codeGen ()
     {
         const int temp = this->intValue();
-        cout << "__cons_int__ ("
-             << temp
+        // cout << "__cons_int__ ("
+        cout << "("
+             << temp << "* 2 + 1"
              << ")";
+
     }
 
 };

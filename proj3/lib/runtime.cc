@@ -1345,7 +1345,17 @@ __print__ (int count, ...)
     for (int i = 0; i < count; i ++) {
         PyValue temp = va_arg(args, PyValue);
         __printspace__();
-        temp->print(cout);
+        stringstream ss;
+        ss << temp;
+        int temp1;
+        ss >> std::hex >> temp1;
+        if (temp1 % 2 == 1){
+            // cout << "here \n";
+            int temp2 = (temp1 - 1) / 2;
+            cout << temp2;
+        } else {
+            temp->print(cout);
+        }
         atStart = false;
     }
     va_end(args);
