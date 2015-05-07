@@ -1350,7 +1350,7 @@ __print__ (int count, ...)
         int temp1;
         ss >> std::hex >> temp1;
         if (temp1 % 2 == 1){
-            // cout << "here \n";
+            cout << "here with value temp1 " << temp1 << "\n";
             int temp2 = (temp1 - 1) / 2;
             cout << temp2;
         } else {

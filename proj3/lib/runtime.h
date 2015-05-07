@@ -15,6 +15,7 @@
 #include <string>
 #include <cstdlib>
 #include <cstdio>
+#include <math.h>
 
 using namespace std;
 
@@ -660,6 +661,20 @@ __lt__left__ (PyStr* val0, PyStr* val1)
         return val1;
     }
     return new PyStr("88888");
+}
+
+static inline PyValue
+__pow__(PyValue val0, PyValue val1)
+{
+    stringstream ss;
+    ss << val0;
+    int temp1;
+    ss >> std::hex >> temp1;
+    stringstream ss1;
+    ss1 << val1;
+    int temp2;
+    ss1 >> std::hex >> temp2;
+    return (PyValue) static_cast<int>(pow((float) temp1, (float)temp2));
 }
 
 #endif

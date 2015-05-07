@@ -318,20 +318,20 @@ protected:
             temp.erase(temp.size()-2, 2);
             if (temp.compare("pow") == 0) {
                 cout << "(";
-                cout << temp << "(";
+                cout << "__" << temp << "__" << "(";
                 cout << "(";
                 child(1)->codeGen();
                 cout << " - 1) / 2";
                 cout << ", ";
                 cout << "(";
                 child(2)->codeGen();
-                cout << " - 1) / 2";
-                cout << ") * 2 + 1)";
+                cout << " - 1) / 2)";
+                cout << "* 2 + 1)";
             } else {
                 cout << "(";
-                cout << "(";
+                cout << "((";
                 child(1)->codeGen();
-                cout << " - 1) / 2";
+                cout << " - 1) / 2)";
                 if (temp.compare("add") == 0) {
                     cout << " + ";
                 }
@@ -347,9 +347,9 @@ protected:
                 if (temp.compare("mod") == 0) {
                     cout << " % ";
                 }
-                cout << "(";
+                cout << "((";
                 child(2)->codeGen();
-                cout << " - 1) / 2";
+                cout << " - 1) / 2)";
                 cout << ") * 2 + 1";
             }
         } else {
