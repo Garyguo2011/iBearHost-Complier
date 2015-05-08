@@ -772,14 +772,12 @@ PyTuple3::toStr()
 PyInt*
 __add__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->asInt()->getValue() + v1->asInt()->getValue());
 }
 
 PyBool*
 __eq__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asInt()->getValue() == 88888){
         return new PyBool(0);
     }
@@ -789,14 +787,12 @@ __eq__int__ (PyInt* v0, PyInt* v1)
 PyInt*
 __floordiv__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->asInt()->getValue() / v1->asInt()->getValue());
 }
 
 PyBool*
 __ge__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asInt()->getValue() == 88888){
         return new PyBool(0);
     }
@@ -806,7 +802,6 @@ __ge__int__ (PyInt* v0, PyInt* v1)
 PyBool*
 __gt__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asInt()->getValue() == 88888){
         return new PyBool(0);
     }
@@ -834,21 +829,18 @@ __lt__int__ (PyInt* v0, PyInt* v1)
 PyInt*
 __mod__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->asInt()->getValue() % v1->asInt()->getValue());
 }
 
 PyInt*
 __mul__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->asInt()->getValue() * v1->asInt()->getValue());
 }
 
 PyBool*
 __ne__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asInt()->getValue() == 88888){
         return new PyBool(0);
     }
@@ -858,7 +850,6 @@ __ne__int__ (PyInt* v0, PyInt* v1)
 PyInt*
 __neg__int__ (PyInt* v0)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(-1 * v0->asInt()->getValue()); 
 }
 
@@ -871,14 +862,12 @@ __pos__int__ (PyInt* v0)
 PyInt*
 __pow__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(pow(v0->asInt()->getValue(), v1->asInt()->getValue()));
 }
 
 PyInt*
 __sub__int__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->asInt()->getValue() - v1->asInt()->getValue());
 }
 
@@ -888,14 +877,12 @@ __sub__int__ (PyInt* v0, PyInt* v1)
 PyStr*
 __add__str__ (PyStr* v0, PyStr* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyStr (v0->asStr()->getValue() + v1->asStr()->getValue());
 }
 
 PyBool*
 __eq__str__ (PyStr* v0, PyStr* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asStr()->getValue() == "88888"){
         return new PyBool(0);
     }
@@ -905,7 +892,6 @@ __eq__str__ (PyStr* v0, PyStr* v1)
 PyBool*
 __ne__str__ (PyStr* v0, PyStr* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asStr()->getValue() == "88888"){
         return new PyBool(0);
     }
@@ -915,7 +901,6 @@ __ne__str__ (PyStr* v0, PyStr* v1)
 PyBool*
 __ge__str__ (PyStr* v0, PyStr* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asStr()->getValue() == "88888"){
         return new PyBool(0);
     }
@@ -925,7 +910,6 @@ __ge__str__ (PyStr* v0, PyStr* v1)
 PyStr*
 __getitem__str__ (PyStr* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     int temp = 0;
     if (v1->getValue() < 0) {
         temp = __len__str__(v0)->getValue() + v1->getValue();
@@ -946,9 +930,6 @@ __getitem__str__ (PyStr* v0, PyInt* v1)
 PyStr*
 __getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2)
 {
-    // return NULL;  // REPLACE WITH BODY
-    // char* s = v0->getValue().substr(v1->getValue(), v2->getValue());
-    // fprintf(stderr, "lala: %s\n", s);
     int temp1 = 0;
     int temp2 = 0;
     int size = __len__str__(v0)->getValue();
@@ -977,7 +958,6 @@ __getslice__str__ (PyStr* v0, PyInt* v1, PyInt* v2)
 PyBool*
 __gt__str__ (PyStr* v0, PyStr* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     if (v0->asStr()->getValue() == "88888"){
         return new PyBool(0);
     }
@@ -996,16 +976,12 @@ __le__str__ (PyStr* v0, PyStr* v1)
 PyInt*
 __len__str__ (PyStr* v0)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->asStr()->getValue().length());
 }
 
 PyStr*
 __lmul__str__ (PyStr* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
-    // v0 is str
-    // v1 is int
     string tmp = "";
     string input_str = v0->asStr()->getValue();
     int times = v1->asInt()->getValue();
@@ -1034,14 +1010,9 @@ __rmul__str__ (PyInt* v0, PyStr* v1)
 PyInt*
 __toint__str__ (PyStr* v0)
 {
-    // v0 is str
-    // return int
-    // return NULL;  // REPLACE WITH BODY
     std::stringstream sstr(v0->getValue());
     int val;
     sstr >> val;
-    // TO BE IMPLEMENTED: Should throw an error if it is not an "int string"
-    // e.g. "hello world" should throw a runtime error.
     return new PyInt(val);
 }
 
@@ -1049,7 +1020,6 @@ PyStr*
 __tostr__ (PyValue v0)
 {
     // v0 can be anytype
-    // return NULL;  // REPLACE WITH BODY
     return new PyStr(v0->toStr());
 }
 
@@ -1059,28 +1029,24 @@ __tostr__ (PyValue v0)
 PyBool*
 __contains__dict__ (PyValue v0, PyDict* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return v1->contains(v0);
 }
 
 PyValue
 __getitem__dict__ (PyDict* v0, PyValue v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return v0->get(v1);
 }
 
 PyInt*
 __len__dict__ (PyDict* v0)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->getSize());
 }
 
 PyValue
 __setitem__dict__ (PyDictInt* v0, PyInt* v1, PyValue v2)
 {
-    // return NULL;  // REPLACE WITH BODY
     v0->setItem(v1, v2);
     return v2;
 }
@@ -1102,7 +1068,6 @@ __setitem__dict__ (PyDictStr* v0, PyStr* v1, PyValue v2)
 PyBool*
 __notcontains__dict__ (PyValue v0, PyDict* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return v1->contains(v0)->notBool();
 
 }
@@ -1113,7 +1078,6 @@ __notcontains__dict__ (PyValue v0, PyDict* v1)
 PyValue
 __getitem__list__ (PyList* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     int temp = 0;
     if (v1->getValue() < 0) {
         temp = __len__list__(v0)->getValue() + v1->getValue();
@@ -1129,7 +1093,6 @@ __getitem__list__ (PyList* v0, PyInt* v1)
 PyList*
 __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
 {
-    // return NULL;  // REPLACE WITH BODY
     int temp1 = 0;
     int temp2 = 0;
     int size = __len__list__(v0)->getValue();
@@ -1162,14 +1125,12 @@ __getslice__list__ (PyList* v0, PyInt* v1, PyInt* v2)
 PyInt*
 __len__list__ (PyList* v0)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->getSize());
 }
 
 PyValue
 __setitem__list__ (PyList* v0, PyInt* v1, PyValue v2)
 {
-    // return NULL;  // REPLACE WITH BODY
     v0->asList()->setItem(v1, v2);
     return v2;
 }
@@ -1187,14 +1148,12 @@ __setslice__list__ (PyList* v0, PyInt* v1, PyInt* v2, PyList* v3)
 PyInt*
 __len__range__ (PyRange* v0)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyInt(v0->getSize());
 }
 
 PyRange*
 __xrange__ (PyInt* v0, PyInt* v1)
 {
-    // return NULL;  // REPLACE WITH BODY
     return new PyRange(v0, v1);
 }
  
@@ -1296,14 +1255,12 @@ static PyList* commandLine;
 PyList*
 __argv__ ()
 {
-    // return NULL;  // REPLACE WITH BODY
     return commandLine;
 }
 
 PyStr*
 __read__ ()
 {
-    // return NULL;  // REPLACE WITH BODY
     string input_line;
     while (cin) {
         getline(cin, input_line);
@@ -1314,7 +1271,6 @@ __read__ ()
 PyStr*
 __readline__ ()
 {
-    // return NULL;  // REPLACE WITH BODY
     string s;
     cin >> s;
     s += "\\n";
@@ -1335,11 +1291,6 @@ void __printspace__()
 void
 __print__ (int count, ...)
 {
-    // if (!atStart) 
-	   // cout << " ";
-    // if (count == 0) {
-    //     cout << "";
-    // }
     va_list args;
     va_start(args, count);
     for (int i = 0; i < count; i ++) {
