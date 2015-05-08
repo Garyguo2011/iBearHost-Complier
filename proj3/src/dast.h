@@ -443,6 +443,9 @@ extern string current_function;
 /** Return type of current function */
 extern string return_type; 
 
+/** Whether we are inside a function call */
+extern bool function_call;
+
 /** Check whether a class is user defined or not*/
 extern bool user_defined(AST_Ptr cls); 
 
@@ -451,6 +454,9 @@ extern void printFrame(Decl* frame);
 
 /** Check whether a string is already used as an id */
 extern bool add_to_names_func_peek(string temp);
+
+/** Keep track of parameters inside a function def */
+extern vector<string> names_params;
 
 /** Create an "id" node for the identifier TEXT, giving LOC as its
  *  location. TEXT must be a permanent string (that is, it must not
