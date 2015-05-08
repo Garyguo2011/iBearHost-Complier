@@ -17,7 +17,11 @@ static GCINIT _gcdummy;
 vector<string> names; 
 /** All local ids used so far */
 vector<string> names_local;
+
+/** All function names used so far */
 vector<string> names_func;
+
+/** All param names used so far in a function def */
 vector<string> names_params;
 int nested;
 string func_name;
@@ -178,17 +182,22 @@ protected:
         child(1)->codeGen();
         cout << ")" << endl <<  "{" << endl;
 
+        /** Save the params of the container function if there is one */
+        vector<string> container_params = names_params;
+        /** Start names_params afresh */
+        names_params.clear();
+
         if (child(1)->arity() != 0) {
             for_each_child(c, child(1)) {
                 stringstream ss_params;
                 ss_params << convertAsPyType(c->getType()) << " " << c->getId()->as_string() << "_" << c->getDecl()->getIndex();
                 // cerr << convertAsPyType(c->getType()) << endl;
-                names_params.push_back(ss_params.str());
 
                 std::string s = ss_params.str();
                 int index = s.find(" ");
                 std::string type = s.substr(0, index);
                 std::string name = s.substr(index+1, s.size());
+                names_params.push_back(name);
                 std::string origin_type = AST::convertBackFromPyType(type);
                 cout << name << " = " << "(" << type << ")" << name << "_param;" << endl;
             } end_for;
@@ -257,20 +266,11 @@ protected:
         string struct_inst_name = struct_inst_name_stream.str();
         cout << endl;
         cout << struct_name << "* " << struct_inst_name << " = new " << struct_name << "();" << endl;
-        names_params.clear();
+        names_params = container_params;
         nested = 0;
         current_function = "";
         return_type = "";
     }
-
-    // void codeGenInternalFunc() {
-    //     cout << "struct " << getId()->as_string() << getId()->getDecl()->getIndex() << "_local ";
-    //     cout << "{" << endl;
-    //     codeGen();
-    //     cout << "} ";
-    //     cout<< getId()->as_string() << "_" << getId()->getDecl()->getIndex() << ";" << endl;
-
-    // }
 };
 
 NODE_FACTORY (Def_AST, DEF);
@@ -302,14 +302,14 @@ protected:
             for_each_child(c, child(1)) {
                 stringstream ss_params;
                 ss_params << convertAsPyType(c->getType()) << " " << c->getId()->as_string() << "_" << c->getDecl()->getIndex();
-                // cerr << convertAsPyType(c->getType()) << endl;
-                names_params.push_back(ss_params.str());
 
                 std::string s = ss_params.str();
                 int index = s.find(" ");
                 std::string type = s.substr(0, index);
                 std::string name = s.substr(index+1, s.size());
                 std::string origin_type = AST::convertBackFromPyType(type);
+
+                names_params.push_back(name);
 
                 if (((std::string) c->getId()->as_string().c_str()).compare("self") != 0) {
                     cout << name << " = (" << type << ")" << name << "_param;" << endl;
@@ -341,6 +341,7 @@ protected:
             }
         }
         cout << "}" << endl;
+        names_params.clear();
     }
 
 
@@ -356,15 +357,13 @@ protected:
             for_each_child(c, child(1)) {
                 stringstream ss_params;
                 ss_params << convertAsPyType(c->getType()) << " " << c->getId()->as_string() << "_" << c->getDecl()->getIndex();
-                // cerr << convertAsPyType(c->getType()) << endl;
-                names_params.push_back(ss_params.str());
 
                 std::string s = ss_params.str();
                 int index = s.find(" ");
                 std::string type = s.substr(0, index);
                 std::string name = s.substr(index+1, s.size());
                 std::string origin_type = AST::convertBackFromPyType(type);
-
+                names_params.push_back(name);
                 if (((std::string) c->getId()->as_string().c_str()).compare("self") != 0) {
                     cout << name << " = (" << type << ")" << name << "_param;" << endl;
                 }
@@ -383,7 +382,7 @@ protected:
             child(i)->codeGen();
         }
         cout << "}" << endl;
-
+        names_params.clear();
     }
 
 };
@@ -405,17 +404,11 @@ protected:
             ss << child(i)->child(0)->as_string() << "_" << child(i)->child(0)->getDecl()->getIndex();
             string temp;
             ss >> temp;
-            // if (find(names.begin(), names.end(), temp) == names.end()) {
-            //     names.push_back (temp);
-            //     // cout << convertAsPyType(child(i)->getType()) << " ";
-            // } 
             if (find(names_local.begin(), names_local.end(), temp) == names_local.end()) {
                 names_local.push_back (temp);
-                // cout << convertAsPyType(child(i)->getType()) << " ";
             }
 
             if (((std::string) child(i)->getId()->as_string().c_str()).compare("self") != 0) {
-                //cout << convertAsPyType(child(i)->getType()) << " ";
                 cout << "PyValue ";
                 cout << temp << "_param";
             } else {
