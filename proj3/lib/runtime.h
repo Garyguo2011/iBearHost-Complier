@@ -68,6 +68,7 @@ public:
     virtual PyPair* asPair ();
 
     /** Function base cases */
+    virtual PyValue function();
     virtual PyValue function(PyValue p1);
     virtual PyValue function(PyValue p1, PyValue p2);
     virtual PyValue function(PyValue p1, PyValue p2, PyValue p3);
