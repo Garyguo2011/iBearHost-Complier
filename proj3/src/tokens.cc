@@ -123,12 +123,19 @@ protected:
     }
 
     void codeGen() {
+        stringstream ss;
         const char* temp = as_string().c_str();
-        cout << temp;
+        ss << temp;
         if (temp[0] != '_') {
-            cout << "_" << getDecl()->getIndex();
+            ss << "_" << getDecl()->getIndex();
         }
-        cout << "";
+        string output;
+        ss >> output;
+        cout << output;
+        if (function_call && 
+            find(names_params.begin(), names_params.end(), output) != names_params.end()) {
+            cout << "_param";
+        }
     }
 
 public:

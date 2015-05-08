@@ -13,6 +13,8 @@ using namespace std;
 
 static GCINIT _gcdummy;
 
+bool function_call = false;
+
 /*****   Typed_Tree   *****/
 
 Type_Ptr
@@ -81,7 +83,6 @@ protected:
         cout << "__cons_bool__ ("
              << 1
              << ")";
-        // cout << true;
     }
 
 };
@@ -104,7 +105,6 @@ protected:
         cout << "__cons_bool__ ("
              << 0
              << ")";
-        // cout << false;
     }
 
 };
@@ -147,82 +147,6 @@ public:
 
 };
 
-
-// /** A function call. */
-// class Call_AST : public Callable {
-// protected:
-
-//     NODE_CONSTRUCTORS (Call_AST, Callable);
-
-//     void codeGen() {
-//         std::string call_name = child(0)->as_string().c_str();
-//         if (child(0)->oper()->syntax() != ATTRIBUTEREF) {
-//             cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-//         }
-//         child(0)->codeGen();
-//         cout<< "(";
-//         for (unsigned int i = 1; i < arity(); i++) {
-//             child(i)->codeGen();
-//             if (i < arity()-1)
-//             {
-//                 cout << ", ";   
-//             }
-//         }
-//         cout << ")";
-//     }
-
-//     void codeGenRecursiveCall(AST_Ptr func_id) {
-//         std::string func_name0 = func_id->as_string().c_str();
-//         std::string call_name = child(0)->as_string().c_str();
-//         if (func_name0.compare(call_name) != 0
-//             || child(0)->oper()->syntax() != ATTRIBUTEREF) {
-//             cout << child(0)->as_string() << "_" << child(0)->getDecl()->getIndex() << ".";
-//         }
-//         child(0)->codeGen();
-//         cout<< "(";
-//         for (unsigned int i = 1; i < arity(); i++) {
-//             child(i)->codeGenRecursiveCall(func_id);
-//             if (i < arity()-1)
-//             {
-//                 cout << ", ";   
-//             }
-//         }
-//         cout << ")";
-//     }
-
-// };
-
-// NODE_FACTORY (Call_AST, CALL);
-
-// /***** CALL1 *****/
-
-// /** __init__(new T, ...)      */
-// class Call1_AST : public Call_AST {
-// protected:
-
-//     NODE_CONSTRUCTORS (Call1_AST, Call_AST);
-
-//     void codeGen() {
-//         // getType()->print(cerr, 4);
-//         // cerr << ", type!\n";
-//         // child(1)->getType()->print(cerr, 3);
-//         // cerr << ", child 1 type!\n";
-//         cout << "new ";
-//         cout << (std::string)getType()->child(0)->as_string().c_str();
-//         cout << "(";
-//         for (unsigned int i = 2; i < arity(); i++) {
-//             child(i)->codeGen();
-//             if (i < arity()-1) {
-//                 cout << ", ";
-//             }
-//         }
-//         cout << ")";
-//     }
-
-// };
-
-// NODE_FACTORY (Call1_AST, CALL1);
-
 /** A function call. */
 class Call_AST : public Callable {
 protected:
@@ -248,6 +172,10 @@ protected:
         cout<< "(";
         for (unsigned int i = 1; i < arity(); i++) {
 
+            /** Mark that we are inside a function call
+             * so params being passed in must have _param appended
+             */
+            function_call = true;
             child(i)->codeGen();
             if (i < arity()-1)
             {
@@ -255,6 +183,8 @@ protected:
             }
         }
         cout << ")";
+
+        function_call = false;
     }
 
 };
@@ -270,10 +200,6 @@ protected:
     NODE_CONSTRUCTORS (Call1_AST, Call_AST);
 
     void codeGen() {
-        // getType()->print(cerr, 4);
-        // cerr << ", type!\n";
-        // child(1)->getType()->print(cerr, 3);
-        // cerr << ", child 1 type!\n";
         cout << "new ";
         cout << (std::string)getType()->child(0)->as_string().c_str();
         cout << "(";
@@ -330,50 +256,14 @@ protected:
 
     NODE_CONSTRUCTORS (Compare_AST, Binop_AST);
 
-    // void codeGen() {
-    //     cout << "(";
-    //     if (child(1)->oper()->syntax() == LEFT_COMPARE){
-    //         cout << "(PyBool*) __and__";
-    //         cout << "(";
-    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-    //         child(0)->codeGen();
-    //         cout << "(";
-    //         child(1)->child(2)->codeGen();
-    //         cout << ", ";
-    //         child(2)->codeGen();
-    //         cout << ")";
-    //         cout << ",";
-    //         child(1)->codeGen();
-    //         cout << ")";
-    //     } else {
-    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-    //         child(0)->codeGen();
-    //         cout << "(";
-    //         child(1)->codeGen();
-    //         cout << ", ";
-    //         child(2)->codeGen();
-    //         cout << ")";
-    //     }
-    //     cout << ")";
-    // }
     void codeGen() {
         cout << "(";
-        // if (child(1)->oper()->syntax() == LEFT_COMPARE){
         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << "->function";
         cout << "(";
         child(1)->codeGen();
         cout << ", ";
         child(2)->codeGen();
         cout << ")";
-        // } else {
-        //     cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-        //     child(0)->codeGen();
-        //     cout << "(";
-        //     child(1)->codeGen();
-        //     cout << ", ";
-        //     child(2)->codeGen();
-        //     cout << ")";
-        // }
         cout << ")";
     }
 
@@ -389,59 +279,8 @@ class LeftCompare_AST : public Binop_AST {
 protected:
 
     NODE_CONSTRUCTORS (LeftCompare_AST, Binop_AST);
-    // void codeGen() {
-    //     cout << "(";
-    //     if (child(1)->oper()->syntax() == LEFT_COMPARE){
-    //         cout << "(PyBool*) __and__";
-    //         cout << "(";
-    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-    //         child(0)->codeGen();
-    //         cout << "(";
-    //         child(1)->child(2)->codeGen();
-    //         cout << ", ";
-    //         child(2)->codeGen();
-    //         cout << ")";
-    //         cout << ",";
-    //         child(1)->codeGen();
-    //         cout << ")";
-    //     } else {
-    //         cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-    //         child(0)->codeGen();
-    //         cout << "(";
-    //         child(1)->codeGen();
-    //         cout << ", ";
-    //         child(2)->codeGen();
-    //         cout << ")";
-    //     }
-    //     cout << ")";
-    // }
     void codeGen() {
         cout << "(";
-        // if (child(1)->oper()->syntax() == LEFT_COMPARE){
-            // cout << "(PyBool*) __and__";
-            // cout << "(";
-            // cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-            // child(0)->codeGen();
-            // cout << "(";
-            // child(1)->child(2)->codeGen();
-            // cout << ", ";
-            // child(2)->codeGen();
-            // cout << ")";
-            // cout << ",";
-            // child(1)->codeGen();
-            // cout << ")";
-        // } else {
-            // cout << "__eval_bool__";
-            // cout << "(";
-            // cout << child(0)->as_string()<< "_" << child(0)->getDecl()->getIndex() << ".";
-            // child(0)->codeGen();
-            // cout << "(";
-            // child(1)->codeGen();
-            // cout << ", ";
-            // child(2)->codeGen();
-            // cout << "))";
-            // cout << " ? __cons_int__ (1) : __cons_int__ (0)";
-        // }
         child(0)->codeGen();
         cout << "left__";
         cout << "(";
@@ -663,9 +502,6 @@ protected:
     NODE_CONSTRUCTORS (DictDisplay_AST, Typed_Tree);
 
     void codeGen() {
-        // getType()->print(cerr, 4);
-        // cerr << "\n";
-        // cerr << getType()->arity() << ", size\n";
         const char* temp = getType()->child(1)->child(0)->as_string().c_str();
         cout << "__cons_dict";
         cout << temp;
@@ -731,7 +567,6 @@ protected:
             child(1)->codeGen();
         cout << " : ";
             child(2)->codeGen();
-        // cout << ";";
     }
 
 };              
@@ -834,8 +669,6 @@ protected:
     }
 
     void codeGen() {
-        // To be implemented. Right now assuming undefined type_var to be void at this time.
-        // const char* temp = getType()->child(0)->as_string().c_str();
         std::string name = getId()->as_string().c_str();
         if (name.compare("self") != 0) {
             cout << convertAsPyType(getType());
