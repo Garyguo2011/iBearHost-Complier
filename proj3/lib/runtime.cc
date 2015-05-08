@@ -33,9 +33,9 @@ PyObject::print(ostream& os)
 string
 PyObject::toStr()
 {
-    string str = "";
-    str.append("undefined toStr()"); 
-    return str;
+    stringstream ss;
+    ss << "<" << typeName () << "@" << (void*) this << ">";
+    return ss.str();
 }
 
 int
@@ -54,6 +54,12 @@ PyValue
 PyObject::get(int index)
 {
     return PyNone;
+}
+
+PyValue
+PyObject::function()
+{
+    return NULL;
 }
 
 PyValue
